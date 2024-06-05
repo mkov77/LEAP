@@ -24,6 +24,7 @@ export default function LandingPage() {
     },
   });
 
+  // Function to handle login based on role and selected section
   const handleLogin = (values: { password: string }) => {
     if (role === 'Admin' && values.password === 'admin') {
       navigate('/admin');
@@ -36,6 +37,7 @@ export default function LandingPage() {
     }
   };
 
+  // Function to render the sections table
   const renderSectionsTable = () => (
     <Box style={{ maxWidth: 600, margin: '0 auto' }}>
       <Table>
@@ -51,9 +53,14 @@ export default function LandingPage() {
               key={section.sectionID}
               onClick={() => {
                 if (section.isOnline) {
-                  setSelectedSection((prev) =>
-                    prev === section.sectionID ? null : section.sectionID
-                  );
+                  if (selectedSection === section.sectionID) {
+                    // If the clicked row is already selected, navigate accordingly
+                    handleLogin(form.values);
+                  } else {
+                    setSelectedSection((prev) =>
+                      prev === section.sectionID ? null : section.sectionID
+                    );
+                  }
                 }
               }}
               style={{
@@ -122,15 +129,15 @@ export default function LandingPage() {
         {(role === 'Student' || role === 'Observer') && renderSectionsTable()}
         {(role === 'Student' || role === 'Observer') && (
           <Button
-          fullWidth
-          mt="xl"
-          size="md"
-          onClick={() => handleLogin(form.values)} // Update route
-          disabled={!selectedSection}
-        >
-          Login
-        </Button>
-        
+            fullWidth
+            mt="xl"
+            size="md"
+            onClick={() => handleLogin(form.values)} // Handle login button click
+            disabled={!selectedSection}
+          >
+            {/* Button text based on role */}
+            {role === 'Student' ? 'Launch Session' : 'Launch Observer Session'}
+          </Button>
         )}
       </Paper>
     </div>

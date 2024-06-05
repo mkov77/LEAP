@@ -1,4 +1,3 @@
-// src/pages/AdminPage.tsx
 import { AppShell, Burger, Group, Skeleton, Image } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
