@@ -44,16 +44,16 @@ export default function LandingPage() {
         <h1 className='sessionCentered' >
              Ensure Correct Student Session is Selected
         </h1>
-        <Table withColumnBorders withRowBorders>
-          <thead>
-            <tr>
+        <Table withRowBorders>
+          <Table.Thead>
+            <Table.Tr>
               <th className='left-oriented'>Section ID</th>
               <th className='isOnlineCentered'>Is Online</th>
-            </tr>
-          </thead>
-          <tbody>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
             {sections.map((section) => (
-              <tr
+              <Table.Tr
                 key={section.sectionID}
                 onClick={() => {
                   if (section.isOnline) {
@@ -73,8 +73,8 @@ export default function LandingPage() {
                 }}
                 className="highlightable-row"
               >
-                <td>{section.sectionID}</td>
-                <td>
+                <Table.Td>{section.sectionID}</Table.Td>
+                <Table.Td>
                   <Box
                     style={{
                       backgroundColor: section.isOnline ? theme.colors.green[0] : theme.colors.red[0],
@@ -87,10 +87,10 @@ export default function LandingPage() {
                   >
                     {section.isOnline ? 'Online' : 'Offline'}
                   </Box>
-                </td>
-              </tr>
+                </Table.Td>
+              </Table.Tr>
             ))}
-          </tbody>
+          </Table.Tbody>
         </Table>
     </Box>
   );
