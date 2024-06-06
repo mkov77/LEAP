@@ -168,7 +168,6 @@ function AdminPage() {
         />
         <Button fullWidth mt="md" onClick={handleCreateNewSection} disabled={!newSectionName.trim()}>
           Create
-          This is a new line!
         </Button>
       </Modal>
     </AppShell>
