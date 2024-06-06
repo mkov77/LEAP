@@ -1,15 +1,22 @@
 import '../App.css';
-import AccordionC from '../components/Accordion'; // Remove the '.tsx' extension
-import { AppShell, Burger, Group, Skeleton, Image } from '@mantine/core';
+import CarouselC from '../components/carousel'; // Remove the '.tsx' extension
+import SearchResultList from '../components/searchResults'
+import { AppShell, Burger, Group, Skeleton, Image, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 function App() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setSearch(value);
+  }
   const handleLogoClick = () => {
     navigate('/'); // Navigate to the main login page
   };
@@ -25,11 +32,7 @@ function App() {
       padding="md"
     >
       <AppShell.Header>
-        <Group h="100%" px="md">
-          <Group>
-            <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
-            <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
-          </Group>
+        <Group h="100%" justify="space-between" px="md" align="center">
           <Image
             src={null}
             radius="md"
@@ -38,16 +41,15 @@ function App() {
             onClick={handleLogoClick} // Add onClick handler here
             style={{ cursor: 'pointer' }} // Add cursor pointer to indicate clickable
           />
+          <TextInput
+            placeholder='Search'
+            style={{ width:'30%',  }}
+            value={search}
+            onChange={handleChange}
+          />
         </Group>
       </AppShell.Header>
-      <AppShell.Navbar p="sm">
-        Navbar
-        {Array(15)
-          .fill(0)
-          .map((_, index) => (
-            <Skeleton key={index} h={28} mt="sm" animate={false} />
-          ))}
-      </AppShell.Navbar>
+
       <AppShell.Main>
         <div>
           <h1>Welcome to the Student Page</h1>
@@ -57,9 +59,18 @@ function App() {
             </p>
           )}
         </div>
+        {search ? (
+        <>
         <div className="App">
-          <AccordionC />
+          <SearchResultList search={search} />
         </div>
+        </>
+        ) : (
+        <div className="App">
+          <CarouselC />
+        </div>
+        )
+      }
       </AppShell.Main>
     </AppShell>
   );

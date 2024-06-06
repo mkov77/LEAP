@@ -17,7 +17,7 @@ function CardC({ unit }: CardProps) {
   const { unitID, unitType, unitHealth } = unit;
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
+    <Card shadow="sm" padding="lg" radius="md" withBorder  style={{ maxWidth: '300px' }}>
       <Card.Section component="a">
         <Image
           src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
@@ -47,13 +47,11 @@ function CardC({ unit }: CardProps) {
 
 function GridC({ units }: { units: Unit[] }) {
   return (
-    <Grid>
+    <>
       {units.map((unit, index) => (
-        <Grid.Col key={index} span={2}>
-          <CardC unit={unit} />
-        </Grid.Col>
+        <CardC key={index} unit={unit} />
       ))}
-    </Grid>
+    </>
   );
 }
 
