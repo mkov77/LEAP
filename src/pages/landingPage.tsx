@@ -25,6 +25,7 @@ export default function LandingPage() {
     },
   });
 
+  // Function to handle login based on role and selected section
   const handleLogin = (values: { password: string }) => {
     if (role === 'Admin' && values.password === 'admin') {
       navigate('/admin');
@@ -37,6 +38,7 @@ export default function LandingPage() {
     }
   };
 
+  // Function to render the sections table
   const renderSectionsTable = () => (
     <Box style={{ maxWidth: 600, margin: '0 auto'}}>
         <h1 className='sessionCentered' >

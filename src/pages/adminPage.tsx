@@ -1,16 +1,114 @@
-// src/pages/AdminPage.tsx
-import { AppShell, Burger, Group, Skeleton, Image } from '@mantine/core';
+// pages/adminPage.js
+import React, { useState } from 'react';
+import {
+  AppShell,
+  Burger,
+  Group,
+  Skeleton,
+  Image,
+  Box,
+  Table,
+  Checkbox,
+  Button,
+  Modal,
+  TextInput,
+  useMantineTheme,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
+import { sections as initialSections } from '../data/sections';
 
 function AdminPage() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
   const navigate = useNavigate();
+  const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const [selectedSections, setSelectedSections] = useState<string[]>([]);
+  const [sections, setSections] = useState(initialSections);
+  const theme = useMantineTheme();
+  const [newSectionName, setNewSectionName] = useState('');
+  const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
 
   const handleLogoClick = () => {
     navigate('/');
   };
+
+  const handleCheckboxChange = (sectionID: string) => {
+    setSelectedSections((prev) =>
+      prev.includes(sectionID) ? prev.filter((id) => id !== sectionID) : [...prev, sectionID]
+    );
+  };
+
+  const handleCreateNewSection = () => {
+    if (newSectionName.trim()) {
+      setSections((prevSections) => [
+        ...prevSections,
+        { sectionID: newSectionName.trim(), isOnline: false }, // Default to offline
+      ]);
+      setNewSectionName('');
+      closeModal();
+    }
+  };
+
+  const handleDeleteSections = () => {
+    setSections((prevSections) =>
+      prevSections.filter((section) => !selectedSections.includes(section.sectionID))
+    );
+    setSelectedSections([]);
+  };
+
+  const handleRowDoubleClick = (sectionID: string) => {
+    navigate(`/sectionControls/${sectionID}`);
+  };
+
+  // Function to render the sections table
+  const renderSectionsTable = () => (
+    <Box style={{ maxWidth: 600, margin: '0 auto' }}>
+      <Table>
+        <thead>
+          <tr>
+            <th>Section ID</th>
+            <th>Is Online</th>
+            <th>Select</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sections.map((section) => (
+            <tr
+              key={section.sectionID}
+              onClick={() => setSelectedSection(section.sectionID)}
+              onDoubleClick={() => handleRowDoubleClick(section.sectionID)}
+              style={{
+                cursor: 'pointer',
+                backgroundColor: selectedSection === section.sectionID ? theme.colors.gray[0] : '',
+              }}
+            >
+              <td>{section.sectionID}</td>
+              <td>
+                <Box
+                  style={{
+                    backgroundColor: section.isOnline ? theme.colors.green[0] : theme.colors.red[0],
+                    color: section.isOnline ? theme.colors.green[9] : theme.colors.red[9],
+                    padding: '4px',
+                    borderRadius: '4px',
+                    display: 'inline-block',
+                  }}
+                >
+                  {section.isOnline ? 'Online' : 'Offline'}
+                </Box>
+              </td>
+              <td>
+                <Checkbox
+                  checked={selectedSections.includes(section.sectionID)}
+                  onChange={() => handleCheckboxChange(section.sectionID)}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </Box>
+  );
 
   return (
     <AppShell
@@ -49,8 +147,29 @@ function AdminPage() {
       <AppShell.Main>
         <div className="App">
           <h1>Admin Page</h1>
+          {renderSectionsTable()}
+          <Group mt="md">
+            <Button color="blue" onClick={openModal}>
+              New Section
+            </Button>
+            <Button color="red" onClick={handleDeleteSections} disabled={selectedSections.length === 0}>
+              Delete
+            </Button>
+          </Group>
         </div>
       </AppShell.Main>
+
+      <Modal opened={modalOpened} onClose={closeModal} title="New Section" centered>
+        <TextInput
+          label="Section Name"
+          placeholder="Enter section name"
+          value={newSectionName}
+          onChange={(event) => setNewSectionName(event.currentTarget.value)}
+        />
+        <Button fullWidth mt="md" onClick={handleCreateNewSection} disabled={!newSectionName.trim()}>
+          Create
+        </Button>
+      </Modal>
     </AppShell>
   );
 }
