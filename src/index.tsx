@@ -1,3 +1,4 @@
+// index.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
@@ -8,6 +9,7 @@ import LandingPage from './pages/landingPage';
 import StudentPage from './pages/studentPage';
 import AdminPage from './pages/adminPage';
 import ObserverPage from './pages/observerPage';
+import SectionControls from './pages/sectionControls';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 const theme = createTheme({
@@ -26,6 +28,7 @@ root.render(
           <Route path="/studentPage/:sectionId" element={<StudentPage />} /> {/* Update route */}
           <Route path="/observerPage/:sectionId" element={<ObserverPage />} /> {/* Update route */}
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/sectionControls/:sectionId" element={<SectionControls />} /> {/* New route */}
         </Routes>
       </Router>
     </React.StrictMode>
