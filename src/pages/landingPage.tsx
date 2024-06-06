@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import classes from './landingPage.module.css';
 import { sections } from '../data/sections';
+import './landingPage.module.css';
 
 export interface Section {
   sectionID: string;
@@ -39,53 +40,58 @@ export default function LandingPage() {
 
   // Function to render the sections table
   const renderSectionsTable = () => (
-    <Box style={{ maxWidth: 600, margin: '0 auto' }}>
-      <Table>
-        <thead>
-          <tr>
-            <th>Section ID</th>
-            <th>Is Online</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sections.map((section) => (
-            <tr
-              key={section.sectionID}
-              onClick={() => {
-                if (section.isOnline) {
-                  if (selectedSection === section.sectionID) {
-                    // If the clicked row is already selected, navigate accordingly
-                    handleLogin(form.values);
-                  } else {
+    <Box style={{ maxWidth: 600, margin: '0 auto'}}>
+        <h1 className='sessionCentered' >
+             Ensure Correct Student Session is Selected
+        </h1>
+        <Table withColumnBorders withRowBorders>
+          <thead>
+            <tr>
+              <th className='left-oriented'>Section ID</th>
+              <th className='isOnlineCentered'>Is Online</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sections.map((section) => (
+              <tr
+                key={section.sectionID}
+                onClick={() => {
+                  if (section.isOnline) {
+                    if(selectedSection === section.sectionID){
+                      //If the clicked row is already selected, navigate accordingly
+                      handleLogin(form.values);
+                    }
                     setSelectedSection((prev) =>
                       prev === section.sectionID ? null : section.sectionID
                     );
                   }
-                }
-              }}
-              style={{
-                cursor: section.isOnline ? 'pointer' : 'not-allowed',
-                backgroundColor: selectedSection === section.sectionID ? theme.colors.gray[0] : '',
-              }}
-            >
-              <td>{section.sectionID}</td>
-              <td>
-                <Box
-                  style={{
-                    backgroundColor: section.isOnline ? theme.colors.green[0] : theme.colors.red[0],
-                    color: section.isOnline ? theme.colors.green[9] : theme.colors.red[9],
-                    padding: '4px',
-                    borderRadius: '4px',
-                    display: 'inline-block',
-                  }}
-                >
-                  {section.isOnline ? 'Online' : 'Offline'}
-                </Box>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+                }}
+                style={{
+                  cursor: section.isOnline ? 'pointer' : 'not-allowed',
+                  backgroundColor: selectedSection === section.sectionID ? theme.colors.gray[0] : '',
+                  textAlign: 'center',
+                }}
+                className="highlightable-row"
+              >
+                <td>{section.sectionID}</td>
+                <td>
+                  <Box
+                    style={{
+                      backgroundColor: section.isOnline ? theme.colors.green[0] : theme.colors.red[0],
+                      color: section.isOnline ? theme.colors.green[9] : theme.colors.red[9],
+                      padding: '4px',
+                      borderRadius: '4px',
+                      display: 'block',                    
+                    }}
+                    className = "isOnlineCentered"
+                  >
+                    {section.isOnline ? 'Online' : 'Offline'}
+                  </Box>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
     </Box>
   );
 
@@ -126,18 +132,21 @@ export default function LandingPage() {
             </Button>
           </form>
         )}
+
         {(role === 'Student' || role === 'Observer') && renderSectionsTable()}
         {(role === 'Student' || role === 'Observer') && (
-          <Button
-            fullWidth
-            mt="xl"
-            size="md"
-            onClick={() => handleLogin(form.values)} // Handle login button click
-            disabled={!selectedSection}
-          >
-            {/* Button text based on role */}
-            {role === 'Student' ? 'Launch Session' : 'Launch Observer Session'}
-          </Button>
+          <div style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
+            <Button
+              style={{height: '30px', width: '250px',textAlign: "center"}}
+              mt="xl"
+              size="md"
+              onClick={() => handleLogin(form.values)} // Update route
+              disabled={!selectedSection}
+            >
+              {/* button text based on role */}
+              {role === 'Student' ? 'Launch Session' : 'Launch Observer Session'}
+            </Button>
+          </div>
         )}
       </Paper>
     </div>

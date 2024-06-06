@@ -22,11 +22,47 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  text-align: center;
+  align-self: center;
 }
 
 .App-link {
   color: #61dafb;
 }
+
+.highlightable-row:hover {
+  background-color: rgb(212, 210, 210);
+}
+
+.highlightable {
+  cursor: pointer; 
+}
+
+.centered{
+  height: 5vh;
+  display: block;
+  justify-content: center;
+  text-align: center;
+  font-size: 25px;
+}
+
+.left-oriented{
+  text-align: center;
+  justify-content: center;
+}
+
+.isOnlineCentered{
+  justify-content: center;
+  text-align: center;
+}
+
+.sessionCentered{
+  justify-content: center;
+  text-align: center;
+  display: flex;
+  font-size: 25px;
+}
+
 
 @keyframes App-logo-spin {
   from {
