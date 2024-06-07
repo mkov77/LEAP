@@ -31,6 +31,55 @@ export const data: Unit[] = [
     isFriendly: true,
     unitHealth: 30
   },
+  {
+    unitID: 'INF-BRDG-D',
+    unitType: 'Infantry',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 30
+  },
+  {
+    unitID: 'INF-BRDG-D',
+    unitType: 'Infantry',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 30
+  },
+  {
+    unitID: 'INF-BRDG-D',
+    unitType: 'Infantry',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 30
+  },
+  {
+    unitID: 'INF-BRDG-D',
+    unitType: 'Infantry',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 30
+  },
+  {
+    unitID: 'INF-BRDG-D',
+    unitType: 'Infantry',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 30
+  },
+  {
+    unitID: 'INF-BRDG-D',
+    unitType: 'Infantry',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 30
+  },
+  {
+    unitID: 'INF-BRDG-D',
+    unitType: 'Infantry',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 30
+  },
   // Special Operations
   {
     unitID: 'SF-TEAM-A',

@@ -5,6 +5,7 @@ import { useForm } from '@mantine/form';
 import classes from './landingPage.module.css';
 import { sections } from '../data/sections';
 import './landingPage.module.css';
+import { useUserRole } from '../context/UserContext';
 
 export interface Section {
   sectionID: string;
@@ -16,6 +17,9 @@ export default function LandingPage() {
   const [role, setRole] = useState('Student');
   const theme = useMantineTheme();
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const { userRole, setUserRole } = useUserRole();
+
+
 
   const form = useForm({
     initialValues: { password: '' },
@@ -28,11 +32,14 @@ export default function LandingPage() {
   // Function to handle login based on role and selected section
   const handleLogin = (values: { password: string }) => {
     if (role === 'Admin' && values.password === 'admin') {
+      setUserRole(role);
       navigate('/admin');
     } else if (role === 'Student' || role === 'Observer') {
       if (role === 'Student') {
+        setUserRole(role);
         navigate(`/studentPage/${selectedSection}`); // Navigate to student page
       } else if (role === 'Observer' && selectedSection) {
+        setUserRole(role);
         navigate(`/observerPage/${selectedSection}`); // Navigate to observer page with selected section
       }
     }

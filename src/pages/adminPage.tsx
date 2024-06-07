@@ -1,5 +1,5 @@
 // pages/adminPage.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AppShell,
   Burger,
@@ -17,6 +17,7 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
 import { sections as initialSections } from '../data/sections';
+import { useUserRole } from '../context/UserContext';
 
 function AdminPage() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
@@ -28,6 +29,13 @@ function AdminPage() {
   const theme = useMantineTheme();
   const [newSectionName, setNewSectionName] = useState('');
   const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const { userRole, setUserRole } = useUserRole();
+
+  useEffect(() => {
+    if (userRole !== 'Admin') {
+      navigate('/');
+    }
+  }, [navigate, userRole]);
 
   const handleLogoClick = () => {
     navigate('/');

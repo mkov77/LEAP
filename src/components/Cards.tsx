@@ -17,7 +17,7 @@ function CardC({ unit }: CardProps) {
   const { unitID, unitType, unitHealth } = unit;
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder  style={{ maxWidth: '300px' }}>
+    <Card shadow="sm" padding="lg" radius="md" withBorder style={{ display: 'inline-block', maxWidth: '300px', width: '300px' }}>
       <Card.Section component="a">
         <Image
           src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
@@ -26,9 +26,9 @@ function CardC({ unit }: CardProps) {
         />
       </Card.Section>
 
-      <Group justify="space-between" mt="md" mb="xs">
-        <Text fw={500}>{unitID}</Text>
-      </Group>
+      <Text size="sm" c="dimmed" style={{ margin: '10px 0' }}>
+        {unitID}
+      </Text>
 
       <Text size="sm" c="dimmed">
         {unitType}
