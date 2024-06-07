@@ -19,11 +19,7 @@ const unitTypes = [
 ];
 
 function CarouselC() {
-  const demoProps = {
-    bg: 'var(--mantine-color-blue-light)',
-    h: 50,
-    mt: 'md',
-  };
+
   return (
     <div>
       {unitTypes.map((item) => (

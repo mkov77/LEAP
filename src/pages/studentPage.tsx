@@ -3,8 +3,10 @@ import CarouselC from '../components/carousel'; // Remove the '.tsx' extension
 import SearchResultList from '../components/searchResults'
 import { AppShell, Burger, Group, Skeleton, Image, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useUserRole } from '../context/UserContext';
+
 
 function App() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
@@ -12,6 +14,13 @@ function App() {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
+  const { userRole, setUserRole } = useUserRole();
+
+  useEffect(() => {
+    if (userRole !== 'Student') {
+      navigate('/');
+    }
+  }, [navigate, userRole]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;

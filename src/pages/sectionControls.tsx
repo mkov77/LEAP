@@ -4,6 +4,7 @@ import { AppShell, Burger, Group, Table, useMantineTheme, Image, Button, Box, Sw
 import { useDisclosure } from '@mantine/hooks';
 import { engagements } from '../data/engagements';
 import { IconCheck, IconX, IconInfoCircle } from '@tabler/icons-react';
+import { useUserRole } from '../context/UserContext';
 
 export interface Engagement {
   engagementID: string;
@@ -26,6 +27,13 @@ function SectionControls() {
   const theme = useMantineTheme();
   const [engagementsData, setEngagementsData] = useState<Engagement[]>([]);
   const [sectionOnline, setSectionOnline] = useState(false); // Added state for sectionOnline
+  const { userRole, setUserRole } = useUserRole();
+
+  useEffect(() => {
+    if (userRole !== 'Admin') {
+      navigate('/');
+    }
+  }, [navigate, userRole]);
 
   const handleLogoClick = () => {
     navigate('/'); // Navigate to the main login page
