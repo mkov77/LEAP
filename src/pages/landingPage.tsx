@@ -22,9 +22,9 @@ export default function LandingPage() {
   const [force, setForce] = useState('JFLCC');
   const theme = useMantineTheme();
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const { userRole, setUserRole } = useUserRole();
   const {setColorScheme} = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light');
+  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
 
   const togglecolorScheme = () => {
     setColorScheme(computedColorScheme === "dark" ? 'light' : 'dark')
@@ -41,13 +41,16 @@ export default function LandingPage() {
   // Function to handle login based on role and selected section
   const handleLogin = (values: { password: string }) => {
     if (role === 'Administrator' && values.password === 'admin') {
+      setUserRole(role);
       navigate('/admin');
     } else if (role === 'Student' || role === 'Observer') {
       if (role === 'Student') {
         setUserRole(role);
+        setUserSection(selectedSection);
         navigate(`/studentPage/${selectedSection}`); // Navigate to student page
       } else if (role === 'Observer' && selectedSection) {
         setUserRole(role);
+        setUserSection(selectedSection);
         navigate(`/observerPage/${selectedSection}`); // Navigate to observer page with selected section
       }
     }

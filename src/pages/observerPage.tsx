@@ -11,10 +11,10 @@ function ObserverPage() {
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
   const navigate = useNavigate();
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
-  const { userRole, setUserRole } = useUserRole();
+  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
 
   useEffect(() => {
-    if (userRole !== 'Observer') {
+    if (userRole !== 'Observer' || userSection !== userSection) {
       navigate('/');
     }
   }, [navigate, userRole]);
