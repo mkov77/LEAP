@@ -10,6 +10,7 @@ import StudentPage from './pages/studentPage';
 import AdminPage from './pages/adminPage';
 import ObserverPage from './pages/observerPage';
 import SectionControls from './pages/sectionControls';
+import BattlePage from './pages/battlePage';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 const theme = createTheme({
@@ -29,6 +30,7 @@ root.render(
           <Route path="/observerPage/:sectionId" element={<ObserverPage />} /> {/* Update route */}
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/sectionControls/:sectionId" element={<SectionControls />} /> {/* New route */}
+          <Route path="/battlePage" element={<BattlePage />} />
         </Routes>
       </Router>
     </React.StrictMode>
