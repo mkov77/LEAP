@@ -1,5 +1,5 @@
 import '../App.css';
-import AccordionC from '../components/carousel'; // Remove the '.tsx' extension
+import CarouselC from '../components/carousel'; // Remove the '.tsx' extension
 import { AppShell, Burger, Group, Skeleton, Image } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -58,7 +58,7 @@ function ObserverPage() {
           )}
         </div>
         <div className="App">
-          <AccordionC />
+          <CarouselC />
         </div>
       </AppShell.Main>
     </AppShell>

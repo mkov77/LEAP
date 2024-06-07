@@ -19,6 +19,11 @@ const unitTypes = [
 ];
 
 function CarouselC() {
+  const demoProps = {
+    bg: 'var(--mantine-color-blue-light)',
+    h: 50,
+    mt: 'md',
+  };
   return (
     <div>
       {unitTypes.map((item) => (
@@ -27,9 +32,7 @@ function CarouselC() {
           <div style={{ overflowX: 'auto' }}>
             <Carousel>
               <Carousel.Slide>
-                <div style={{ display: 'flex' }}>
                   <GridC units={filterUnitsByType(item.value)} />
-                </div>
               </Carousel.Slide>
             </Carousel>
           </div>
@@ -37,6 +40,7 @@ function CarouselC() {
       ))}
     </div>
   );
+
 }
 
 // Function to filter units by type
