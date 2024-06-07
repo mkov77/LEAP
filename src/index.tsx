@@ -35,16 +35,6 @@ root.render(
           </Routes>
         </Router>
       </UserRoleProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/studentPage/:sectionId" element={<StudentPage />} /> {/* Update route */}
-          <Route path="/observerPage/:sectionId" element={<ObserverPage />} /> {/* Update route */}
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/sectionControls/:sectionId" element={<SectionControls />} /> {/* New route */}
-          <Route path="/battlePage" element={<BattlePage />} />
-        </Routes>
-      </Router>
     </React.StrictMode>
   </MantineProvider>
 );
