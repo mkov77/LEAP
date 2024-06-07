@@ -21,7 +21,7 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <MantineProvider theme={theme}>
+  <MantineProvider theme={theme} defaultColorScheme='dark'>
     <React.StrictMode>
       <UserRoleProvider>
         <Router>
