@@ -22,7 +22,7 @@ export default function LandingPage() {
   const [force, setForce] = useState('JFLCC');
   const theme = useMantineTheme();
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const { userRole, setUserRole } = useUserRole();
+  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
 
 
 
@@ -42,9 +42,11 @@ export default function LandingPage() {
     } else if (role === 'Student' || role === 'Observer') {
       if (role === 'Student') {
         setUserRole(role);
+        setUserSection(selectedSection);
         navigate(`/studentPage/${selectedSection}`); // Navigate to student page
       } else if (role === 'Observer' && selectedSection) {
         setUserRole(role);
+        setUserSection(selectedSection);
         navigate(`/observerPage/${selectedSection}`); // Navigate to observer page with selected section
       }
     }

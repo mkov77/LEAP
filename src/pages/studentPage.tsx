@@ -14,10 +14,10 @@ function App() {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
-  const { userRole, setUserRole } = useUserRole();
+  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
 
   useEffect(() => {
-    if (userRole !== 'Student') {
+    if (userRole !== 'Student' || userSection !== sectionId) {
       navigate('/');
     }
   }, [navigate, userRole]);
