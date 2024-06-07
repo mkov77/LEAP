@@ -12,6 +12,7 @@ import ObserverPage from './pages/observerPage';
 import SectionControls from './pages/sectionControls';
 import BattlePage from './pages/battlePage';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { UserRoleProvider } from './context/UserContext';
 
 const theme = createTheme({
   /** Put your mantine theme override here */
@@ -23,6 +24,17 @@ const root = ReactDOM.createRoot(
 root.render(
   <MantineProvider theme={theme}>
     <React.StrictMode>
+      <UserRoleProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/studentPage/:sectionId" element={<StudentPage />}  /> {/* Update route */}
+            <Route path="/observerPage/:sectionId" element={<ObserverPage />} /> {/* Update route */}
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/sectionControls/:sectionId" element={<SectionControls />}  /> {/* New route */}
+          </Routes>
+        </Router>
+      </UserRoleProvider>
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />

@@ -5,34 +5,45 @@ import { useForm } from '@mantine/form';
 import classes from './landingPage.module.css';
 import { sections } from '../data/sections';
 import './landingPage.module.css';
+import DarkMode from './darkMode';
+import { useUserRole } from '../context/UserContext';
+
+
 
 export interface Section {
   sectionID: string;
   isOnline: boolean;
 }
 
+
 export default function LandingPage() {
   const navigate = useNavigate();
   const [role, setRole] = useState('Student');
+  const [force, setForce] = useState('JFLCC');
   const theme = useMantineTheme();
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const { userRole, setUserRole } = useUserRole();
+
+
 
   const form = useForm({
     initialValues: { password: '' },
     validate: {
       password: (value) =>
-        role === 'Admin' && value !== 'admin' ? 'Incorrect admin password' : null,
+        role === 'Administrator' && value !== 'admin' ? 'Incorrect admin password' : null,
     },
   });
 
   // Function to handle login based on role and selected section
   const handleLogin = (values: { password: string }) => {
-    if (role === 'Admin' && values.password === 'admin') {
+    if (role === 'Administrator' && values.password === 'admin') {
       navigate('/admin');
     } else if (role === 'Student' || role === 'Observer') {
       if (role === 'Student') {
+        setUserRole(role);
         navigate(`/studentPage/${selectedSection}`); // Navigate to student page
       } else if (role === 'Observer' && selectedSection) {
+        setUserRole(role);
         navigate(`/observerPage/${selectedSection}`); // Navigate to observer page with selected section
       }
     }
@@ -96,43 +107,56 @@ export default function LandingPage() {
   );
 
   return (
+    <div>
     <div className={classes.wrapper}>
       <Paper className={classes.form} radius={0} p={30}>
         <Title order={2} className={classes.title} ta="center" mt="md" mb={50}>
           Welcome back to LEAP
         </Title>
-        <SegmentedControl
-          size="lg"
-          data={['Student', 'Observer', 'Admin']}
-          value={role}
-          onChange={setRole}
-        />
-        {role === 'Admin' && (
+        <div style={{ margin: '10px'}} >
+          <SegmentedControl
+            size="lg"
+            data={['Student', 'Observer', 'Administrator']}
+            value={role}
+            onChange={setRole}
+          />
+        </div>
+        {(role === 'Observer' || role === 'Student') && (
+          <div style={{ margin: '10px'}} >
+            <SegmentedControl
+              size="lg"
+              data={['JFLCC', 'JFMCC', 'JFSOCC']}
+              value={force}
+              onChange={setForce}
+            />
+          </div>
+        )}
+        {role === 'Administrator' && (
           <form onSubmit={form.onSubmit((values) => handleLogin(values))}>
+            <center>
             <PasswordInput
               label="Password"
               placeholder="Admin password"
               mt="md"
               size="md"
+              style={{justifyContent: 'center', width: '250px', alignItems: 'center'}}
               {...form.getInputProps('password')}
             />
-            {form.errors.password && (
-              <Text color="red" size="sm" mt="sm">
-                {form.errors.password}
-              </Text>
-            )}
-            <Button
-              fullWidth
-              mt="xl"
-              size="md"
-              type="submit"
-              disabled={!form.values.password}
-            >
-              Login
-            </Button>
+            
+            <div style={{ margin: '10px', width: '250px', justifyContent: "center", textAlign: "center", alignItems: 'center'}} >
+              <Button 
+                fullWidth
+                mt="xl"
+                size="md"
+                type="submit"
+                disabled={!form.values.password}
+              >
+                Login
+              </Button>
+            </div>
+            </center>
           </form>
         )}
-
         {(role === 'Student' || role === 'Observer') && renderSectionsTable()}
         {(role === 'Student' || role === 'Observer') && (
           <div style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
@@ -148,7 +172,10 @@ export default function LandingPage() {
             </Button>
           </div>
         )}
+
       </Paper>
+    </div>
+    <DarkMode />
     </div>
   );
 }
