@@ -32,6 +32,7 @@ root.render(
             <Route path="/observerPage/:sectionId" element={<ObserverPage />} /> {/* Update route */}
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/sectionControls/:sectionId" element={<SectionControls />}  /> {/* New route */}
+            <Route path="/battlePage/:sectionId" element={<BattlePage />} />
           </Routes>
         </Router>
       </UserRoleProvider>

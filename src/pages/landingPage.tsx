@@ -37,6 +37,7 @@ export default function LandingPage() {
   // Function to handle login based on role and selected section
   const handleLogin = (values: { password: string }) => {
     if (role === 'Administrator' && values.password === 'admin') {
+      setUserRole(role);
       navigate('/admin');
     } else if (role === 'Student' || role === 'Observer') {
       if (role === 'Student') {

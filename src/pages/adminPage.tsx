@@ -32,7 +32,7 @@ function AdminPage() {
   const { userRole, setUserRole } = useUserRole();
 
   useEffect(() => {
-    if (userRole !== 'Admin') {
+    if (userRole !== 'Administrator') {
       navigate('/');
     }
   }, [navigate, userRole]);
