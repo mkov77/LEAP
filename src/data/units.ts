@@ -109,7 +109,56 @@ export const data: Unit[] = [
     isFriendly: true,
     unitHealth: 40
   },
+  {
+    unitID: 'SF-TEAM-D',
+    unitType: 'Special Operations',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 40
+  },
+  {
+    unitID: 'SF-TEAM-D',
+    unitType: 'Special Operations',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 40
+  },
+  {
+    unitID: 'SF-TEAM-D',
+    unitType: 'Special Operations',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 40
+  },
+  {
+    unitID: 'SF-TEAM-D',
+    unitType: 'Special Operations',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 40
+  },
   // Armor
+  {
+    unitID: 'ARM-DIV-1',
+    unitType: 'Armor',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 40
+  },
+  {
+    unitID: 'ARM-DIV-2',
+    unitType: 'Armor',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 43
+  },
+  {
+    unitID: 'ARM-DIV-3',
+    unitType: 'Armor',
+    unitSymbol: 'Loading...',
+    isFriendly: true,
+    unitHealth: 42
+  },
   {
     unitID: 'ARM-DIV-1',
     unitType: 'Armor',
