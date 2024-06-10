@@ -5,7 +5,7 @@ import { useForm } from '@mantine/form';
 import classes from './landingPage.module.css';
 import { sections } from '../data/sections';
 import './landingPage.module.css';
-import DarkMode from './darkMode';
+import DarkMode from '../components/darkMode';
 import { useUserRole } from '../context/UserContext';
 
 

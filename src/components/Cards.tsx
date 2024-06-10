@@ -45,17 +45,18 @@ function CardC({ unit }: CardProps) {
   );
 }
 
-function GridC({ units }: { units: Unit[] }) {
+export function GridC({ units }: { units: Unit[] }) {
   return (
     <>
       {units.map((unit, index) => (
+        
         <CardC key={index} unit={unit} />
       ))}
     </>
   );
 }
 
-export default GridC;
+export default CardC;
 
 
 

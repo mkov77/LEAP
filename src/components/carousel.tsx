@@ -1,7 +1,9 @@
 import { Carousel } from '@mantine/carousel';
-import GridC from './Cards';
+import CardC from './Cards';
 import { type Unit } from './Cards';
 import { data } from '../data/units';
+import { rem } from '@mantine/core';
+import classes from './carousel.module.css';
 
 const unitTypes = [
   {
@@ -26,10 +28,16 @@ function CarouselC() {
         <div key={item.value} style={{ marginBottom: 20 }}>
           <h2>{item.value}</h2>
           <div style={{ overflowX: 'auto' }}>
-            <Carousel>
-              <Carousel.Slide>
-                  <GridC units={filterUnitsByType(item.value)} />
-              </Carousel.Slide>
+            <Carousel 
+            slideSize={{ base: '100%', sm: '50%' }}
+            slideGap={{ base: rem(2), sm: 'xl' }}
+            align="start"
+            slidesToScroll={1}>
+              {filterUnitsByType(item.value).map((unitCard, index) =>
+                <Carousel.Slide key={index}>
+                  <CardC unit={unitCard} />
+                </Carousel.Slide>
+              )}
             </Carousel>
           </div>
         </div>
