@@ -23,13 +23,7 @@ export default function LandingPage() {
   const [force, setForce] = useState('JFLCC');
   const theme = useMantineTheme();
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const {setColorScheme} = useMantineColorScheme();
-  const computedColorScheme = useComputedColorScheme('light');
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
-
-  const togglecolorScheme = () => {
-    setColorScheme(computedColorScheme === "dark" ? 'light' : 'dark')
-  }
 
   const form = useForm({
     initialValues: { password: '' },
@@ -123,8 +117,7 @@ export default function LandingPage() {
   );
 
   return (
-    <div>
-      <Button size='sm' variant='link' onClick={togglecolorScheme}>{computedColorScheme === "dark" ? <FaSun /> : <FaMoon />} </Button>
+    <MantineProvider defaultColorScheme='dark'>
       <div className={classes.wrapper}>
         <Paper className={classes.form} radius={0} p={30}>
           <Title order={2} className={classes.title} ta="center" mt="md" mb={50}>
@@ -196,7 +189,6 @@ export default function LandingPage() {
 
         </Paper>
       </div>
-
-    </div>
+    </MantineProvider>
   );
 }
