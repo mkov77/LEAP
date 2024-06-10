@@ -1,11 +1,12 @@
 import { Carousel } from '@mantine/carousel';
+import { useState } from 'react';
 import CardC from './Cards';
 import { type Unit } from './Cards';
 import { data } from '../data/units';
-import { Container } from '@mantine/core';
 import '@mantine/carousel/styles.css';
 import '@mantine/core/styles.css';
-import classes from './carousel.module.css';
+import { useUnitProvider } from '../context/UnitContext';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const unitTypes = [
   {
@@ -23,26 +24,32 @@ const unitTypes = [
 ];
 
 function CarouselC() {
+  const { selectedUnit, setSelectedUnit } = useUnitProvider();
+
+  const navigate = useNavigate();
+  const { sectionId } = useParams();
 
   return (
     <div>
       {unitTypes.map((item) => (
         <div key={item.value} style={{ marginBottom: 20 }}>
           <h2>{item.value}</h2>
-            <Carousel
-              withIndicators
-              loop
-              align="start"
-              slideSize={100}
-              slideGap='sm'
-              controlSize={40}
-              slidesToScroll={2}>
-              {filterUnitsByType(item.value).map((unitCard, index) =>
-                <Carousel.Slide key={index}>
-                  <CardC unit={unitCard} />
-                </Carousel.Slide>
-              )}
-            </Carousel>
+          <Carousel
+            withIndicators
+            loop
+            align="start"
+            slideSize={100}
+            slideGap='sm'
+            controlSize={40}
+            slidesToScroll={2}>
+            {filterUnitsByType(item.value).map((unitCard, index) =>
+
+              <Carousel.Slide key={index}>
+                <CardC unit={unitCard} />
+              </Carousel.Slide>
+
+            )}
+          </Carousel>
 
         </div>
       ))}

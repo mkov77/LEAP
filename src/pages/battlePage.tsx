@@ -15,7 +15,7 @@ function BattlePage() {
   const [modalOpened, { open, close }] = useDisclosure(false);
   const {setColorScheme} = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light');
-
+  const closeLocation = '/studentPage/' + sectionId;
   const handleLogoClick = () => {
     navigate('/'); // Navigate to the main login page
   };
@@ -158,7 +158,7 @@ function BattlePage() {
             <div>
               <p>This is where your results will be display.</p>
               <Group justify="center" mt="xl">
-              <Button onClick={() => { close(); }}>Done</Button>
+              <Button onClick={() => { navigate(closeLocation) }}>Done</Button>
               </Group>
             </div>
           </Stepper.Step>
