@@ -15,7 +15,7 @@ export const data: Unit[] = [
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 50
+    unitHealth: 85
   },
   {
     unitID: 'INF-BRDG-C',

@@ -1,0 +1,10 @@
+.bar{
+    display: flex;
+    background-color: rgb(0, 0, 0);
+    width: 18px;
+
+    bottom: 0px;
+    left: 0px;
+    margin-left: 0px;
+    margin-bottom: 7px;
+}
