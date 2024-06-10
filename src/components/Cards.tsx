@@ -1,5 +1,5 @@
-import { Card, Image, Text, Badge, Button, Group, Grid, GridCol } from '@mantine/core';
-
+import { Box, Card, Container, Flex, Image, Text, Badge, Button, Group, Grid, GridCol, Progress } from '@mantine/core';
+import classes from './Cards.module.css'
 // Define Unit interface
 export interface Unit {
   unitID: string;
@@ -16,11 +16,33 @@ interface CardProps {
 function CardC({ unit }: CardProps) {
   const { unitID, unitType, unitHealth } = unit;
 
+  
+    let color = 'green';
+    if(unitHealth >= 66){
+      color = 'green';
+    }
+    else if(unitHealth < 66 && unitHealth >= 33){
+      color = 'orange';
+    }
+    else{
+      color = 'red'
+    }
+
+  
+
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder style={{ display: 'inline-block', maxWidth: '300px', width: '300px' }}>
+
+    <Card shadow="sm" padding={0} radius={0} withBorder style={{ display: 'inline-block',  width: '300px' }}>
+      <Grid>
+        <Grid.Col  span={1} style={{backgroundColor: color}}>
+          <div className={classes.bar} style={{ height: `${100 - unitHealth}%` }}/>
+        </Grid.Col>
+
+        <Grid.Col span={11} >
       <Card.Section component="a">
         <Image
           src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
+          fit='contain'
           height={160}
           alt={unitID}
         />
@@ -37,11 +59,10 @@ function CardC({ unit }: CardProps) {
       <Text size="sm" c="dimmed">
         Health: {unitHealth}
       </Text>
-
-      <Button color="blue" fullWidth mt="md" radius="md">
-        Select for battle
-      </Button>
+      </Grid.Col>
+      </Grid>
     </Card>
+
   );
 }
 
