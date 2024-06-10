@@ -5,7 +5,7 @@ import { AppShell, Burger, Group, Skeleton, Image, useMantineColorScheme, useCom
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserRole } from '../context/UserContext';
-import { FaSun, FaMoon } from "react-icons/fa";
+import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
 
 function ObserverPage() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
@@ -31,6 +31,10 @@ function ObserverPage() {
     setColorScheme(computedColorScheme === "dark" ? 'light' : 'dark')
   }
 
+  const handleArrowClick = () => {
+    navigate('/');
+  };
+
   return (
     <AppShell
       header={{ height: 60 }}
@@ -47,6 +51,7 @@ function ObserverPage() {
             <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
             <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
           </Group>
+          <Button size='sm' variant='link' onClick={handleArrowClick}><FaArrowAltCircleLeft /> </Button>
           <Button size='sm' variant='link' onClick={togglecolorScheme}>{computedColorScheme === "dark" ? <FaSun /> : <FaMoon />} </Button>
           <Image
             src={null}

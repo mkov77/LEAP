@@ -5,7 +5,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { engagements } from '../data/engagements';
 import { IconCheck, IconX, IconInfoCircle } from '@tabler/icons-react';
 import { useUserRole } from '../context/UserContext';
-import { FaSun, FaMoon } from "react-icons/fa";
+import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
 
 export interface Engagement {
   engagementID: string;
@@ -46,6 +46,10 @@ function SectionControls() {
     setColorScheme(computedColorScheme === "dark" ? 'light' : 'dark')
   }
 
+  const handleArrowClick = () => {
+    navigate('/admin');
+  };
+
   useEffect(() => {
     // Filter engagements data based on sectionId
     const filteredEngagements = engagements.filter((engagement) => engagement.sectionID === sectionId);
@@ -83,6 +87,7 @@ function SectionControls() {
             <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
             <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
           </Group>
+          <Button size='sm' variant='link' onClick={handleArrowClick}><FaArrowAltCircleLeft /> </Button>
           <Button size='sm' variant='link' onClick={togglecolorScheme}>{computedColorScheme === "dark" ? <FaSun /> : <FaMoon />} </Button>
           <Image
             src={null}

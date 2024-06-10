@@ -22,7 +22,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
 import { sections as initialSections } from '../data/sections';
 import { useUserRole } from '../context/UserContext';
-import { FaSun, FaMoon } from "react-icons/fa";
+import { FaSun, FaMoon, FaArrowAltCircleLeft} from "react-icons/fa";
 
 
 function AdminPage() {
@@ -46,6 +46,10 @@ function AdminPage() {
   }, [navigate, userRole]);
 
   const handleLogoClick = () => {
+    navigate('/');
+  };
+
+  const handleArrowClick = () => {
     navigate('/');
   };
 
@@ -168,6 +172,7 @@ function AdminPage() {
             <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
             <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
           </Group>
+          <Button size='sm' variant='link' onClick={handleArrowClick}><FaArrowAltCircleLeft /> </Button>
           <Button size='sm' variant='link' onClick={togglecolorScheme}>{computedColorScheme === "dark" ? <FaSun /> : <FaMoon />} </Button>
           <Image
             src={null}

@@ -6,7 +6,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserRole } from '../context/UserContext';
-import { FaSun, FaMoon } from "react-icons/fa";
+import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
 
 
 function App() {
@@ -38,6 +38,10 @@ function App() {
     setColorScheme(computedColorScheme === "dark" ? 'light' : 'dark')
   }
 
+  const handleArrowClick = () => {
+    navigate('/');
+  };
+
   return (
     <AppShell
       header={{ height: 60 }}
@@ -51,6 +55,7 @@ function App() {
       <AppShell.Header>
         <Group h="100%" justify="space-between" px="md" align="center">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent:"space-between"}}>
+          <Button size='sm' variant='link' onClick={handleArrowClick}><FaArrowAltCircleLeft /> </Button>
           <Button size='sm' variant='link' onClick={togglecolorScheme} m='10'>{computedColorScheme === "dark" ? <FaSun /> : <FaMoon />} </Button>
           <Image
             src={null}
