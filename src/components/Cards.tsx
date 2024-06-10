@@ -1,5 +1,7 @@
 import { Box, Card, Container, Flex, Image, Text, Badge, Button, Group, Grid, GridCol, Progress } from '@mantine/core';
 import classes from './Cards.module.css'
+import { Box, Card, Container, Flex, Image, Text, Badge, Button, Group, Grid, GridCol, Progress } from '@mantine/core';
+import classes from './Cards.module.css'
 // Define Unit interface
 export interface Unit {
   unitID: string;
@@ -54,15 +56,28 @@ function CardC({ unit }: CardProps) {
       </Text>
       </Grid.Col>
       </Grid>
+
+      <Text size="sm" c="dimmed">
+        {unitType}
+      </Text>
+
+      <Text size="sm" c="dimmed">
+        Health: {unitHealth}
+      </Text>
+      </Grid.Col>
+      </Grid>
     </Card>
+
 
   );
 }
 
 export function GridC({ units }: { units: Unit[] }) {
+export function GridC({ units }: { units: Unit[] }) {
   return (
     <>
       {units.map((unit, index) => (
+        
         
         <CardC key={index} unit={unit} />
       ))}
@@ -70,6 +85,7 @@ export function GridC({ units }: { units: Unit[] }) {
   );
 }
 
+export default CardC;
 export default CardC;
 
 

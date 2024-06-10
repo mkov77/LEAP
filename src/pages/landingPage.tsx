@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Paper, PasswordInput, Button, Title, SegmentedControl, Table, Box, useMantineTheme, Text, useMantineColorScheme, useComputedColorScheme } from '@mantine/core';
+import React, { useState, useEffect, useRef } from 'react';
+import { Paper, PasswordInput, Button, Title, SegmentedControl, Table, Box, useMantineTheme, Text, useMantineColorScheme, useComputedColorScheme, FocusTrap } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import classes from './landingPage.module.css';
@@ -8,6 +8,7 @@ import './landingPage.module.css';
 import { useUserRole } from '../context/UserContext';
 import { MantineProvider } from '@mantine/core';
 import { FaSun, FaMoon } from "react-icons/fa";
+import { useDisclosure, useFocusTrap } from '@mantine/hooks';
 
 
 export interface Section {
@@ -37,6 +38,14 @@ export default function LandingPage() {
         role === 'Administrator' && value !== 'admin' ? 'Incorrect admin password' : null,
     },
   });
+
+  const trapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (trapRef.current) {
+      trapRef.current.focus();
+    }
+  }, []);
 
   // Function to handle login based on role and selected section
   const handleLogin = (values: { password: string }) => {
@@ -140,30 +149,34 @@ export default function LandingPage() {
             </div>
           )}
           {role === 'Administrator' && (
-            <form onSubmit={form.onSubmit((values) => handleLogin(values))}>
-              <center>
-              <PasswordInput
-                label="Password"
-                placeholder="Admin password"
-                mt="md"
-                size="md"
-                style={{justifyContent: 'center', width: '250px', alignItems: 'center'}}
-                {...form.getInputProps('password')}
-              />
-              
-              <div style={{ margin: '10px', width: '250px', justifyContent: "center", textAlign: "center", alignItems: 'center'}} >
-                <Button 
-                  fullWidth
-                  mt="xl"
+          <FocusTrap>
+            <div ref={trapRef} tabIndex={-1}>
+              <form onSubmit={form.onSubmit((values) => handleLogin(values))}>
+                <center>
+                <PasswordInput
+                  label="Password"
+                  placeholder="Admin password"
+                  mt="md"
                   size="md"
-                  type="submit"
-                  disabled={!form.values.password}
-                >
-                  Login
-                </Button>
-              </div>
-              </center>
-            </form>
+                  style={{justifyContent: 'center', width: '250px', alignItems: 'center'}}
+                  {...form.getInputProps('password')}
+                />
+        
+                <div style={{ margin: '10px', width: '250px', justifyContent: "center", textAlign: "center", alignItems: 'center'}} >
+                  <Button 
+                    fullWidth
+                    mt="xl"
+                    size="md"
+                    type="submit"
+                    disabled={!form.values.password}
+                  >
+                    Login
+                  </Button>
+                </div>
+                </center>
+              </form>
+            </div>
+          </FocusTrap>
           )}
           {(role === 'Student' || role === 'Observer') && renderSectionsTable()}
           {(role === 'Student' || role === 'Observer') && (

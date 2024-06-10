@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import '../App.css';
-import { AppShell, Group, Skeleton, Image, Stepper, Button, SegmentedControl, rem, Modal } from '@mantine/core';
+import { AppShell, Group, Skeleton, Image, Stepper, Button, SegmentedControl, rem, Modal, useMantineColorScheme, useComputedColorScheme, } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconSwords, IconHeartbeat, IconNumber1Small, IconNumber2Small, IconNumber3Small, IconNumber4Small } from '@tabler/icons-react';
+import { FaSun, FaMoon } from "react-icons/fa";
 
 function BattlePage() {
   const [mobileOpened] = useDisclosure(false);
@@ -12,10 +13,16 @@ function BattlePage() {
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
   const [active, setActive] = useState(0);
   const [modalOpened, { open, close }] = useDisclosure(false);
+  const {setColorScheme} = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('light');
 
   const handleLogoClick = () => {
     navigate('/'); // Navigate to the main login page
   };
+
+  const togglecolorScheme = () => {
+    setColorScheme(computedColorScheme === "dark" ? 'light' : 'dark')
+  }
 
   const nextStep = () => setActive((current) => (current < 6 ? current + 1 : current));
   const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
@@ -31,6 +38,7 @@ function BattlePage() {
       padding="md"
     >
       <AppShell.Header>
+        <Button size='sm' variant='link' onClick={togglecolorScheme}>{computedColorScheme === "dark" ? <FaSun /> : <FaMoon />} </Button>
         <Group h="100%" px="md">
           <Image
             src={null}
