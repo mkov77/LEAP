@@ -1,10 +1,11 @@
 import '../App.css';
 import React, { useEffect } from 'react';
 import CarouselC from '../components/carousel'; // Remove the '.tsx' extension
-import { AppShell, Burger, Group, Skeleton, Image } from '@mantine/core';
+import { AppShell, Burger, Group, Skeleton, Image, useMantineColorScheme, useComputedColorScheme, Button, } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserRole } from '../context/UserContext';
+import { FaSun, FaMoon } from "react-icons/fa";
 
 function ObserverPage() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
@@ -12,6 +13,9 @@ function ObserverPage() {
   const navigate = useNavigate();
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
+  const {setColorScheme} = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('light');
+
 
   useEffect(() => {
     if (userRole !== 'Observer' || userSection !== userSection) {
@@ -22,6 +26,10 @@ function ObserverPage() {
   const handleLogoClick = () => {
     navigate('/'); // Navigate to the main login page
   };
+
+  const togglecolorScheme = () => {
+    setColorScheme(computedColorScheme === "dark" ? 'light' : 'dark')
+  }
 
   return (
     <AppShell
@@ -39,6 +47,7 @@ function ObserverPage() {
             <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
             <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
           </Group>
+          <Button size='sm' variant='link' onClick={togglecolorScheme}>{computedColorScheme === "dark" ? <FaSun /> : <FaMoon />} </Button>
           <Image
             src={null}
             radius="md"
@@ -49,7 +58,6 @@ function ObserverPage() {
           />
         </Group>
         <Group>
-          
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="sm">

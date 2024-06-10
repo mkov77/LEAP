@@ -1,5 +1,5 @@
 import React from 'react';
-import GridC from './Cards'; // Import your Card component
+import { GridC }  from './Cards'; // Import your Card component
 import { data } from '../data/units';
 
 interface Props {
