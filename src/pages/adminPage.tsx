@@ -1,5 +1,5 @@
 // pages/adminPage.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import {
   AppShell,
   Burger,
@@ -16,12 +16,14 @@ import {
   MantineProvider,
   useMantineColorScheme, 
   useComputedColorScheme,
+  FocusTrap,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
 import { sections as initialSections } from '../data/sections';
 import { useUserRole } from '../context/UserContext';
 import { FaSun, FaMoon } from "react-icons/fa";
+
 
 function AdminPage() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
@@ -32,8 +34,8 @@ function AdminPage() {
   const [sections, setSections] = useState(initialSections);
   const theme = useMantineTheme();
   const [newSectionName, setNewSectionName] = useState('');
-  const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
-  const { userRole, setUserRole } = useUserRole();
+  const [modalOpened, setModalOpened] = useState(false);
+  const { userRole, setUserRole, userSection, setUserSection} = useUserRole();
   const {setColorScheme} = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light');
 
@@ -46,6 +48,14 @@ function AdminPage() {
   const handleLogoClick = () => {
     navigate('/');
   };
+
+  const trapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (trapRef.current) {
+      trapRef.current.focus();
+    }
+  }, []);
 
   const handleCheckboxChange = (sectionID: string) => {
     setSelectedSections((prev) =>
@@ -67,6 +77,20 @@ function AdminPage() {
       closeModal();
     }
   };
+
+  const handleLaunchSession = (sectionID: string) => {
+    setUserSection(selectedSection);
+    navigate(`/sectionControls/${sectionID}`);
+  }
+
+  const openModal = () => {
+    setModalOpened(true);
+  };
+
+  const closeModal = () => {
+    setModalOpened(false);
+  };
+
 
   const handleDeleteSections = () => {
     setSections((prevSections) =>
@@ -167,8 +191,19 @@ function AdminPage() {
         <div className="App">
           <h1>Admin Page</h1>
           {renderSectionsTable()}
-          <Group mt="md">
-            <Button color="blue" onClick={openModal}>
+          <div style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
+              <Button
+                style={{height: '30px', width: '250px',textAlign: "center"}}
+                mt="xl"
+                size="md"
+                onClick={() => selectedSection && handleLaunchSession(selectedSection)} // Update route
+                disabled={!selectedSection}
+              >
+                Launch Session
+             </Button>
+            </div>
+          <Group mt="md" style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
+            <Button color="blue" onClick={openModal} style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
               New Section
             </Button>
             <Button color="red" onClick={handleDeleteSections} disabled={selectedSections.length === 0}>
@@ -177,19 +212,24 @@ function AdminPage() {
           </Group>
         </div>
       </AppShell.Main>
+        <Modal opened={modalOpened} onClose={closeModal} title="New Section" centered>
+        <FocusTrap>
+        <div>
+          <TextInput
+            autoFocus
+            label="Section Name"
+            placeholder="Enter section name"
+            value={newSectionName}
+            onChange={(event) => setNewSectionName(event.currentTarget.value)}
+          />
 
-      <Modal opened={modalOpened} onClose={closeModal} title="New Section" centered>
-        <TextInput
-          label="Section Name"
-          placeholder="Enter section name"
-          value={newSectionName}
-          onChange={(event) => setNewSectionName(event.currentTarget.value)}
-        />
-        <Button fullWidth mt="md" onClick={handleCreateNewSection} disabled={!newSectionName.trim()}>
-          Create
-        </Button>
-      </Modal>
-    </AppShell>
+          <Button fullWidth mt="md" onClick={handleCreateNewSection} disabled={!newSectionName.trim()}>
+            Create
+          </Button>
+        </div>
+      </FocusTrap>  
+    </Modal>
+  </AppShell>
   );
 }
 
