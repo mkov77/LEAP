@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AppShell, Burger, Group, Table, useMantineTheme, Image, Button, Box, Switch, rem, Divider, Alert} from '@mantine/core';
+import { AppShell, Burger, Group, Table, useMantineTheme, Image, Button, Box, Switch, rem, Divider, Alert, useMantineColorScheme, useComputedColorScheme,} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { engagements } from '../data/engagements';
 import { IconCheck, IconX, IconInfoCircle } from '@tabler/icons-react';
 import { useUserRole } from '../context/UserContext';
+import { FaSun, FaMoon } from "react-icons/fa";
 
 export interface Engagement {
   engagementID: string;
@@ -28,6 +29,8 @@ function SectionControls() {
   const [engagementsData, setEngagementsData] = useState<Engagement[]>([]);
   const [sectionOnline, setSectionOnline] = useState(false); // Added state for sectionOnline
   const { userRole, setUserRole } = useUserRole();
+  const {setColorScheme} = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('light');
 
   useEffect(() => {
     if (userRole !== 'Administrator') {
@@ -38,6 +41,10 @@ function SectionControls() {
   const handleLogoClick = () => {
     navigate('/'); // Navigate to the main login page
   };
+
+  const togglecolorScheme = () => {
+    setColorScheme(computedColorScheme === "dark" ? 'light' : 'dark')
+  }
 
   useEffect(() => {
     // Filter engagements data based on sectionId
@@ -76,6 +83,7 @@ function SectionControls() {
             <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
             <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
           </Group>
+          <Button size='sm' variant='link' onClick={togglecolorScheme}>{computedColorScheme === "dark" ? <FaSun /> : <FaMoon />} </Button>
           <Image
             src={null}
             radius="md"

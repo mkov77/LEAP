@@ -13,11 +13,15 @@ import {
   Modal,
   TextInput,
   useMantineTheme,
+  MantineProvider,
+  useMantineColorScheme, 
+  useComputedColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
 import { sections as initialSections } from '../data/sections';
 import { useUserRole } from '../context/UserContext';
+import { FaSun, FaMoon } from "react-icons/fa";
 
 function AdminPage() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
@@ -30,6 +34,8 @@ function AdminPage() {
   const [newSectionName, setNewSectionName] = useState('');
   const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
   const { userRole, setUserRole } = useUserRole();
+  const {setColorScheme} = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('light');
 
   useEffect(() => {
     if (userRole !== 'Administrator') {
@@ -46,6 +52,10 @@ function AdminPage() {
       prev.includes(sectionID) ? prev.filter((id) => id !== sectionID) : [...prev, sectionID]
     );
   };
+  
+  const togglecolorScheme = () => {
+    setColorScheme(computedColorScheme === "dark" ? 'light' : 'dark')
+  }
 
   const handleCreateNewSection = () => {
     if (newSectionName.trim()) {
@@ -134,6 +144,7 @@ function AdminPage() {
             <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
             <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
           </Group>
+          <Button size='sm' variant='link' onClick={togglecolorScheme}>{computedColorScheme === "dark" ? <FaSun /> : <FaMoon />} </Button>
           <Image
             src={null}
             radius="md"
