@@ -22,7 +22,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
 import { sections as initialSections } from '../data/sections';
 import { useUserRole } from '../context/UserContext';
-import { FaSun, FaMoon } from "react-icons/fa";
+import { FaSun, FaMoon, FaArrowAltCircleLeft} from "react-icons/fa";
 
 
 function AdminPage() {
@@ -36,8 +36,6 @@ function AdminPage() {
   const [newSectionName, setNewSectionName] = useState('');
   const [modalOpened, setModalOpened] = useState(false);
   const { userRole, setUserRole, userSection, setUserSection} = useUserRole();
-  const {setColorScheme} = useMantineColorScheme();
-  const computedColorScheme = useComputedColorScheme('light');
 
   useEffect(() => {
     if (userRole !== 'Administrator') {
@@ -46,6 +44,10 @@ function AdminPage() {
   }, [navigate, userRole]);
 
   const handleLogoClick = () => {
+    navigate('/');
+  };
+
+  const handleArrowClick = () => {
     navigate('/');
   };
 
@@ -62,10 +64,7 @@ function AdminPage() {
       prev.includes(sectionID) ? prev.filter((id) => id !== sectionID) : [...prev, sectionID]
     );
   };
-  
-  const togglecolorScheme = () => {
-    setColorScheme(computedColorScheme === "dark" ? 'light' : 'dark')
-  }
+
 
   const handleCreateNewSection = () => {
     if (newSectionName.trim()) {
@@ -153,83 +152,85 @@ function AdminPage() {
   );
 
   return (
-    <AppShell
-      header={{ height: 60 }}
-      navbar={{
-        width: 300,
-        breakpoint: 'sm',
-        collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
-      }}
-      padding="md"
-    >
-      <AppShell.Header>
-        <Group h="100%" px="md">
-          <Group>
-            <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
-            <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
+    <MantineProvider defaultColorScheme='dark'>
+      <AppShell
+        header={{ height: 60 }}
+        navbar={{
+          width: 300,
+          breakpoint: 'sm',
+          collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
+        }}
+        padding="md"
+      >
+        <AppShell.Header>
+          <Group h="100%" px="md">
+            <Group>
+              <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
+              <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
+            </Group>
+            <Button size='sm' variant='link' onClick={handleArrowClick}><FaArrowAltCircleLeft /> </Button>
+            <Image
+              src={null}
+              radius="md"
+              h={50}
+              fallbackSrc="https://placehold.co/600x400?text=Placeholder"
+              onClick={handleLogoClick}
+              style={{ cursor: 'pointer' }}
+            />
           </Group>
-          <Button size='sm' variant='link' onClick={togglecolorScheme}>{computedColorScheme === "dark" ? <FaSun /> : <FaMoon />} </Button>
-          <Image
-            src={null}
-            radius="md"
-            h={50}
-            fallbackSrc="https://placehold.co/600x400?text=Placeholder"
-            onClick={handleLogoClick}
-            style={{ cursor: 'pointer' }}
-          />
-        </Group>
-      </AppShell.Header>
-      <AppShell.Navbar p="sm">
-        Admin Navbar
-        {Array(15)
-          .fill(0)
-          .map((_, index) => (
-            <Skeleton key={index} h={28} mt="sm" animate={false} />
-          ))}
-      </AppShell.Navbar>
-      <AppShell.Main>
-        <div className="App">
-          <h1>Admin Page</h1>
-          {renderSectionsTable()}
-          <div style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
-              <Button
-                style={{height: '30px', width: '250px',textAlign: "center"}}
-                mt="xl"
-                size="md"
-                onClick={() => selectedSection && handleLaunchSession(selectedSection)} // Update route
-                disabled={!selectedSection}
-              >
-                Launch Session
-             </Button>
-            </div>
-          <Group mt="md" style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
-            <Button color="blue" onClick={openModal} style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
-              New Section
-            </Button>
-            <Button color="red" onClick={handleDeleteSections} disabled={selectedSections.length === 0}>
-              Delete
-            </Button>
-          </Group>
-        </div>
-      </AppShell.Main>
-        <Modal opened={modalOpened} onClose={closeModal} title="New Section" centered>
-        <FocusTrap>
-        <div>
-          <TextInput
-            autoFocus
-            label="Section Name"
-            placeholder="Enter section name"
-            value={newSectionName}
-            onChange={(event) => setNewSectionName(event.currentTarget.value)}
-          />
+        </AppShell.Header>
+        <AppShell.Navbar p="sm">
+          Admin Navbar
+          {Array(15)
+            .fill(0)
+            .map((_, index) => (
+              <Skeleton key={index} h={28} mt="sm" animate={false} />
+            ))}
+        </AppShell.Navbar>
+        <AppShell.Main>
+          <div className="App">
+            <h1>Admin Page</h1>
+            {renderSectionsTable()}
+            <div style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
+                <Button
+                  style={{height: '30px', width: '250px',textAlign: "center"}}
+                  mt="xl"
+                  size="md"
+                  onClick={() => selectedSection && handleLaunchSession(selectedSection)} // Update route
+                  disabled={!selectedSection}
+                >
+                  Launch Session
+              </Button>
+              </div>
+            <Group mt="md" style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
+              <Button color="blue" onClick={openModal} style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
+                New Section
+              </Button>
+              <Button color="red" onClick={handleDeleteSections} disabled={selectedSections.length === 0}>
+                Delete
+              </Button>
+            </Group>
+          </div>
+        </AppShell.Main>
+          <Modal opened={modalOpened} onClose={closeModal} title="New Section" centered>
+          <FocusTrap>
+          <div>
+            <TextInput
+              autoFocus
+              label="Section Name"
+              placeholder="Enter section name"
+              value={newSectionName}
+              onChange={(event) => setNewSectionName(event.currentTarget.value)}
+            />
 
-          <Button fullWidth mt="md" onClick={handleCreateNewSection} disabled={!newSectionName.trim()}>
-            Create
-          </Button>
-        </div>
-      </FocusTrap>  
-    </Modal>
-  </AppShell>
+            <Button fullWidth mt="md" onClick={handleCreateNewSection} disabled={!newSectionName.trim()}>
+              Create
+            </Button>
+          </div>
+        </FocusTrap>  
+      </Modal>
+    </AppShell>
+  </MantineProvider>
   );
 }
 
