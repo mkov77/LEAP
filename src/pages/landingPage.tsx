@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Paper, PasswordInput, Button, Title, SegmentedControl, Table, Box, useMantineTheme, Text } from '@mantine/core';
+import { Paper, PasswordInput, Button, Title, SegmentedControl, Table, Box, useMantineTheme, Text, useMantineColorScheme, useComputedColorScheme } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import classes from './landingPage.module.css';
 import { sections } from '../data/sections';
 import './landingPage.module.css';
-import DarkMode from '../components/darkMode';
 import { useUserRole } from '../context/UserContext';
-
+import { MantineProvider } from '@mantine/core';
+import { FaSun, FaMoon } from "react-icons/fa";
 
 
 export interface Section {
@@ -22,9 +22,13 @@ export default function LandingPage() {
   const [force, setForce] = useState('JFLCC');
   const theme = useMantineTheme();
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const {setColorScheme} = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('light');
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
 
-
+  const togglecolorScheme = () => {
+    setColorScheme(computedColorScheme === "dark" ? 'light' : 'dark')
+  }
 
   const form = useForm({
     initialValues: { password: '' },
@@ -82,7 +86,7 @@ export default function LandingPage() {
                 }}
                 style={{
                   cursor: section.isOnline ? 'pointer' : 'not-allowed',
-                  backgroundColor: selectedSection === section.sectionID ? theme.colors.gray[0] : '',
+                  backgroundColor: selectedSection === section.sectionID ? 'rgba(128, 128, 128, 0.5)' : '',
                   textAlign: 'center',
                 }}
                 className="highlightable-row"
@@ -111,74 +115,75 @@ export default function LandingPage() {
 
   return (
     <div>
-    <div className={classes.wrapper}>
-      <Paper className={classes.form} radius={0} p={30}>
-        <Title order={2} className={classes.title} ta="center" mt="md" mb={50}>
-          Welcome back to LEAP
-        </Title>
-        <div style={{ margin: '10px'}} >
-          <SegmentedControl
-            size="lg"
-            data={['Student', 'Observer', 'Administrator']}
-            value={role}
-            onChange={setRole}
-          />
-        </div>
-        {(role === 'Observer' || role === 'Student') && (
+      <Button size='sm' variant='link' onClick={togglecolorScheme}>{computedColorScheme === "dark" ? <FaSun /> : <FaMoon />} </Button>
+      <div className={classes.wrapper}>
+        <Paper className={classes.form} radius={0} p={30}>
+          <Title order={2} className={classes.title} ta="center" mt="md" mb={50}>
+            Welcome back to LEAP
+          </Title>
           <div style={{ margin: '10px'}} >
             <SegmentedControl
               size="lg"
-              data={['JFLCC', 'JFMCC', 'JFSOCC']}
-              value={force}
-              onChange={setForce}
+              data={['Student', 'Observer', 'Administrator']}
+              value={role}
+              onChange={setRole}
             />
           </div>
-        )}
-        {role === 'Administrator' && (
-          <form onSubmit={form.onSubmit((values) => handleLogin(values))}>
-            <center>
-            <PasswordInput
-              label="Password"
-              placeholder="Admin password"
-              mt="md"
-              size="md"
-              style={{justifyContent: 'center', width: '250px', alignItems: 'center'}}
-              {...form.getInputProps('password')}
-            />
-            
-            <div style={{ margin: '10px', width: '250px', justifyContent: "center", textAlign: "center", alignItems: 'center'}} >
-              <Button 
-                fullWidth
+          {(role === 'Observer' || role === 'Student') && (
+            <div style={{ margin: '10px'}} >
+              <SegmentedControl
+                size="lg"
+                data={['JFLCC', 'JFMCC', 'JFSOCC']}
+                value={force}
+                onChange={setForce}
+              />
+            </div>
+          )}
+          {role === 'Administrator' && (
+            <form onSubmit={form.onSubmit((values) => handleLogin(values))}>
+              <center>
+              <PasswordInput
+                label="Password"
+                placeholder="Admin password"
+                mt="md"
+                size="md"
+                style={{justifyContent: 'center', width: '250px', alignItems: 'center'}}
+                {...form.getInputProps('password')}
+              />
+              
+              <div style={{ margin: '10px', width: '250px', justifyContent: "center", textAlign: "center", alignItems: 'center'}} >
+                <Button 
+                  fullWidth
+                  mt="xl"
+                  size="md"
+                  type="submit"
+                  disabled={!form.values.password}
+                >
+                  Login
+                </Button>
+              </div>
+              </center>
+            </form>
+          )}
+          {(role === 'Student' || role === 'Observer') && renderSectionsTable()}
+          {(role === 'Student' || role === 'Observer') && (
+            <div style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
+              <Button
+                style={{height: '30px', width: '250px',textAlign: "center"}}
                 mt="xl"
                 size="md"
-                type="submit"
-                disabled={!form.values.password}
+                onClick={() => handleLogin(form.values)} // Update route
+                disabled={!selectedSection}
               >
-                Login
+                {/* button text based on role */}
+                {role === 'Student' ? 'Launch Session' : 'Launch Observer Session'}
               </Button>
             </div>
-            </center>
-          </form>
-        )}
-        {(role === 'Student' || role === 'Observer') && renderSectionsTable()}
-        {(role === 'Student' || role === 'Observer') && (
-          <div style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
-            <Button
-              style={{height: '30px', width: '250px',textAlign: "center"}}
-              mt="xl"
-              size="md"
-              onClick={() => handleLogin(form.values)} // Update route
-              disabled={!selectedSection}
-            >
-              {/* button text based on role */}
-              {role === 'Student' ? 'Launch Session' : 'Launch Observer Session'}
-            </Button>
-          </div>
-        )}
+          )}
 
-      </Paper>
-    </div>
-    <DarkMode />
+        </Paper>
+      </div>
+
     </div>
   );
 }

@@ -33,6 +33,7 @@
 
 .highlightable-row:hover {
   background-color: rgb(212, 210, 210);
+  color: black;
 }
 
 .highlightable {
