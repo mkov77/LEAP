@@ -13,7 +13,7 @@ import SectionControls from './pages/sectionControls';
 import BattlePage from './pages/battlePage';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { UserRoleProvider } from './context/UserContext';
-
+import { UnitProvider } from './context/UnitContext';
 const theme = createTheme({
   /** Put your mantine theme override here */
 });
@@ -25,16 +25,18 @@ root.render(
   <MantineProvider theme={theme} defaultColorScheme='dark'>
     <React.StrictMode>
       <UserRoleProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/studentPage/:sectionId" element={<StudentPage />}  /> {/* Update route */}
-            <Route path="/observerPage/:sectionId" element={<ObserverPage />} /> {/* Update route */}
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/sectionControls/:sectionId" element={<SectionControls />}  /> {/* New route */}
-            <Route path="/battlePage/:sectionId" element={<BattlePage />} />
-          </Routes>
-        </Router>
+        <UnitProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/studentPage/:sectionId" element={<StudentPage />} /> {/* Update route */}
+              <Route path="/observerPage/:sectionId" element={<ObserverPage />} /> {/* Update route */}
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/sectionControls/:sectionId" element={<SectionControls />} /> {/* New route */}
+              <Route path="/battlePage/:sectionId" element={<BattlePage />} />
+            </Routes>
+          </Router>
+        </UnitProvider>
       </UserRoleProvider>
     </React.StrictMode>
   </MantineProvider>
