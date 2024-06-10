@@ -25,3 +25,18 @@
     font-weight: 700;
     text-transform: uppercase;
   }
+
+  .controls {
+    transition: opacity 500ms ease;
+    opacity: 0;
+  }
+  
+  .root:hover .controls {
+    opacity: 1;
+  }
+
+  .control {
+    color: black; /* Light text color */
+    /* Add any other styles for individual control buttons */
+  }
+  

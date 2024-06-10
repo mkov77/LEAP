@@ -33,13 +33,14 @@ function CardC({ unit }: CardProps) {
 
     <Card shadow="sm" padding={0} radius={0} style={{ display: 'inline-block', width: '250px', margin: '0' }}> 
       <Grid style={{ margin: 0 }}>
+
       <Grid.Col span={1} style={{ backgroundColor: 'black', position: 'relative', padding: 0 }}>
       <div className={classes.bar} style={{ height: `${unitHealth}%`, width: '100%', backgroundColor: healthColor }} />
       </Grid.Col>
 
-      <Grid.Col span={11} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 0 }}>
+      <Grid.Col span={11} style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '20px 20px' }}>
 
-      <Card.Section style={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}> {/* Added styles */}
+      <Card.Section inheritPadding={true} style={{ marginRight: '10px' }}> {/* Added padding */}
             <Image
               src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
               fit="contain"
@@ -48,10 +49,11 @@ function CardC({ unit }: CardProps) {
               style={{ width: '100%', maxHeight: '100%', objectFit: 'contain' }} // Ensure the image fills the container width
             />
           </Card.Section>
-
-      <Text size="sm" c="dimmed" style={{ margin: '10px 0' }}>
-        {unitID}
-      </Text>
+<Card.Section>
+<Text size="lg" c="dimmed" style={{textAlign: 'center', marginRight:'10px', fontWeight: 'bold', color: 'white'}}>
+            {unitID}
+          </Text>
+</Card.Section>
       </Grid.Col>
       </Grid>
     </Card>
