@@ -1,11 +1,12 @@
 import '../App.css';
 import CarouselC from '../components/carousel'; // Remove the '.tsx' extension
 import SearchResultList from '../components/searchResults'
-import { AppShell, Burger, Group, Skeleton, Image, TextInput } from '@mantine/core';
+import { AppShell, Burger, Group, Skeleton, Image, TextInput, useMantineColorScheme, useComputedColorScheme, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserRole } from '../context/UserContext';
+import { FaSun, FaMoon } from "react-icons/fa";
 
 
 function App() {
@@ -15,6 +16,9 @@ function App() {
   const navigate = useNavigate();
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
+  const {setColorScheme} = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('light');
+
 
   useEffect(() => {
     if (userRole !== 'Student' || userSection !== sectionId) {
@@ -30,6 +34,10 @@ function App() {
     navigate('/'); // Navigate to the main login page
   };
 
+  const togglecolorScheme = () => {
+    setColorScheme(computedColorScheme === "dark" ? 'light' : 'dark')
+  }
+
   return (
     <AppShell
       header={{ height: 60 }}
@@ -42,6 +50,8 @@ function App() {
     >
       <AppShell.Header>
         <Group h="100%" justify="space-between" px="md" align="center">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent:"space-between"}}>
+          <Button size='sm' variant='link' onClick={togglecolorScheme} m='10'>{computedColorScheme === "dark" ? <FaSun /> : <FaMoon />} </Button>
           <Image
             src={null}
             radius="md"
@@ -50,6 +60,7 @@ function App() {
             onClick={handleLogoClick} // Add onClick handler here
             style={{ cursor: 'pointer' }} // Add cursor pointer to indicate clickable
           />
+        </div>
           <TextInput
             placeholder='Search'
             style={{ width:'30%',  }}
