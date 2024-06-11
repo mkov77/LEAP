@@ -36,6 +36,7 @@ function CarouselC() {
           <h2>{item.value}</h2>
           <Carousel
             withIndicators
+            dragFree
             loop
             align="start"
             slideSize={100}
