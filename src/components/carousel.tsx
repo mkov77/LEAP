@@ -7,6 +7,7 @@ import '@mantine/carousel/styles.css';
 import '@mantine/core/styles.css';
 import { useUnitProvider } from '../context/UnitContext';
 import { useNavigate, useParams } from 'react-router-dom';
+import classes from './carousel.module.css';
 
 const unitTypes = [
   {
@@ -35,23 +36,20 @@ function CarouselC() {
         <div key={item.value} style={{ marginBottom: 20 }}>
           <h2>{item.value}</h2>
           <Carousel
-            withIndicators
-            dragFree
-            loop
-            align="start"
-            slideSize={100}
-            slideGap='sm'
-            controlSize={40}
-            slidesToScroll={2}>
-            {filterUnitsByType(item.value).map((unitCard, index) =>
-
-              <Carousel.Slide key={index}>
-                <CardC unit={unitCard} />
-              </Carousel.Slide>
-
-            )}
-          </Carousel>
-
+            classNames={{ controls: classes.controls, root: classes.root }}
+              align="start"
+              slideSize={100}
+              slideGap='md'
+              controlsOffset={0}
+              controlSize={50}
+              containScroll='trimSnaps'
+              slidesToScroll={3}>
+              {filterUnitsByType(item.value).map((unitCard, index) =>
+                <Carousel.Slide key={index}>
+                  <CardC unit={unitCard} />
+                </Carousel.Slide>
+              )}
+            </Carousel>
         </div>
       ))}
     </div>
