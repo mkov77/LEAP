@@ -1,183 +1,215 @@
 import { type Unit } from '../components/Cards';
 
-// Unit dummy data
+// Updated Unit dummy data
 export const data: Unit[] = [
-    // Infantry
+  // Infantry
   {
     unitID: 'INF-BRDG-A',
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 20
+    unitHealth: 20,
+    roleType: 'Combat',
+    unitSize: 'Brigade/Regiment',
+    forcePosture: 'Offense and Defense',
+    forceMobility: 'Mobile (foot)',
+    forceReadiness: 'High',
+    forceSkill: 'Advanced'
   },
   {
     unitID: 'INF-BRDG-B',
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 85
+    unitHealth: 85,
+    roleType: 'Combat',
+    unitSize: 'Brigade/Regiment',
+    forcePosture: 'Offense and Defense',
+    forceMobility: 'Mobile (foot)',
+    forceReadiness: 'Medium',
+    forceSkill: 'Advanced'
   },
   {
     unitID: 'INF-BRDG-C',
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 40
+    unitHealth: 40,
+    roleType: 'Combat',
+    unitSize: 'Brigade/Regiment',
+    forcePosture: 'Offense and Defense',
+    forceMobility: 'Mobile (foot)',
+    forceReadiness: 'Medium',
+    forceSkill: 'Basic'
   },
   {
     unitID: 'INF-BRDG-D',
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 35
+    unitHealth: 5,
+    roleType: 'Combat',
+    unitSize: 'Brigade/Regiment',
+    forcePosture: 'Offense and Defense',
+    forceMobility: 'Mobile (foot)',
+    forceReadiness: 'Medium',
+    forceSkill: 'Basic'
   },
+  // Additional units with new types and parameters
   {
-    unitID: 'INF-BRDG-E',
-    unitType: 'Infantry',
+    unitID: 'ENG-CMD-A',
+    unitType: 'Engineer',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 17
+    unitHealth: 75,
+    roleType: 'Support',
+    unitSize: 'Company/Battery',
+    forcePosture: 'Defensive Only',
+    forceMobility: 'Mobile (wheeled)',
+    forceReadiness: 'High',
+    forceSkill: 'Advanced'
   },
   {
-    unitID: 'INF-BRDG-F',
-    unitType: 'Infantry',
+    unitID: 'SPF-SIG-A',
+    unitType: 'Signal',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 46
+    unitHealth: 60,
+    roleType: 'Support',
+    unitSize: 'Platoon',
+    forcePosture: 'Defensive Only',
+    forceMobility: 'Mobile (wheeled)',
+    forceReadiness: 'Medium',
+    forceSkill: 'Basic'
   },
   {
-    unitID: 'INF-BRDG-G',
-    unitType: 'Infantry',
+    unitID: 'ARM-MECH-A',
+    unitType: 'Armored Mechanized',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 87
+    unitHealth: 90,
+    roleType: 'Combat',
+    unitSize: 'Division',
+    forcePosture: 'Offensive Only',
+    forceMobility: 'Mobile (track)',
+    forceReadiness: 'Elite',
+    forceSkill: 'Advanced'
   },
   {
-    unitID: 'INF-BRDG-H',
-    unitType: 'Infantry',
+    unitID: 'ARTY-FA-A',
+    unitType: 'Field Artillery',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 69
+    unitHealth: 80,
+    roleType: 'Combat',
+    unitSize: 'Battalion',
+    forcePosture: 'Defensive Only',
+    forceMobility: 'Mobile (track)',
+    forceReadiness: 'High',
+    forceSkill: 'Advanced'
   },
   {
-    unitID: 'INF-BRDG-I',
-    unitType: 'Infantry',
+    unitID: 'MED-MTF-A',
+    unitType: 'Medical Treatment Facility',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 7
+    unitHealth: 100,
+    roleType: 'Facility',
+    unitSize: 'Company/Battery',
+    forcePosture: 'Defensive Only',
+    forceMobility: 'Stationary',
+    forceReadiness: 'Elite',
+    forceSkill: 'Advanced'
   },
   {
-    unitID: 'INF-BRDG-J',
-    unitType: 'Infantry',
+    unitID: 'UAS-UNIT-A',
+    unitType: 'Unmanned Aerial Systems',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 100
+    unitHealth: 50,
+    roleType: 'Support',
+    unitSize: 'UAS (1)',
+    forcePosture: 'Offense and Defense',
+    forceMobility: 'Flight (fixed wing)',
+    forceReadiness: 'Medium',
+    forceSkill: 'Basic'
   },
   {
-    unitID: 'INF-BRDG-K',
-    unitType: 'Infantry',
+    unitID: 'RECON-TEAM-A',
+    unitType: 'Reconnaissance',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 88
-  },
-  // Special Operations
-  {
-    unitID: 'SF-TEAM-A',
-    unitType: 'Special Operations',
-    unitSymbol: 'Loading...',
-    isFriendly: true,
-    unitHealth: 54
+    unitHealth: 65,
+    roleType: 'Combat',
+    unitSize: 'Platoon',
+    forcePosture: 'Offense and Defense',
+    forceMobility: 'Mobile (wheeled)',
+    forceReadiness: 'High',
+    forceSkill: 'Advanced'
   },
   {
-    unitID: 'SF-TEAM-B',
-    unitType: 'Special Operations',
+    unitID: 'SPF-TEAM-A',
+    unitType: 'Special Operations Forces',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 25
+    unitHealth: 70,
+    roleType: 'Combat',
+    unitSize: 'Squad/Team',
+    forcePosture: 'Offense and Defense',
+    forceMobility: 'Mobile (foot)',
+    forceReadiness: 'Elite',
+    forceSkill: 'Advanced'
   },
   {
-    unitID: 'SF-TEAM-C',
-    unitType: 'Special Operations',
+    unitID: 'SPF-TEAM-B',
+    unitType: 'Special Operations Forces',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 100
+    unitHealth: 75,
+    roleType: 'Combat',
+    unitSize: 'Squad/Team',
+    forcePosture: 'Offense and Defense',
+    forceMobility: 'Mobile (foot)',
+    forceReadiness: 'Elite',
+    forceSkill: 'Advanced'
   },
   {
-    unitID: 'SF-TEAM-D',
-    unitType: 'Special Operations',
+    unitID: 'SPF-TEAM-C',
+    unitType: 'Special Operations Forces',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 36
+    unitHealth: 60,
+    roleType: 'Combat',
+    unitSize: 'Squad/Team',
+    forcePosture: 'Offense and Defense',
+    forceMobility: 'Mobile (foot)',
+    forceReadiness: 'Elite',
+    forceSkill: 'Advanced'
   },
   {
-    unitID: 'SF-TEAM-E',
-    unitType: 'Special Operations',
+    unitID: 'SPF-TEAM-D',
+    unitType: 'Special Operations Forces',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 69
+    unitHealth: 45,
+    roleType: 'Combat',
+    unitSize: 'Squad/Team',
+    forcePosture: 'Offense and Defense',
+    forceMobility: 'Mobile (foot)',
+    forceReadiness: 'Elite',
+    forceSkill: 'Advanced'
   },
   {
-    unitID: 'SF-TEAM-F',
-    unitType: 'Special Operations',
+    unitID: 'SPF-TEAM-E',
+    unitType: 'Special Operations Forces',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 25
-  },
-  {
-    unitID: 'SF-TEAM-G',
-    unitType: 'Special Operations',
-    unitSymbol: 'Loading...',
-    isFriendly: true,
-    unitHealth: 65
-  },
-  {
-    unitID: 'SF-TEAM-H',
-    unitType: 'Special Operations',
-    unitSymbol: 'Loading...',
-    isFriendly: true,
-    unitHealth: 32
-  },
-  // Armor
-  {
-    unitID: 'ARM-DIV-1',
-    unitType: 'Armor',
-    unitSymbol: 'Loading...',
-    isFriendly: true,
-    unitHealth: 40
-  },
-  {
-    unitID: 'ARM-DIV-2',
-    unitType: 'Armor',
-    unitSymbol: 'Loading...',
-    isFriendly: true,
-    unitHealth: 84
-  },
-  {
-    unitID: 'ARM-DIV-3',
-    unitType: 'Armor',
-    unitSymbol: 'Loading...',
-    isFriendly: true,
-    unitHealth: 34
-  },
-  {
-    unitID: 'ARM-DIV-4',
-    unitType: 'Armor',
-    unitSymbol: 'Loading...',
-    isFriendly: true,
-    unitHealth: 46
-  },
-  {
-    unitID: 'ARM-DIV-5',
-    unitType: 'Armor',
-    unitSymbol: 'Loading...',
-    isFriendly: true,
-    unitHealth: 15
-  },
-  {
-    unitID: 'ARM-DIV-6',
-    unitType: 'Armor',
-    unitSymbol: 'Loading...',
-    isFriendly: true,
-    unitHealth: 71
+    unitHealth: 20,
+    roleType: 'Combat',
+    unitSize: 'Squad/Team',
+    forcePosture: 'Offense and Defense',
+    forceMobility: 'Mobile (foot)',
+    forceReadiness: 'Elite',
+    forceSkill: 'Advanced'
   }
-]
+];

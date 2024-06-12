@@ -15,11 +15,11 @@ const unitTypes = [
     description: '...',
   },
   {
-    value: 'Special Operations',
+    value: 'Special Operations Forces',
     description: '...',
   },
   {
-    value: 'Armor',
+    value: 'Other',
     description: '...',
   },
 ];
@@ -59,7 +59,13 @@ function CarouselC() {
 
 // Function to filter units by type
 function filterUnitsByType(type: string): Unit[] {
-  return data.filter((unit) => unit.unitType === type);
+  if (type === 'Other') {
+    return data.filter(
+      (unit) => unit.unitType !== 'Infantry' && unit.unitType !== 'Special Operations Forces'
+    );
+  } else {
+    return data.filter((unit) => unit.unitType === type);
+  }
 }
 
 export default CarouselC;
