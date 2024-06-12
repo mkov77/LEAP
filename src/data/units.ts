@@ -29,56 +29,56 @@ export const data: Unit[] = [
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 30
+    unitHealth: 35
   },
   {
-    unitID: 'INF-BRDG-D',
+    unitID: 'INF-BRDG-E',
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 30
+    unitHealth: 17
   },
   {
-    unitID: 'INF-BRDG-D',
+    unitID: 'INF-BRDG-F',
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 30
+    unitHealth: 46
   },
   {
-    unitID: 'INF-BRDG-D',
+    unitID: 'INF-BRDG-G',
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 30
+    unitHealth: 87
   },
   {
-    unitID: 'INF-BRDG-D',
+    unitID: 'INF-BRDG-H',
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 30
+    unitHealth: 69
   },
   {
-    unitID: 'INF-BRDG-D',
+    unitID: 'INF-BRDG-I',
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 30
+    unitHealth: 7
   },
   {
-    unitID: 'INF-BRDG-D',
+    unitID: 'INF-BRDG-J',
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 30
+    unitHealth: 100
   },
   {
-    unitID: 'INF-BRDG-Z',
+    unitID: 'INF-BRDG-K',
     unitType: 'Infantry',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 30
+    unitHealth: 88
   },
   // Special Operations
   {
@@ -86,7 +86,7 @@ export const data: Unit[] = [
     unitType: 'Special Operations',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 20
+    unitHealth: 54
   },
   {
     unitID: 'SF-TEAM-B',
@@ -100,42 +100,42 @@ export const data: Unit[] = [
     unitType: 'Special Operations',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 35
+    unitHealth: 100
   },
   {
     unitID: 'SF-TEAM-D',
     unitType: 'Special Operations',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 40
+    unitHealth: 36
   },
   {
-    unitID: 'SF-TEAM-D',
+    unitID: 'SF-TEAM-E',
     unitType: 'Special Operations',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 40
+    unitHealth: 69
   },
   {
-    unitID: 'SF-TEAM-D',
+    unitID: 'SF-TEAM-F',
     unitType: 'Special Operations',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 40
+    unitHealth: 25
   },
   {
-    unitID: 'SF-TEAM-D',
+    unitID: 'SF-TEAM-G',
     unitType: 'Special Operations',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 40
+    unitHealth: 65
   },
   {
-    unitID: 'SF-TEAM-D',
+    unitID: 'SF-TEAM-H',
     unitType: 'Special Operations',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 40
+    unitHealth: 32
   },
   // Armor
   {
@@ -150,34 +150,34 @@ export const data: Unit[] = [
     unitType: 'Armor',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 43
+    unitHealth: 84
   },
   {
     unitID: 'ARM-DIV-3',
     unitType: 'Armor',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 42
+    unitHealth: 34
   },
   {
-    unitID: 'ARM-DIV-1',
+    unitID: 'ARM-DIV-4',
     unitType: 'Armor',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 40
+    unitHealth: 46
   },
   {
-    unitID: 'ARM-DIV-2',
+    unitID: 'ARM-DIV-5',
     unitType: 'Armor',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 43
+    unitHealth: 15
   },
   {
-    unitID: 'ARM-DIV-3',
+    unitID: 'ARM-DIV-6',
     unitType: 'Armor',
     unitSymbol: 'Loading...',
     isFriendly: true,
-    unitHealth: 42
+    unitHealth: 71
   }
 ]

@@ -20,6 +20,8 @@ function App() {
 
   useEffect(() => {
     if (userRole !== 'Student' || userSection !== sectionId) {
+      console.log(`user Role: ${userRole}`);
+      console.log(`user section: ${sectionId}`);
       navigate('/');
     }
   }, [navigate, userRole]);
@@ -49,23 +51,18 @@ function App() {
       >
         <AppShell.Header>
           <Group h="100%" justify="space-between" px="md" align="center">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent:"space-between"}}>
-            <Button size='sm' variant='link' onClick={handleArrowClick} style={{margin:'10px'}}><FaArrowAltCircleLeft /> </Button>
-            <Image
-              src={null}
-              radius="md"
-              h={50}
-              fallbackSrc="https://placehold.co/600x400?text=Placeholder"
-              onClick={handleLogoClick} // Add onClick handler here
-              style={{ cursor: 'pointer' }} // Add cursor pointer to indicate clickable
-            />
-          </div>
-            <TextInput
-              placeholder='Search'
-              style={{ width:'30%',  }}
-              value={search}
-              onChange={handleChange}
-            />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between" }}>
+              <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}><FaArrowAltCircleLeft /> </Button>
+              <Image
+                src={null}
+                radius="md"
+                h={50}
+                fallbackSrc="https://placehold.co/600x400?text=Placeholder"
+                onClick={handleLogoClick} // Add onClick handler here
+                style={{ cursor: 'pointer' }} // Add cursor pointer to indicate clickable
+              />
+            </div>
+
           </Group>
         </AppShell.Header>
 
@@ -77,19 +74,26 @@ function App() {
                 You are in section: <strong>{sectionId}</strong>
               </p>
             )}
+            <TextInput
+              placeholder='Search'
+              style={{ width: '30%', }}
+              value={search}
+              onChange={handleChange}
+            />
           </div>
+
           {search ? (
-          <>
-          <div className="App">
-            <SearchResultList search={search} />
-          </div>
-          </>
+            <>
+              <div className="App">
+                <SearchResultList search={search} />
+              </div>
+            </>
           ) : (
-          <div className="App">
-            <CarouselC />
-          </div>
+            <div className="App">
+              <CarouselC />
+            </div>
           )
-        }
+          }
         </AppShell.Main>
       </AppShell>
     </MantineProvider>
