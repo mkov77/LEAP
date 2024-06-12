@@ -30,6 +30,7 @@ function CardC({ unit }: CardProps) {
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
   const navigate = useNavigate();
 
+
   let healthColor = 'green';
 
   if (unitHealth >= 75) {
@@ -43,12 +44,13 @@ function CardC({ unit }: CardProps) {
   }
 
   return (
-    <HoverCard width={280} shadow="md">
+    <HoverCard width={280} shadow="md" openDelay={750}>
       <HoverCard.Target>
         <Card
           shadow={unitID === selectedUnit ? '0' : 'lg'}
           padding={0}
           radius={0}
+
           onClick={() => {
             if (unitHealth > 0) {
               if (selectedUnit === unitID) {

@@ -64,12 +64,14 @@ function BattlePage() {
             <p>Phase 2: Tactical Advantage</p>
             <Grid>
               <Grid.Col span={6}>
+              <h1>Friendly {selectedUnit}</h1>
                 <p>Under ISR coverage?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 <p>Working GPS?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
               </Grid.Col>
               <Grid.Col span={6}>
+              <h1>Enemy INF-BRIG-C</h1>
                 <p>Under ISR coverage?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                 <p>Working GPS?</p>
@@ -86,12 +88,14 @@ function BattlePage() {
             <p>Phase 3: Fire Support</p>
             <Grid>
               <Grid.Col span={6}>
+              <h1>Friendly {selectedUnit}</h1>
                 <p>Working communications?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 <p>Within fire support range?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
               </Grid.Col>
               <Grid.Col span={6}>
+              <h1>Enemy INF-BRIG-C</h1>
                 <p>Working communications?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                 <p>Within fire support range?</p>
@@ -108,12 +112,14 @@ function BattlePage() {
             <p>Phase 4: Terrain</p>
             <Grid>
               <Grid.Col span={6}>
+              <h1>Friendly {selectedUnit}</h1>
                 <p>Higher ground?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 <p>Accessible by pattern force?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
               </Grid.Col>
               <Grid.Col span={6}>
+              <h1>Enemy INF-BRIG-C</h1>
                 <p>Higher ground?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                 <p>Accessible by pattern force?</p>

@@ -100,6 +100,7 @@ function App() {
           disabled={!selectedUnit}
           size='compact-xl'
           onClick={() => navigate(`/battlePage`)}
+          style={{margin: '30px'}}
           >Select For Battle!</Button>
           </Group>
         </AppShell.Main>
