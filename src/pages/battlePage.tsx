@@ -27,8 +27,31 @@ function BattlePage() {
       <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
         <Stepper.Step allowStepSelect={false} icon={<IconSwords stroke={1.5} style={{ width: rem(27), height: rem(27) }} />}>
           <div>
-            <h2>You have selected unit: {selectedUnit}</h2>
-            <p>This is where you'll learn about your friendly and enemy units before they start</p>
+            <Grid>
+              <Grid.Col span={6}>
+              <h2>Friendly Unit: {selectedUnit}</h2>
+              <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+              <Image
+                src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
+                height={160}
+                style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
+              />
+            </div>
+              <p>Characteristics will appear here</p>
+              </Grid.Col>
+              <Grid.Col span={6}>  
+            <h2>Enemy Unit: TBD</h2>
+            <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+            <Image
+              src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
+              height={160}
+              style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
+            />
+          </div>
+            <p>Characteristics will appear here</p>
+            
+              </Grid.Col>
+            </Grid>
             <Group justify="center" mt="xl">
               <Button onClick={nextStep}>Start Engagement</Button>
             </Group>
@@ -133,9 +156,10 @@ function BattlePage() {
         </Stepper.Step>
         <Stepper.Step allowStepSelect={false} icon={<IconHeartbeat stroke={1.5} style={{ width: rem(35), height: rem(35) }} />}>
           <div>
-            <p>This is where your results will be display.</p>
+            <h1>After-Action Review</h1>
+            <p>This is where your results will be displayed.</p>
             <Group justify="center" mt="xl">
-              <Button onClick={() => { navigate(closeLocation) }}>Done</Button>
+              <Button onClick={() => { navigate(closeLocation); setSelectedUnit(null) }}>Done</Button>
             </Group>
           </div>
         </Stepper.Step>

@@ -63,7 +63,7 @@ export default function LandingPage() {
   const renderSectionsTable = () => (
     <Box style={{ maxWidth: 600, margin: '0 auto'}}>
         <h1 className='sessionCentered' >
-             Ensure Correct Student Session is Selected
+             Select Student Session
         </h1>
         <Table withRowBorders>
           <Table.Thead>
