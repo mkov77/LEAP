@@ -135,7 +135,12 @@ function BattlePage() {
           <div>
             <p>This is where your results will be display.</p>
             <Group justify="center" mt="xl">
-              <Button onClick={() => { navigate(closeLocation) }}>Done</Button>
+              <Button onClick={() => { 
+                setSelectedUnit(null);
+                navigate(closeLocation) }}
+                >
+                  Done
+                </Button>
             </Group>
           </div>
         </Stepper.Step>
