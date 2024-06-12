@@ -6,6 +6,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserRole } from '../context/UserContext';
+import { useUnitProvider } from '../context/UnitContext';
 import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
 
 
@@ -16,7 +17,7 @@ function App() {
   const navigate = useNavigate();
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
-
+  const { selectedUnit, setSelectedUnit } = useUnitProvider();
 
   useEffect(() => {
     if (userRole !== 'Student' || userSection !== sectionId) {
@@ -94,6 +95,13 @@ function App() {
             </div>
           )
           }
+          <Group justify='center'>
+          <Button 
+          disabled={!selectedUnit}
+          size='compact-xl'
+          onClick={() => navigate(`/battlePage`)}
+          >Select For Battle!</Button>
+          </Group>
         </AppShell.Main>
       </AppShell>
     </MantineProvider>

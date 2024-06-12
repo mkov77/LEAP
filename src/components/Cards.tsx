@@ -2,7 +2,8 @@ import { Box, Card, Container, Flex, Image, Text, Badge, Button, Group, Grid, Gr
 import classes from './Cards.module.css'
 import { useUnitProvider } from '../context/UnitContext';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import BattleComponent from '../pages/battlePage';
+import { useClickOutside } from '@mantine/hooks';
+
 // Define Unit interface
 export interface Unit {
   unitID: string;
@@ -18,9 +19,9 @@ interface CardProps {
 
 function CardC({ unit }: CardProps) {
   const { unitID, unitType, unitHealth } = unit;
-  const { sectionID } = useParams();
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
   const navigate = useNavigate();
+
   let healthColor = 'green';
 
   if (unitHealth >= 66) {
