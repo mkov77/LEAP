@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Paper, PasswordInput, Button, Title, SegmentedControl, Table, Box, useMantineTheme, Text, useMantineColorScheme, useComputedColorScheme, FocusTrap } from '@mantine/core';
+import { Image, Paper, PasswordInput, Button, Title, SegmentedControl, Table, Box, useMantineTheme, Text, useMantineColorScheme, useComputedColorScheme, FocusTrap } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import classes from './landingPage.module.css';
@@ -118,9 +118,14 @@ export default function LandingPage() {
     <MantineProvider defaultColorScheme='dark'>
       <div className={classes.wrapper}>
         <Paper className={classes.form} radius={0} p={30}>
-          <Title order={2} className={classes.title} ta="center" mt="md" mb={50}>
-            Welcome back to LEAP
-          </Title>
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '40px', scale:'0.75' }}>
+            <Image
+              radius="md"
+              src="https://github.com/mkov77/LEAP/blob/main/Tr_FullColor.png?raw=true"
+              h={200}
+              fallbackSrc='https://placehold.co/600x400?text=Placeholder'
+            />
+          </div>
           <div style={{ margin: '10px'}} >
             <SegmentedControl
               size="lg"
@@ -133,7 +138,7 @@ export default function LandingPage() {
             <div style={{ margin: '10px'}} >
               <SegmentedControl
                 size="lg"
-                data={['JFLCC', 'JFMCC', 'JFSOCC']}
+                data={['JFLCC', 'JFSOCC']}
                 value={force}
                 onChange={setForce}
               />
