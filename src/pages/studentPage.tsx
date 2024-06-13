@@ -39,6 +39,10 @@ function App() {
     navigate('/');
   };
 
+  const handleAARClick = () => {
+    navigate(`/AAR/${sectionId}`)
+  }
+
   return (
     <MantineProvider defaultColorScheme='dark'>
       <AppShell
@@ -63,7 +67,7 @@ function App() {
                 style={{ cursor: 'pointer' }} // Add cursor pointer to indicate clickable
               />
             </div>
-
+            <Button size='md' variant='link' onClick={handleAARClick} style={{margin: '10px'}}>After Action Reports</Button>
           </Group>
         </AppShell.Header>
 

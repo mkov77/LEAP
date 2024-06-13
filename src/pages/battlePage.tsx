@@ -70,6 +70,73 @@ function BattlePage() {
     }
   }
 
+  const CustomProgressBarReadiness = ({value}: { value: number}) => {
+    let color = 'blue';
+
+    //set color based on value for readiness
+    if (value === 0){
+      color = 'red';
+    }
+    else if (value <=25){
+      color = 'orange';
+    }
+    else if (value <=50){
+      color = 'yellow';
+    }
+    else if (value <=75){
+      color = 'lime';
+    }
+    else{
+      color = 'green';
+    }
+
+    return (
+      <Progress value={value} color={color} size={'xl'}/>
+    );
+  };
+
+  const CustomProgressBarSkill = ({value}: { value: number}) => {
+    let color = 'blue';
+
+    //set color based on value for readiness
+    if (value === 0){
+      color = 'red';
+    }
+    else if (value <=50){
+      color = 'yellow';
+    }
+    else{
+      color = 'green';
+    }
+
+    return (
+      <Progress value={value} color={color} size={'xl'}/>
+    );
+  };
+
+  const CustomProgressBarHealth = ({value}: { value: number}) => {
+    let color = 'blue';
+
+    //set color based on value for readiness
+    if (value <= 25){
+      color = 'red';
+    }
+    else if (value <=50){
+      color = 'orange';
+    }
+    else if (value <= 75){
+      color = 'yellow';
+    }
+    else{
+      color = 'green';
+    }
+
+    return (
+      <Progress value={value} color={color} size={'xl'} />
+    );
+  };
+
+
   return (
     <MantineProvider defaultColorScheme='dark'>
 
@@ -92,18 +159,18 @@ function BattlePage() {
                 </Card.Section>
                 <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
             {unit ? (
-              <Text size="sm">
+              <Text size="xl" style={{whiteSpace: 'pre-line'}}>
                 <strong>Type:</strong> {unitType}<br />
                 <strong>Unit Size:</strong> {unitSize}<br />
                 <strong>Force Mobility:</strong> {forceMobility}<br />
-                 <strong>Health:</strong> {unitHealth}<br />
-                <Progress value={Number(unitHealth)} />
+                <strong>Health:</strong> {unitHealth}<br />
+                <CustomProgressBarHealth value={Number(unitHealth)} />
 
                 <strong>Force Readiness:</strong> {forceReadiness}<br />
-                <Progress value={Number(getReadinessProgress(forceReadiness))} />
+                <CustomProgressBarReadiness value={Number(getReadinessProgress(forceReadiness))} />
 
                 <strong>Force Skill:</strong> {forceSkill}<br />
-                <Progress value={Number(getForceSkill((forceSkill)))} />
+                <CustomProgressBarReadiness value={Number(getForceSkill((forceSkill)))} />
               </Text>
             ) : (
               <Text size="sm">Unit not found</Text>
@@ -112,9 +179,8 @@ function BattlePage() {
               </Grid.Col>
           <Grid.Col span={4}>  
             <Card withBorder radius="md" className={classes.card} >
-            <h2>Enemy Unit: TBD</h2>
-            <Card.Section className={classes.section} mt="md" >
-              <Group gap={8} mb={-8}>
+            <Card.Section className={classes.imageSection} mt="md" >
+              <Group>
             <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
             <Image
               src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
@@ -124,16 +190,21 @@ function BattlePage() {
           </div>
           </Group>
             </Card.Section>
-            <h2>Unit Information</h2>
+            <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
             {unit ? (
-              <Text size="sm">
-                <strong>Unit ID:</strong> {unitID}<br />
+              <Text size="xl">
                 <strong>Type:</strong> {unitType}<br />
-                <strong>Health:</strong> {unitHealth}<br />
                 <strong>Unit Size:</strong> {unitSize}<br />
                 <strong>Force Mobility:</strong> {forceMobility}<br />
+                <strong>Health:</strong> {unitHealth}<br />
+                <CustomProgressBarHealth value={Number(unitHealth)} />
+
                 <strong>Force Readiness:</strong> {forceReadiness}<br />
+                <CustomProgressBarReadiness value={Number(getReadinessProgress(forceReadiness))} />
+
                 <strong>Force Skill:</strong> {forceSkill}<br />
+                <CustomProgressBarSkill value={Number(getForceSkill((forceSkill)))} />
+
               </Text>
             ) : (
               <Text size="sm">Unit not found</Text>

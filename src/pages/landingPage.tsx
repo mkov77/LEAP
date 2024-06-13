@@ -7,8 +7,6 @@ import { sections } from '../data/sections';
 import './landingPage.module.css';
 import { useUserRole } from '../context/UserContext';
 import { MantineProvider } from '@mantine/core';
-import { FaSun, FaMoon } from "react-icons/fa";
-import { useDisclosure, useFocusTrap } from '@mantine/hooks';
 
 
 export interface Section {
