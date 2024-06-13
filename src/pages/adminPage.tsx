@@ -163,30 +163,20 @@ function AdminPage() {
         padding="md"
       >
         <AppShell.Header>
-          <Group h="100%" px="md">
-            <Group>
-              <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
-              <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
-            </Group>
-            <Button size='sm' variant='link' onClick={handleArrowClick}><FaArrowAltCircleLeft /> </Button>
-            <Image
-              src={null}
-              radius="md"
-              h={50}
-              fallbackSrc="https://placehold.co/600x400?text=Placeholder"
-              onClick={handleLogoClick}
-              style={{ cursor: 'pointer' }}
-            />
-          </Group>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}>
+            <FaArrowAltCircleLeft />
+          </Button>
+          <Image
+            src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
+            radius="md"
+            h={50}
+            fallbackSrc="https://placehold.co/600x400?text=Placeholder"
+            onClick={handleLogoClick}
+            style={{ cursor: 'pointer', scale: '1', padding:'8px' }}
+          />
+          </div>
         </AppShell.Header>
-        <AppShell.Navbar p="sm">
-          Admin Navbar
-          {Array(15)
-            .fill(0)
-            .map((_, index) => (
-              <Skeleton key={index} h={28} mt="sm" animate={false} />
-            ))}
-        </AppShell.Navbar>
         <AppShell.Main>
           <div className="App">
             <h1>Admin Page</h1>

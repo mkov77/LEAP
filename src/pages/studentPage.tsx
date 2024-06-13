@@ -51,20 +51,19 @@ function App() {
         padding="md"
       >
         <AppShell.Header>
-          <Group h="100%" justify="space-between" px="md" align="center">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between" }}>
-              <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}><FaArrowAltCircleLeft /> </Button>
-              <Image
-                src={null}
-                radius="md"
-                h={50}
-                fallbackSrc="https://placehold.co/600x400?text=Placeholder"
-                onClick={handleLogoClick} // Add onClick handler here
-                style={{ cursor: 'pointer' }} // Add cursor pointer to indicate clickable
-              />
-            </div>
-
-          </Group>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}>
+            <FaArrowAltCircleLeft />
+          </Button>
+          <Image
+            src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
+            radius="md"
+            h={50}
+            fallbackSrc="https://placehold.co/600x400?text=Placeholder"
+            onClick={handleLogoClick}
+            style={{ cursor: 'pointer', scale: '1', padding:'8px' }}
+          />
+          </div>
         </AppShell.Header>
 
         <AppShell.Main>
