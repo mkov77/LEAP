@@ -3,7 +3,7 @@ import classes from './Cards.module.css'
 import { useUnitProvider } from '../context/UnitContext';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useClickOutside } from '@mantine/hooks';
-
+import { RawNodeDatum } from 'react-d3-tree';
 
 // Define Unit interface
 export interface Unit {
@@ -18,7 +18,7 @@ export interface Unit {
   forceMobility: string;
   forceReadiness: string;
   forceSkill: string;
-  parent: string;
+  children: string[];
 }
 
 interface CardProps {

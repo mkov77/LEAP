@@ -14,7 +14,8 @@ export const data: Unit[] = [
     forcePosture: 'Offense and Defense',
     forceMobility: 'Mobile (foot)',
     forceReadiness: 'High',
-    forceSkill: 'Advanced'
+    forceSkill: 'Advanced',
+    children: ['INF-BRDG-B', 'INF-BRDG-C', 'INF-BRDG-D']
   },
   {
     unitID: 'INF-BRDG-B',
@@ -27,7 +28,8 @@ export const data: Unit[] = [
     forcePosture: 'Offense and Defense',
     forceMobility: 'Mobile (foot)',
     forceReadiness: 'Medium',
-    forceSkill: 'Advanced'
+    forceSkill: 'Advanced',
+    children: ['ENG-CMD-A', 'SPF-SIG-A']
   },
   {
     unitID: 'INF-BRDG-C',
@@ -40,7 +42,8 @@ export const data: Unit[] = [
     forcePosture: 'Offense and Defense',
     forceMobility: 'Mobile (foot)',
     forceReadiness: 'Medium',
-    forceSkill: 'Basic'
+    forceSkill: 'Basic',
+    children: ['ARM-MECH-A', 'ARTY-FA-A']
   },
   {
     unitID: 'INF-BRDG-D',
@@ -53,7 +56,8 @@ export const data: Unit[] = [
     forcePosture: 'Offense and Defense',
     forceMobility: 'Mobile (foot)',
     forceReadiness: 'Medium',
-    forceSkill: 'Basic'
+    forceSkill: 'Basic',
+    children: ['MED-MTF-A', 'UAS-UNIT-A']
   },
   // Additional units with new types and parameters
   {
@@ -67,7 +71,8 @@ export const data: Unit[] = [
     forcePosture: 'Defensive Only',
     forceMobility: 'Mobile (wheeled)',
     forceReadiness: 'High',
-    forceSkill: 'Advanced'
+    forceSkill: 'Advanced',
+    children: ['RECON-TEAM-A', 'SPF-TEAM-A']
   },
   {
     unitID: 'SPF-SIG-A',
@@ -80,7 +85,8 @@ export const data: Unit[] = [
     forcePosture: 'Defensive Only',
     forceMobility: 'Mobile (wheeled)',
     forceReadiness: 'Medium',
-    forceSkill: 'Basic'
+    forceSkill: 'Basic',
+    children: []
   },
   {
     unitID: 'ARM-MECH-A',
@@ -93,7 +99,8 @@ export const data: Unit[] = [
     forcePosture: 'Offensive Only',
     forceMobility: 'Mobile (track)',
     forceReadiness: 'Elite',
-    forceSkill: 'Advanced'
+    forceSkill: 'Advanced',
+    children: []
   },
   {
     unitID: 'ARTY-FA-A',
@@ -106,7 +113,8 @@ export const data: Unit[] = [
     forcePosture: 'Defensive Only',
     forceMobility: 'Mobile (track)',
     forceReadiness: 'High',
-    forceSkill: 'Advanced'
+    forceSkill: 'Advanced',
+    children: []
   },
   {
     unitID: 'MED-MTF-A',
@@ -119,7 +127,8 @@ export const data: Unit[] = [
     forcePosture: 'Defensive Only',
     forceMobility: 'Stationary',
     forceReadiness: 'Elite',
-    forceSkill: 'Advanced'
+    forceSkill: 'Advanced',
+    children: []
   },
   {
     unitID: 'UAS-UNIT-A',
@@ -132,7 +141,8 @@ export const data: Unit[] = [
     forcePosture: 'Offense and Defense',
     forceMobility: 'Flight (fixed wing)',
     forceReadiness: 'Medium',
-    forceSkill: 'Basic'
+    forceSkill: 'Basic',
+    children: []
   },
   {
     unitID: 'RECON-TEAM-A',
@@ -145,7 +155,8 @@ export const data: Unit[] = [
     forcePosture: 'Offense and Defense',
     forceMobility: 'Mobile (wheeled)',
     forceReadiness: 'High',
-    forceSkill: 'Advanced'
+    forceSkill: 'Advanced',
+    children: []
   },
   {
     unitID: 'SPF-TEAM-A',
@@ -158,7 +169,8 @@ export const data: Unit[] = [
     forcePosture: 'Offense and Defense',
     forceMobility: 'Mobile (foot)',
     forceReadiness: 'Elite',
-    forceSkill: 'Advanced'
+    forceSkill: 'Advanced',
+    children: ['SPF-TEAM-B', 'SPF-TEAM-C', 'SPF-TEAM-D', 'SPF-TEAM-E']
   },
   {
     unitID: 'SPF-TEAM-B',
@@ -171,7 +183,8 @@ export const data: Unit[] = [
     forcePosture: 'Offense and Defense',
     forceMobility: 'Mobile (foot)',
     forceReadiness: 'Elite',
-    forceSkill: 'Advanced'
+    forceSkill: 'Advanced',
+    children: []
   },
   {
     unitID: 'SPF-TEAM-C',
@@ -184,7 +197,8 @@ export const data: Unit[] = [
     forcePosture: 'Offense and Defense',
     forceMobility: 'Mobile (foot)',
     forceReadiness: 'Elite',
-    forceSkill: 'Advanced'
+    forceSkill: 'Advanced',
+    children: []
   },
   {
     unitID: 'SPF-TEAM-D',
@@ -197,7 +211,8 @@ export const data: Unit[] = [
     forcePosture: 'Offense and Defense',
     forceMobility: 'Mobile (foot)',
     forceReadiness: 'Elite',
-    forceSkill: 'Advanced'
+    forceSkill: 'Advanced',
+    children: []
   },
   {
     unitID: 'SPF-TEAM-E',
@@ -210,6 +225,7 @@ export const data: Unit[] = [
     forcePosture: 'Offense and Defense',
     forceMobility: 'Mobile (foot)',
     forceReadiness: 'Elite',
-    forceSkill: 'Advanced'
+    forceSkill: 'Advanced',
+    children: []
   }
 ];

@@ -1,18 +1,19 @@
 import '../App.css';
 import CarouselC from '../components/carousel'; // Remove the '.tsx' extension
 import SearchResultList from '../components/searchResults'
-import { AppShell, Burger, Group, Skeleton, Image, TextInput, useMantineColorScheme, useComputedColorScheme, Button, MantineProvider } from '@mantine/core';
+import { AppShell, Burger, Group, Skeleton, Image, TextInput, useMantineColorScheme, useComputedColorScheme, Button, MantineProvider, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserRole } from '../context/UserContext';
 import { useUnitProvider } from '../context/UnitContext';
 import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
-
+import Hierarchy from '../components/HierarchyBuilder';
 
 function App() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
+  const [modalOpened, { open, close }] = useDisclosure(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
@@ -39,6 +40,8 @@ function App() {
     navigate('/');
   };
 
+
+
   return (
     <MantineProvider defaultColorScheme='dark'>
       <AppShell
@@ -63,8 +66,9 @@ function App() {
                 style={{ cursor: 'pointer' }} // Add cursor pointer to indicate clickable
               />
             </div>
-
+            <Button onClick={open}>Hierarchy View</Button>
           </Group>
+
         </AppShell.Header>
 
         <AppShell.Main>
@@ -75,6 +79,9 @@ function App() {
                 You are in section: <strong>{sectionId}</strong>
               </p>
             )}
+            <Modal opened={modalOpened} size='xl' onClose={close} title='Hierarchy'>
+
+            </Modal>
             <TextInput
               placeholder='Search'
               style={{ width: '30%', }}
@@ -96,12 +103,12 @@ function App() {
           )
           }
           <Group justify='center'>
-          <Button 
-          disabled={!selectedUnit}
-          size='compact-xl'
-          onClick={() => navigate(`/battlePage`)}
-          style={{margin: '30px'}}
-          >Select For Battle!</Button>
+            <Button
+              disabled={!selectedUnit}
+              size='compact-xl'
+              onClick={() => navigate(`/battlePage`)}
+              style={{ margin: '30px' }}
+            >Select For Battle!</Button>
           </Group>
         </AppShell.Main>
       </AppShell>

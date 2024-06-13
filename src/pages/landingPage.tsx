@@ -9,6 +9,7 @@ import { useUserRole } from '../context/UserContext';
 import { MantineProvider } from '@mantine/core';
 import { FaSun, FaMoon } from "react-icons/fa";
 import { useDisclosure, useFocusTrap } from '@mantine/hooks';
+import Hierarchy from '../components/HierarchyBuilder';
 
 
 export interface Section {
@@ -135,7 +136,7 @@ export default function LandingPage() {
             <div style={{ margin: '10px'}} >
               <SegmentedControl
                 size="lg"
-                data={['JFLCC', 'JFMCC', 'JFSOCC']}
+                data={['JFLCC', 'JFSOCC']}
                 value={force}
                 onChange={setForce}
               />
@@ -185,6 +186,7 @@ export default function LandingPage() {
                 {role === 'Student' ? 'Launch Session' : 'Launch Observer Session'}
               </Button>
             </div>
+            
           )}
 
         </Paper>
