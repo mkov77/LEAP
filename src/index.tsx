@@ -14,6 +14,7 @@ import BattlePage from './pages/battlePage';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { UserRoleProvider } from './context/UserContext';
 import { UnitProvider } from './context/UnitContext';
+import AAR from './pages/afterActionReportStorage';
 const theme = createTheme({
   /** Put your mantine theme override here */
 });
@@ -34,6 +35,7 @@ root.render(
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/sectionControls/:sectionId" element={<SectionControls />} /> {/* New route */}
               <Route path="/battlePage" element={<BattlePage />} />
+              <Route path="/AAR/:sectionId" element={<AAR />} />
             </Routes>
           </Router>
         </UnitProvider>
