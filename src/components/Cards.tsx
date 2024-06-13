@@ -18,6 +18,7 @@ export interface Unit {
   forceMobility: string;
   forceReadiness: string;
   forceSkill: string;
+  parent: string;
 }
 
 interface CardProps {
