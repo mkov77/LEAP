@@ -80,12 +80,15 @@ function App() {
                   You are in section: <strong>{sectionId}</strong>
                 </p>
               )}
+              {!hierarchyToggle && (
               <TextInput
-                placeholder='Search'
-                style={{ width: '100%' }}
-                value={search}
-                onChange={handleChange}
-              />
+              placeholder='Search'
+              style={{ width: '100%' }}
+              value={search}
+              onChange={handleChange}
+            />
+              )}
+
             </div>
             <div>
               <Button onClick={() => setHierarchyToggle(!hierarchyToggle)}>
