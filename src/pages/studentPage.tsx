@@ -13,12 +13,12 @@ import Hierarchy from '../components/HierarchyBuilder';
 function App() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
-  const [modalOpened, { open, close }] = useDisclosure(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
+  const [hierarchyToggle, setHierarchyToggle] = useState(false);
 
   useEffect(() => {
     if (userRole !== 'Student' || userSection !== sectionId) {
@@ -57,62 +57,69 @@ function App() {
       >
         <AppShell.Header>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}>
-            <FaArrowAltCircleLeft />
-          </Button>
-          <Image
-            src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
-            radius="md"
-            h={50}
-            fallbackSrc="https://placehold.co/600x400?text=Placeholder"
-            onClick={handleLogoClick}
-            style={{ cursor: 'pointer', scale: '1', padding:'8px' }}
-          />
+            <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}>
+              <FaArrowAltCircleLeft />
+            </Button>
+            <Image
+              src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
+              radius="md"
+              h={50}
+              fallbackSrc="https://placehold.co/600x400?text=Placeholder"
+              onClick={handleLogoClick}
+              style={{ cursor: 'pointer', scale: '1', padding: '8px' }}
+            />
           </div>
         </AppShell.Header>
 
         <AppShell.Main>
-          <div>
-            <h1>Welcome to the Student Page</h1>
-            {sectionId && (
-              <p>
-                You are in section: <strong>{sectionId}</strong>
-              </p>
-            )}
-            <Modal opened={modalOpened} size='xl' onClose={close} title='Hierarchy'>
-
-            </Modal>
-            <TextInput
-              placeholder='Search'
-              style={{ width: '30%', }}
-              value={search}
-              onChange={handleChange}
-            />
-          </div>
-
-          {search ? (
-            <>
-              <div className="App">
-                <SearchResultList search={search} />
-              </div>
-            </>
-          ) : (
-            <div className="App">
-              <CarouselC />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <h1>Welcome to the Student Page</h1>
+              {sectionId && (
+                <p>
+                  You are in section: <strong>{sectionId}</strong>
+                </p>
+              )}
+              <TextInput
+                placeholder='Search'
+                style={{ width: '100%' }}
+                value={search}
+                onChange={handleChange}
+              />
             </div>
-          )
-          }
+            <div>
+              <Button onClick={() => setHierarchyToggle(!hierarchyToggle)}>
+                {hierarchyToggle ? 'Selection Menu' : 'Hierarchy View'}
+              </Button>
+            </div>
+          </div>
+          <div className="App">
+      {!hierarchyToggle ? (
+        <>
+          {search && (
+            <SearchResultList search={search} />
+          )}
+          {!search && (
+            <CarouselC />
+          )}
           <Group justify='center'>
             <Button
               disabled={!selectedUnit}
               size='compact-xl'
               onClick={() => navigate(`/battlePage`)}
               style={{ margin: '30px' }}
-            >Select For Battle!</Button>
+            >
+              Select For Battle!
+            </Button>
           </Group>
-        </AppShell.Main>
-      </AppShell>
-    </MantineProvider>
+        </>
+      ) : (
+        <Hierarchy />
+      )}
+    </div>
+      </AppShell.Main>
+    </AppShell>
+    </MantineProvider >
   );
 }
 
