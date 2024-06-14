@@ -56,19 +56,23 @@ function App() {
         padding="md"
       >
         <AppShell.Header>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}>
-            <FaArrowAltCircleLeft />
-          </Button>
-          <Image
-            src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
-            radius="md"
-            h={50}
-            fallbackSrc="https://placehold.co/600x400?text=Placeholder"
-            onClick={handleLogoClick}
-            style={{ cursor: 'pointer', scale: '1', padding:'8px' }}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{display:'flex', alignItems: 'center'}}>
+              <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}>
+                <FaArrowAltCircleLeft />
+              </Button>
+              <Image
+                src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
+                radius="md"
+                h={50}
+                fallbackSrc="https://placehold.co/600x400?text=Placeholder"
+                onClick={handleLogoClick}
+                style={{ cursor: 'pointer', scale: '1', padding:'8px' }}
+              />
+            </div>
+            <Button size='sm' variant='link' onClick={handleAARClick} style={{margin: '10px '}}>After Action Reports</Button>
           </div>
+          
         </AppShell.Header>
 
         <AppShell.Main>
