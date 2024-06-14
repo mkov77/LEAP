@@ -188,6 +188,7 @@ export default function LandingPage() {
                 {/* button text based on role */}
                 {role === 'Student' ? 'Launch Session' : 'Launch Observer Session'}
               </Button>
+
             </div>
             
           )}
