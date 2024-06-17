@@ -43,7 +43,7 @@ export default function AAR() {
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
   const [scrolled, setScrolled] = useState(false);
-  const [isOpen, setOpen] = useState(false);
+ // const [isOpen, setOpen] = useState(false);
 
   const handleLogoClick = () => {
     navigate('/'); // Navigate to the main login page
@@ -53,9 +53,13 @@ export default function AAR() {
     navigate(`/studentPage/${sectionId}`);
   };
 
-  const handleToggle = () => {
-    setOpen((prev) => !prev);
-  };
+  useEffect(() => {
+    if (isOpen !== null){
+      disableScroll();
+    } else {
+      enableScroll();
+    }
+  })
 
   const tactics = [
     {ID:'Aware of OPFOR', blueScore: 20, redScore: 0},
@@ -73,28 +77,35 @@ export default function AAR() {
     </Table.Tr>
   ));
 
-  const BlueForce = [
-    { timeStamp:':00:39', engagmentID:'001', friendlyUnitName:'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B'},
-    { timeStamp:':00:50', engagmentID:'002', friendlyUnitName:'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B'},
-    { timeStamp:':01:39', engagmentID:'002', friendlyUnitName:'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B'},
-    { timeStamp:':03:39', engagmentID:'003', friendlyUnitName:'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B'},    
-    { timeStamp:':07:39', engagmentID:'004', friendlyUnitName:'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B'},
-    { timeStamp:':09:39', engagmentID:'005', friendlyUnitName:'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B'}
+  const rowData = [
+    { timeStamp:':00:39', engagementID:'001', friendlyUnitName:'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B'},
+    { timeStamp:':00:50', engagementID:'002', friendlyUnitName:'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B'},
+    { timeStamp:':01:39', engagementID:'002', friendlyUnitName:'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B'},
+    { timeStamp:':03:39', engagementID:'003', friendlyUnitName:'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B'},    
+    { timeStamp:':07:39', engagementID:'004', friendlyUnitName:'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B'},
+    { timeStamp:':09:39', engagementID:'005', friendlyUnitName:'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B'}
   ];
 
- const row = BlueForce.map((BlueForce) => (
-    <Table.Tr key={BlueForce.friendlyUnitName}>
-      <Table.Td>{BlueForce.timeStamp}</Table.Td>
-      <Table.Td>{BlueForce.engagmentID}</Table.Td>
-      <Table.Td>{BlueForce.friendlyUnitName}</Table.Td>
-      <Table.Td><Group justify="space-between">
-            {/*}  <Text fz="xs" c="teal" fw={700}>
-                {BlueForce.forceSkill.toFixed(0)}%
-              </Text>
-              <Text fz="xs" c="red" fw={700}>
-                {negativeReviews.toFixed(0)}%
-              </Text> */}
-            </Group>
+ 
+
+  let index: number = 0;
+
+  const [isOpen, setIsOpen] = useState<boolean[]>(Array(rowData.length).fill(false));
+
+  const handleToggle = (index: number) => {
+    setIsOpen(prev => {
+      const newState = [...prev]; // Create a copy of isOpen array
+      newState[index] = !newState[index]; // Toggle the state of the clicked row
+      return newState;
+    });
+  };
+
+ const row = rowData.map((rowData) => (
+    <Table.Tr key={rowData.friendlyUnitName}>
+      <Table.Td>{rowData.timeStamp}</Table.Td>
+      <Table.Td>{rowData.engagementID}</Table.Td>
+      <Table.Td>{rowData.friendlyUnitName}</Table.Td>
+      <Table.Td>
         <Progress.Root style={{width:'600px', height:'50px'}}>
           <Progress.Section
                 className={classes.progressSection}
@@ -140,7 +151,7 @@ export default function AAR() {
 
         </Progress.Root>
       </Table.Td>
-      <Table.Td>{BlueForce.enemyUnitName}</Table.Td>
+      <Table.Td>{rowData.enemyUnitName}</Table.Td>
       <Table.Td>
         <Group justify="space-between">
             {/*}  <Text fz="xs" c="teal" fw={700}>
@@ -196,6 +207,15 @@ export default function AAR() {
     </Table.Tr>
   ));
 
+  const disableScroll = () => {
+    document.body.style.overflow = 'hidden';
+  };
+
+  const enableScroll = () => {
+    document.body.style.overflow = '';
+  };
+
+
 
 
   return(
@@ -215,22 +235,23 @@ export default function AAR() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between" }}>
               <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}><FaArrowAltCircleLeft /> </Button>
               <Image
-                src={null}
-                radius="md"
-                h={50}
-                fallbackSrc="https://placehold.co/600x400?text=Placeholder"
-                onClick={handleLogoClick} // Add onClick handler here
-                style={{ cursor: 'pointer' }} // Add cursor pointer to indicate clickable
+               src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
+               radius="md"
+               h={50}
+               fallbackSrc="https://placehold.co/600x400?text=Placeholder"
+               onClick={handleLogoClick}
+               style={{ cursor: 'pointer', scale: '1', padding: '8px' }}
               />
             </div>
           </Group>
         </AppShell.Header>
 
         <AppShell.Main>
-         <h2> This is the AAR Page for {sectionId}</h2>
+          <h1 style={{justifyContent:'center', alignItems: 'center', display:'flex'}}>Log of After Action Reports</h1>
+         <h2 style={{justifyContent:'center', alignItems: 'center', display:'flex'}}>Section: {sectionId}</h2>
         <AppShell>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder style={{width: '600px'}}>
+          <Card shadow="sm" padding="lg" radius="md" withBorder style={{width: '600px'}} display={'flex'}>
             <Card.Section>
               <div style={{textAlign:'center'}}>
                 <h2>Most Recent Engagement</h2>
@@ -239,47 +260,47 @@ export default function AAR() {
                 Engagement ID:
               </div>
               <div style={{display:'flex', justifyContent:'space-between', padding: '30px'}}>
-              <Progress.Root style={{width:'200px', height:'25px'}}>
-                <Progress.Section
-                      className={classes.progressSection}
-                      value={30 * .15}
-                      color="#1864ab">
-                </Progress.Section>
-                <Progress.Section
-                      className={classes.progressSection}
-                      value={90 * .02}
-                      color="#1971c2">
-                </Progress.Section>
-                <Progress.Section
-                      className={classes.progressSection}
-                      value={70 * .25}
-                      color="#1c7ed6">
-                </Progress.Section>
-                <Progress.Section
-                      className={classes.progressSection}
-                      value={90 * .10}
-                      color="#228be6">
-                </Progress.Section>
-                <Progress.Section
-                      className={classes.progressSection}
-                      value={50 * .10}
-                      color="#339af0">
-                </Progress.Section>
-                <Progress.Section
-                      className={classes.progressSection}
-                      value={90 * .04}
-                      color="#4dabf7">
-                </Progress.Section>
-                <Progress.Section
-                      className={classes.progressSection}
-                      value={70 * .04}
-                      color="#74c0fc">
-                </Progress.Section>
-                <Progress.Section
-                      className={classes.progressSection}
-                      value={40 * .30}
-                      color="#a5d8ff">
-                </Progress.Section>
+                <Progress.Root style={{width:'200px', height:'25px'}}>
+                  <Progress.Section
+                        className={classes.progressSection}
+                        value={30 * .15}
+                        color="#4e87c1">
+                  </Progress.Section>
+                  <Progress.Section
+                        className={classes.progressSection}
+                        value={90 * .02}
+                        color="#1971c2">
+                  </Progress.Section>
+                  <Progress.Section
+                        className={classes.progressSection}
+                        value={70 * .25}
+                        color="#1c7ed6">
+                  </Progress.Section>
+                  <Progress.Section
+                        className={classes.progressSection}
+                        value={90 * .10}
+                        color="#228be6">
+                  </Progress.Section>
+                  <Progress.Section
+                        className={classes.progressSection}
+                        value={50 * .10}
+                        color="#339af0">
+                  </Progress.Section>
+                  <Progress.Section
+                        className={classes.progressSection}
+                        value={90 * .04}
+                        color="#4dabf7">
+                  </Progress.Section>
+                  <Progress.Section
+                        className={classes.progressSection}
+                        value={70 * .04}
+                        color="#74c0fc">
+                  </Progress.Section>
+                  <Progress.Section
+                        className={classes.progressSection}
+                        value={40 * .30}
+                        color="#a5d8ff">
+                  </Progress.Section>
 
 
               </Progress.Root>
@@ -287,7 +308,7 @@ export default function AAR() {
                 <Progress.Section
                         className={classes.progressSection}
                         value={30 * .15}
-                        color="#c92a2a">
+                        color="#bd3058">
                   </Progress.Section>
                   <Progress.Section
                         className={classes.progressSection}
@@ -325,9 +346,6 @@ export default function AAR() {
                         color="#ffc9c9">
                   </Progress.Section>
                 </Progress.Root>
-                <Button size="xs" onClick={handleToggle}>
-                {isOpen ? 'Collapse' : 'Expand'}
-              </Button>
               </div>
               <Table verticalSpacing={'xs'} style={{width: '600px', justifyContent: 'center'}}>
                 <Table.Thead>
@@ -342,36 +360,138 @@ export default function AAR() {
             </Card.Section>
           </Card>
           </div>
-        <Table.ScrollContainer minWidth={800}>
+
          <Table verticalSpacing={'xs'}>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Time Stamp</Table.Th>
-                <Table.Th>Engagmenet ID</Table.Th>
+                <Table.Th>Engagement ID</Table.Th>
                 <Table.Th>Friendly Unit Name</Table.Th>
                 <Table.Th>Friendly Bar</Table.Th>
                 <Table.Th>Enemy Unit Name</Table.Th>
                 <Table.Th>Enemy Bar</Table.Th>
+                <Table.Th style={{width:'425px'}}></Table.Th>
               </Table.Tr>
             </Table.Thead>
-          <Table.Tbody>{row}
-            <Table.Tr>
-              <Table.Td colSpan={6}></Table.Td>
-              <Button size="xs" onClick={handleToggle}>
-                {isOpen ? 'Collapse' : 'Expand'}
-              </Button>
-            </Table.Tr>
+          <Table.Tbody>
+            {rowData.map((row, index) => (
+              <Table.Tr key={index}>
+                <Table.Td>{row.timeStamp}</Table.Td>
+                <Table.Td>{row.engagementID}</Table.Td>
+                <Table.Td>{row.friendlyUnitName}</Table.Td>
+                <Table.Td>
+                  <Progress.Root style={{width:'200px', height:'25px'}}>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={30 * .15}
+                          color="#1864ab">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={90 * .02}
+                          color="#1971c2">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={70 * .25}
+                          color="#1c7ed6">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={90 * .10}
+                          color="#228be6">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={50 * .10}
+                          color="#339af0">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={90 * .04}
+                          color="#4dabf7">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={70 * .04}
+                          color="#74c0fc">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={40 * .30}
+                          color="#a5d8ff">
+                    </Progress.Section>
+                  </Progress.Root>
+                </Table.Td>
+                <Table.Td>{row.enemyUnitName}</Table.Td>
+                <Table.Td>
+                  <Progress.Root style={{width:'200px', height:'25px'}}>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={30 * .15}
+                          color="#c92a2a">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={90 * .02}
+                          color="#e03131">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={70 * .25}
+                          color="#f03e3e">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={50 * .10}
+                          color="#fa5252">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={30 * .10}
+                          color="#ff6b6b">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={90 * .04}
+                          color="#ff8787">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={70 * .04}
+                          color="#ffa8a8">
+                    </Progress.Section>
+                    <Progress.Section
+                          className={classes.progressSection}
+                          value={50 * .30}
+                          color="#ffc9c9">
+                    </Progress.Section>
+                  </Progress.Root>
+                </Table.Td>
+                
+                <Table.Td>
+                  <Button className='.toggle-details' size="xs" onClick={() => handleToggle(index)}>
+                    {isOpen[index] ? 'Collapse' : 'Expand'}
+                  </Button>
+                <Collapse in={isOpen[index]}>
+              <div>
+                  <Table verticalSpacing={'xs'} style={{width: '100%', overflowX: 'auto'}}>
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th>Tactic</Table.Th>
+                        <Table.Th>Blue Score</Table.Th>
+                        <Table.Th>Red Score</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>{tacticRows}</Table.Tbody>
+                  </Table>
+              </div>
+                  </Collapse>
+                </Table.Td>
+              </Table.Tr>
+            ))}
           </Table.Tbody>
-          </Table>
-        </Table.ScrollContainer>
-
-        <Collapse in={isOpen}>
-          <div style={{ padding: '10px', borderTop: '1px solid #ccc' }}>
-            Additional Details Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-            ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
-            ut aliquip ex ea commodo consequat.
-          </div>
-        </Collapse>
+        </Table>
       </AppShell>
         </AppShell.Main>
       </AppShell>
