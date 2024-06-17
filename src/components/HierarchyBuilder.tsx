@@ -95,8 +95,9 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
     }, []);
 
 
+
     return (
-      <div style={{ width: '100%', height: '100vh' }}>
+      <div style={{ width: '100%', height: '81.5vh' }}>
         {tree && 
         <Tree 
         data={tree}
@@ -106,6 +107,7 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
         collapsible={false}
         pathFunc={'step'}
         zoom={1.2}    
+        
         scaleExtent={{ min: 0.5, max: 3 }}
         renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps}/>}
          />}
