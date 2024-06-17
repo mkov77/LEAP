@@ -16,15 +16,27 @@ const pool = new Pool({
   port: 5432,
 });
 
-app.get('/api/data', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM sections');
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
-  }
-});
+// Endpoint to fetch data from 'sections' table
+app.get('/api/sections', async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM sections');
+      res.json(result.rows);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  });
+  
+  // Endpoint to fetch data from 'units' table
+  app.get('/api/units', async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM units');
+      res.json(result.rows);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  });
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

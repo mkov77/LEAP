@@ -58,7 +58,7 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<Section[]>('http://localhost:5000/api/data');
+        const response = await axios.get<Section[]>('http://10.0.1.226:5000/api/sections');
         setSections(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -66,8 +66,6 @@ export default function LandingPage() {
     };
     fetchData();
   }, []);
-
-
 
   const renderSectionsTable = () => (
     <Box style={{ maxWidth: 600, margin: '0 auto'}}>
@@ -199,9 +197,7 @@ export default function LandingPage() {
               </Button>
 
             </div>
-            
           )}
-
         </Paper>
       </div>
     </MantineProvider>

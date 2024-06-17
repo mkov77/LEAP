@@ -12,19 +12,19 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
   
     // First pass: Add all units to a map
     units.forEach(unit => {
-      unitMap.set(unit.unitID, {
-        name: unit.unitID,
+      unitMap.set(unit.unit_id, {
+        name: unit.unit_id,
         attributes: {
-           unitType: unit.unitType,
-          unitSymbol: unit.unitSymbol,
-           isFriendly: unit.isFriendly,
-           unitHealth: unit.unitHealth,
-           roleType: unit.roleType,
-           unitSize: unit.unitSize,
-           forcePosture: unit.forcePosture,
-           forceMobility: unit.forceMobility,
-           forceReadiness: unit.forceReadiness,
-           forceSkill: unit.forceSkill,
+           unit_type: unit.unit_type,
+          unit_symbol: unit.unit_symbol,
+           is_friendly: unit.is_friendly,
+           unit_health: unit.unit_health,
+           role_type: unit.role_type,
+           unit_size: unit.unit_size,
+           force_posture: unit.force_posture,
+           force_mobility: unit.force_mobility,
+           forceReadiness: unit.force_readiness,
+           forceSkill: unit.force_skill,
         },
         children: []
       });
@@ -34,20 +34,20 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
     units.forEach(unit => {
       if (unit.children.length > 0) {
         unit.children.forEach(childID => {
-          const parent = unitMap.get(unit.unitID);
+          const parent = unitMap.get(unit.unit_id);
           const child = unitMap.get(childID);
           if (parent && child) {
             parent.children!.push(child);
           } else {
-            console.error(`Parent or child not found: ParentID = ${unit.unitID}, ChildID = ${childID}`);
+            console.error(`Parent or child not found: ParentID = ${unit.unit_id}, ChildID = ${childID}`);
           }
         });
       }
     });
   
     // Return the roots (units without a parent)
-    const rootNodes = units.filter(unit => !units.some(u => u.children.includes(unit.unitID)));
-    return rootNodes.map(unit => unitMap.get(unit.unitID)!);
+    const rootNodes = units.filter(unit => !units.some(u => u.children.includes(unit.unit_id)));
+    return rootNodes.map(unit => unitMap.get(unit.unit_id)!);
   };
   
   const CustomNode = ({ nodeDatum }: CustomNodeElementProps) => {

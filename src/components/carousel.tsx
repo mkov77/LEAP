@@ -1,5 +1,5 @@
 import { Carousel } from '@mantine/carousel';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CardC from './Cards';
 import { type Unit } from './Cards';
 import { data } from '../data/units';
@@ -8,6 +8,7 @@ import '@mantine/core/styles.css';
 import { useUnitProvider } from '../context/UnitContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import classes from './carousel.module.css';
+import axios from 'axios';
 
 const unitTypes = [
   {
@@ -27,6 +28,20 @@ const unitTypes = [
 function CarouselC() {
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
 
+  const [units, setUnits] = useState<Unit[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units');
+        setUnits(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
   const navigate = useNavigate();
   const { sectionId } = useParams();
 
@@ -44,7 +59,7 @@ function CarouselC() {
               controlSize={50}
               containScroll='trimSnaps'
               slidesToScroll={3}>
-              {filterUnitsByType(item.value).map((unitCard, index) =>
+              {filterUnitsByType(item.value, units).map((unitCard, index) =>
                 <Carousel.Slide key={index}>
                   <CardC unit={unitCard} />
                 </Carousel.Slide>
@@ -58,13 +73,13 @@ function CarouselC() {
 }
 
 // Function to filter units by type
-function filterUnitsByType(type: string): Unit[] {
+function filterUnitsByType(type: string, units: Unit[]): Unit[] {
   if (type === 'Other') {
-    return data.filter(
-      (unit) => unit.unitType !== 'Infantry' && unit.unitType !== 'Special Operations Forces'
+    return units.filter(
+      (unit) => unit.unit_type !== 'Infantry' && unit.unit_type !== 'Special Operations Forces'
     );
   } else {
-    return data.filter((unit) => unit.unitType === type);
+    return units.filter((unit) => unit.unit_type === type);
   }
 }
 

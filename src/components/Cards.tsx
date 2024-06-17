@@ -7,17 +7,17 @@ import { RawNodeDatum } from 'react-d3-tree';
 
 // Define Unit interface
 export interface Unit {
-  unitID: string;
-  unitType: string;
-  unitSymbol: string;
-  isFriendly: boolean;
-  unitHealth: number;
-  roleType: string;
-  unitSize: string;
-  forcePosture: string;
-  forceMobility: string;
-  forceReadiness: string;
-  forceSkill: string;
+  unit_id: string;
+  unit_type: string;
+  unit_symbol: string;
+  is_friendly: boolean;
+  unit_health: number;
+  role_type: string;
+  unit_size: string;
+  force_posture: string;
+  force_mobility: string;
+  force_readiness: string;
+  force_skill: string;
   children: string[];
 }
 
@@ -26,7 +26,7 @@ interface CardProps {
 }
 
 function CardC({ unit }: CardProps) {
-  const { unitID, unitType, unitHealth, unitSymbol, isFriendly, roleType, unitSize, forcePosture, forceMobility, forceReadiness, forceSkill } = unit;
+  const { unit_id, unit_type, unit_health, unit_symbol, is_friendly, role_type, unit_size, force_posture, force_mobility, force_readiness, force_skill } = unit;
   const { sectionID } = useParams();
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
   const navigate = useNavigate();
@@ -34,11 +34,11 @@ function CardC({ unit }: CardProps) {
 
   let healthColor = 'green';
 
-  if (unitHealth >= 75) {
+  if (unit_health >= 75) {
     healthColor = '#6aa84f';
-  } else if (unitHealth < 75 && unitHealth >= 50) {
+  } else if (unit_health < 75 && unit_health >= 50) {
     healthColor = '#f1c232';
-  } else if (unitHealth < 50 && unitHealth >= 25) {
+  } else if (unit_health < 50 && unit_health >= 25) {
     healthColor = '#e69138';
   } else {
     healthColor = '#cc0000';
@@ -48,22 +48,22 @@ function CardC({ unit }: CardProps) {
     <HoverCard width={280} shadow="md" openDelay={750}>
       <HoverCard.Target>
         <Card
-          shadow={unitID === selectedUnit ? '0' : 'lg'}
+          shadow={unit_id === selectedUnit ? '0' : 'lg'}
           padding={0}
           radius={0}
 
           onClick={() => {
-            if (unitHealth > 0) {
-              if (selectedUnit === unitID) {
+            if (unit_health > 0) {
+              if (selectedUnit === unit_id) {
                 navigate('/battlePage');
               } else {
-                setSelectedUnit(unitID);
+                setSelectedUnit(unit_id);
               }
             }
           }}
           style={{
-            cursor: unitHealth > 0 ? 'pointer' : 'not-allowed',
-            backgroundColor: selectedUnit === unitID ? 'rgba(128, 128, 128, 0.5)' : '',
+            cursor: unit_health > 0 ? 'pointer' : 'not-allowed',
+            backgroundColor: selectedUnit === unit_id ? 'rgba(128, 128, 128, 0.5)' : '',
             display: 'inline-block',
             width: '250px',
             margin: '0'
@@ -72,7 +72,7 @@ function CardC({ unit }: CardProps) {
         >
           <Grid style={{ margin: 0 }}>
             <Grid.Col span={1} style={{ backgroundColor: 'black', position: 'relative', padding: 0 }}>
-              <div className={classes.bar} style={{ height: `${unitHealth}%`, width: '100%', backgroundColor: healthColor }} />
+              <div className={classes.bar} style={{ height: `${unit_health}%`, width: '100%', backgroundColor: healthColor }} />
             </Grid.Col>
 
             <Grid.Col span={11} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '20px 20px' }}>
@@ -81,13 +81,13 @@ function CardC({ unit }: CardProps) {
                   src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
                   fit="contain"
                   height={160}
-                  alt={unitID}
+                  alt={unit_id}
                   style={{ width: '100%', maxHeight: '100%', objectFit: 'contain' }}
                 />
               </Card.Section>
               <Card.Section>
                 <Text size="lg" c="dimmed" style={{ textAlign: 'center', marginRight: '10px', fontWeight: 'bold', color: 'white' }}>
-                  {unitID}
+                  {unit_id}
                 </Text>
               </Card.Section>
             </Grid.Col>
@@ -96,16 +96,16 @@ function CardC({ unit }: CardProps) {
       </HoverCard.Target>
       <HoverCard.Dropdown>
         <Text size="sm">
-          <strong>Unit ID:</strong> {unitID}<br />
-          <strong>Type:</strong> {unitType}<br />
-          <strong>Friendly:</strong> {isFriendly ? 'Yes' : 'No'}<br />
-          <strong>Health:</strong> {unitHealth}<br />
-          <strong>Role Type:</strong> {roleType}<br />
-          <strong>Unit Size:</strong> {unitSize}<br />
-          <strong>Force Posture:</strong> {forcePosture}<br />
-          <strong>Force Mobility:</strong> {forceMobility}<br />
-          <strong>Force Readiness:</strong> {forceReadiness}<br />
-          <strong>Force Skill:</strong> {forceSkill}<br />
+          <strong>Unit ID:</strong> {unit_id}<br />
+          <strong>Type:</strong> {unit_type}<br />
+          <strong>Friendly:</strong> {is_friendly ? 'Yes' : 'No'}<br />
+          <strong>Health:</strong> {unit_health}<br />
+          <strong>Role Type:</strong> {role_type}<br />
+          <strong>Unit Size:</strong> {unit_size}<br />
+          <strong>Force Posture:</strong> {force_posture}<br />
+          <strong>Force Mobility:</strong> {force_mobility}<br />
+          <strong>Force Readiness:</strong> {force_readiness}<br />
+          <strong>Force Skill:</strong> {force_skill}<br />
         </Text>
       </HoverCard.Dropdown>
     </HoverCard>
