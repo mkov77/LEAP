@@ -3,23 +3,23 @@ import { type Section } from '../pages/landingPage';
 // Sections dummy data
 export const sections: Section[] = [
   {
-    sectionID: 'M6A',
-    isOnline: true
+    sectionid: 'M6A',
+    isonline: true
   },
   {
-    sectionID: 'T6B',
-    isOnline: true
+    sectionid: 'T6B',
+    isonline: true
   },
   {
-    sectionID: 'M6C',
-    isOnline: false
+    sectionid: 'M6C',
+    isonline: false
   },
   {
-    sectionID: 'T6A',
-    isOnline: false
+    sectionid: 'T6A',
+    isonline: false
   },
   {
-    sectionID: 'T4A',
-    isOnline: false
+    sectionid: 'T4A',
+    isonline: false
   }
 ]

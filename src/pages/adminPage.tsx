@@ -59,9 +59,9 @@ function AdminPage() {
     }
   }, []);
 
-  const handleCheckboxChange = (sectionID: string) => {
+  const handleCheckboxChange = (sectionid: string) => {
     setSelectedSections((prev) =>
-      prev.includes(sectionID) ? prev.filter((id) => id !== sectionID) : [...prev, sectionID]
+      prev.includes(sectionid) ? prev.filter((id) => id !== sectionid) : [...prev, sectionid]
     );
   };
 
@@ -70,16 +70,16 @@ function AdminPage() {
     if (newSectionName.trim()) {
       setSections((prevSections) => [
         ...prevSections,
-        { sectionID: newSectionName.trim(), isOnline: false }, // Default to offline
+        { sectionid: newSectionName.trim(), isonline: false }, // Default to offline
       ]);
       setNewSectionName('');
       closeModal();
     }
   };
 
-  const handleLaunchSession = (sectionID: string) => {
+  const handleLaunchSession = (sectionid: string) => {
     setUserSection(selectedSection);
-    navigate(`/sectionControls/${sectionID}`);
+    navigate(`/sectionControls/${sectionid}`);
   }
 
   const openModal = () => {
@@ -93,13 +93,13 @@ function AdminPage() {
 
   const handleDeleteSections = () => {
     setSections((prevSections) =>
-      prevSections.filter((section) => !selectedSections.includes(section.sectionID))
+      prevSections.filter((section) => !selectedSections.includes(section.sectionid))
     );
     setSelectedSections([]);
   };
 
-  const handleRowDoubleClick = (sectionID: string) => {
-    navigate(`/sectionControls/${sectionID}`);
+  const handleRowDoubleClick = (sectionid: string) => {
+    navigate(`/sectionControls/${sectionid}`);
   };
 
   // Function to render the sections table
@@ -116,32 +116,32 @@ function AdminPage() {
         <tbody>
           {sections.map((section) => (
             <tr
-              key={section.sectionID}
-              onClick={() => setSelectedSection(section.sectionID)}
-              onDoubleClick={() => handleRowDoubleClick(section.sectionID)}
+              key={section.sectionid}
+              onClick={() => setSelectedSection(section.sectionid)}
+              onDoubleClick={() => handleRowDoubleClick(section.sectionid)}
               style={{
                 cursor: 'pointer',
-                backgroundColor: selectedSection === section.sectionID ? theme.colors.gray[0] : '',
+                backgroundColor: selectedSection === section.sectionid ? theme.colors.gray[0] : '',
               }}
             >
-              <td>{section.sectionID}</td>
+              <td>{section.sectionid}</td>
               <td>
                 <Box
                   style={{
-                    backgroundColor: section.isOnline ? theme.colors.green[0] : theme.colors.red[0],
-                    color: section.isOnline ? theme.colors.green[9] : theme.colors.red[9],
+                    backgroundColor: section.isonline ? theme.colors.green[0] : theme.colors.red[0],
+                    color: section.isonline ? theme.colors.green[9] : theme.colors.red[9],
                     padding: '4px',
                     borderRadius: '4px',
                     display: 'inline-block',
                   }}
                 >
-                  {section.isOnline ? 'Online' : 'Offline'}
+                  {section.isonline ? 'Online' : 'Offline'}
                 </Box>
               </td>
               <td>
                 <Checkbox
-                  checked={selectedSections.includes(section.sectionID)}
-                  onChange={() => handleCheckboxChange(section.sectionID)}
+                  checked={selectedSections.includes(section.sectionid)}
+                  onChange={() => handleCheckboxChange(section.sectionid)}
                 />
               </td>
             </tr>
