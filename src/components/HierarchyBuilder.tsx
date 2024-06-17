@@ -55,8 +55,21 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
     const cardHeight = 110;
     const imageSize = 100;
 
+    const {
+      unitType,
+      isFriendly,
+      unitHealth,
+      roleType,
+      unitSize,
+      forcePosture,
+      forceMobility,
+      forceReadiness,
+      forceSkill,
+    } = nodeDatum.attributes as any;
   
     return (
+      <HoverCard width={280} shadow="md" openDelay={750}>
+        <HoverCard.Target>
       <g>
         <rect
           width={cardWidth}
@@ -82,6 +95,22 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
           {nodeDatum.name}
         </text>
       </g>
+      </HoverCard.Target>
+      <HoverCard.Dropdown>
+        <Text size="sm">
+          <strong>Unit ID:</strong> {nodeDatum.name}<br />
+          <strong>Type:</strong> {unitType}<br />
+          <strong>Friendly:</strong> {isFriendly ? 'Yes' : 'No'}<br />
+          <strong>Health:</strong> {unitHealth}<br />
+          <strong>Role Type:</strong> {roleType}<br />
+          <strong>Unit Size:</strong> {unitSize}<br />
+          <strong>Force Posture:</strong> {forcePosture}<br />
+          <strong>Force Mobility:</strong> {forceMobility}<br />
+          <strong>Force Readiness:</strong> {forceReadiness}<br />
+          <strong>Force Skill:</strong> {forceSkill}<br />
+        </Text>
+      </HoverCard.Dropdown>
+      </HoverCard>
     );
   };
   
@@ -94,7 +123,7 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
       setTree(formattedData);
     }, []);
 
-
+    
 
     return (
       <div style={{ width: '100%', height: '81.5vh' }}>
@@ -106,8 +135,7 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
         translate={{x:1250, y:70}}
         collapsible={false}
         pathFunc={'step'}
-        zoom={1.2}    
-        
+        zoom={1.2}
         scaleExtent={{ min: 0.5, max: 3 }}
         renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps}/>}
          />}
