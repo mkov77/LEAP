@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../App.css';
 import { Progress, Text, AppShell, Group, Skeleton, Image, Stepper, Button, SegmentedControl, rem, Modal, useMantineColorScheme, useComputedColorScheme, MantineProvider, Grid, Card, Center} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -8,9 +8,9 @@ import { FaSun, FaMoon } from "react-icons/fa";
 import { useUserRole } from '../context/UserContext';
 import { UnitProvider, useUnitProvider } from '../context/UnitContext';
 import { Unit } from '../components/Cards';
-import { data } from '../data/units';
 import classes from './battlePage.module.css';
 import { read } from 'fs';
+import axios from 'axios';
 
 function BattlePage() {
   const [mobileOpened] = useDisclosure(false);
@@ -21,7 +21,23 @@ function BattlePage() {
   const [modalOpened, { open, close }] = useDisclosure(true);
   const closeLocation = '/studentPage/' + userSection;
   const { selectedUnit, setSelectedUnit} = useUnitProvider();
-  const unit = data.find((u) => u.unit_id === selectedUnit);
+
+
+  const [units, setUnits] = useState<Unit[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units');
+        setUnits(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const unit = units.find((u) => u.unit_id === selectedUnit);
   const {
     unit_id,
     unit_type,

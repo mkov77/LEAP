@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import Tree from 'react-d3-tree';
 import { RawNodeDatum, CustomNodeElementProps } from 'react-d3-tree';
-import { data } from '../data/units';
 import CardC, { Unit } from './Cards';
 import classes from './Cards.module.css';
 import { Box, Card, Container, Flex, Image, Text, Badge, Button, Group, Grid, Progress, HoverCard } from '@mantine/core';
+import axios from 'axios';
 
 
 const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
@@ -23,8 +23,8 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
            unit_size: unit.unit_size,
            force_posture: unit.force_posture,
            force_mobility: unit.force_mobility,
-           forceReadiness: unit.force_readiness,
-           forceSkill: unit.force_skill,
+           force_readiness: unit.force_readiness,
+           force_skill: unit.force_skill,
         },
         children: []
       });
@@ -86,13 +86,38 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
   };
   
   function Hierarchy() {
+
+    const [units, setUnits] = useState<Unit[]>([]);
     const [tree, setTree] = useState<RawNodeDatum[]>();
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units');
+          const normalizedData = response.data.map(unit => ({
+            ...unit,
+            children: unit.children || [] // Ensure children is an array
+          }));
+          console.log('Normalized Data:', normalizedData);
+          setUnits(normalizedData);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      fetchData();
+    }, []);
+
 
     useEffect(() => {
-      // Convert the data to the RawNodeDatum format
-      const formattedData = buildHierarchy(data);
-      setTree(formattedData);
-    }, []);
+      if(units.length <= 0){
+        console.log("waiting");
+      }
+      else{
+        const formattedData = buildHierarchy(units);
+        setTree(formattedData);
+      }
+
+    }, [units]);
+
 
 
     return (

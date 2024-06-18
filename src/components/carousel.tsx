@@ -2,7 +2,6 @@ import { Carousel } from '@mantine/carousel';
 import { useEffect, useState } from 'react';
 import CardC from './Cards';
 import { type Unit } from './Cards';
-import { data } from '../data/units';
 import '@mantine/carousel/styles.css';
 import '@mantine/core/styles.css';
 import { useUnitProvider } from '../context/UnitContext';
