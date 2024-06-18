@@ -136,7 +136,16 @@ const CustomNode = ({ nodeDatum }: CustomNodeElementProps) => {
       fetchData();
     }, []);
 
-    
+    useEffect(() => {
+      // Convert the data to the RawNodeDatum format
+      if(units.length <= 0){
+        console.log("waiting");
+      }
+      else{
+      const formattedData = buildHierarchy(units);
+      setTree(formattedData);
+      }
+    }, [units]);
 
 
   return (
