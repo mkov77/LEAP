@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
-import { Progress, Text, AppShell, Group, Skeleton, Image, Stepper, Button, SegmentedControl, rem, Modal, useMantineColorScheme, useComputedColorScheme, MantineProvider, Grid, Card, Center} from '@mantine/core';
+import { Progress, Text, AppShell, Group, Skeleton, Image, Stepper, Button, SegmentedControl, rem, Modal, useMantineColorScheme, useComputedColorScheme, MantineProvider, Grid, Card, Center } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconSwords, IconHeartbeat, IconNumber1Small, IconNumber2Small, IconNumber3Small, IconNumber4Small } from '@tabler/icons-react';
@@ -20,7 +20,7 @@ function BattlePage() {
   const [active, setActive] = useState(0);
   const [modalOpened, { open, close }] = useDisclosure(true);
   const closeLocation = '/studentPage/' + userSection;
-  const { selectedUnit, setSelectedUnit} = useUnitProvider();
+  const { selectedUnit, setSelectedUnit } = useUnitProvider();
 
 
   const [units, setUnits] = useState<Unit[]>([]);
@@ -57,7 +57,7 @@ function BattlePage() {
 
   let readinessColor = 'green';
   const getReadinessProgress = (force_readiness: string | undefined) => {
-    switch(force_readiness) {
+    switch (force_readiness) {
       case 'Untrained':
         return 0;
       case 'Low':
@@ -74,7 +74,7 @@ function BattlePage() {
   }
 
   const getForceSkill = (force_skill: string | undefined) => {
-    switch(force_skill) {
+    switch (force_skill) {
       case 'Untrained':
         return 0;
       case 'Basic':
@@ -86,64 +86,64 @@ function BattlePage() {
     }
   }
 
-  const CustomProgressBarReadiness = ({value}: { value: number}) => {
+  const CustomProgressBarReadiness = ({ value }: { value: number }) => {
     let color = 'blue';
 
     //set color based on value for readiness
-    if (value === 0){
+    if (value === 0) {
       color = 'red';
     }
-    else if (value <=25){
+    else if (value <= 25) {
       color = 'orange';
     }
-    else if (value <=50){
+    else if (value <= 50) {
       color = 'yellow';
     }
-    else if (value <=75){
+    else if (value <= 75) {
       color = 'lime';
     }
-    else{
+    else {
       color = 'green';
     }
 
     return (
-      <Progress value={value} color={color} size={'xl'}/>
+      <Progress value={value} color={color} size={'xl'} />
     );
   };
 
-  const CustomProgressBarSkill = ({value}: { value: number}) => {
+  const CustomProgressBarSkill = ({ value }: { value: number }) => {
     let color = 'blue';
 
     //set color based on value for readiness
-    if (value === 0){
+    if (value === 0) {
       color = 'red';
     }
-    else if (value <=50){
+    else if (value <= 50) {
       color = 'yellow';
     }
-    else{
+    else {
       color = 'green';
     }
 
     return (
-      <Progress value={value} color={color} size={'xl'}/>
+      <Progress value={value} color={color} size={'xl'} />
     );
   };
 
-  const CustomProgressBarHealth = ({value}: { value: number}) => {
+  const CustomProgressBarHealth = ({ value }: { value: number }) => {
     let color = 'blue';
 
     //set color based on value for readiness
-    if (value <= 25){
+    if (value <= 25) {
       color = 'red';
     }
-    else if (value <=50){
+    else if (value <= 50) {
       color = 'orange';
     }
-    else if (value <= 75){
+    else if (value <= 75) {
       color = 'yellow';
     }
-    else{
+    else {
       color = 'green';
     }
 
@@ -161,72 +161,72 @@ function BattlePage() {
           <div>
             <Grid justify='center' align='flex-start' gutter={100}>
               <Grid.Col span={4}>
-              <Card withBorder radius="md" className={classes.card} >
-                <Card.Section className={classes.imageSection} mt="md" >
-                  <Group>
-                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-                      <Image
-                        src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
-                        height={160}
-                        style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
-                      />
-                    </div>
-                  </Group>
-                </Card.Section>
-                <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
-            {unit ? (
-              <Text size="xl" style={{whiteSpace: 'pre-line'}}>
-                <strong>Type:</strong> {unit_type}<br />
-                <strong>Unit Size:</strong> {unit_size}<br />
-                <strong>Force Mobility:</strong> {force_mobility}<br />
-                <strong>Health:</strong> {unit_health}<br />
-                <CustomProgressBarHealth value={Number(unit_health)} />
+                <Card withBorder radius="md" className={classes.card} >
+                  <Card.Section className={classes.imageSection} mt="md" >
+                    <Group>
+                      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                        <Image
+                          src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
+                          height={160}
+                          style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
+                        />
+                      </div>
+                    </Group>
+                  </Card.Section>
+                  <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
+                  {unit ? (
+                    <Text size="xl" style={{ whiteSpace: 'pre-line' }}>
+                      <strong>Type:</strong> {unit_type}<br />
+                      <strong>Unit Size:</strong> {unit_size}<br />
+                      <strong>Force Mobility:</strong> {force_mobility}<br />
+                      <strong>Health:</strong> {unit_health}<br />
+                      <CustomProgressBarHealth value={Number(unit_health)} />
 
-                <strong>Force Readiness:</strong> {force_readiness}<br />
-                <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
+                      <strong>Force Readiness:</strong> {force_readiness}<br />
+                      <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
 
-                <strong>Force Skill:</strong> {force_skill}<br />
-                <CustomProgressBarReadiness value={Number(getForceSkill((force_skill)))} />
-              </Text>
-            ) : (
-              <Text size="sm">Unit not found</Text>
-            )}
-          </Card>
+                      <strong>Force Skill:</strong> {force_skill}<br />
+                      <CustomProgressBarReadiness value={Number(getForceSkill((force_skill)))} />
+                    </Text>
+                  ) : (
+                    <Text size="sm">Unit not found</Text>
+                  )}
+                </Card>
               </Grid.Col>
-          <Grid.Col span={4}>  
-            <Card withBorder radius="md" className={classes.card} >
-            <Card.Section className={classes.imageSection} mt="md" >
-              <Group>
-            <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-            <Image
-              src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
-              height={160}
-              style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
-            />
-          </div>
-          </Group>
-            </Card.Section>
-            <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
-            {unit ? (
-              <Text size="xl">
-                <strong>Type:</strong> {unit_type}<br />
-                <strong>Unit Size:</strong> {unit_size}<br />
-                <strong>Force Mobility:</strong> {force_mobility}<br />
-                <strong>Health:</strong> {unit_health}<br />
-                <CustomProgressBarHealth value={Number(unit_health)} />
+              <Grid.Col span={4}>
+                <Card withBorder radius="md" className={classes.card} >
+                  <Card.Section className={classes.imageSection} mt="md" >
+                    <Group>
+                      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                        <Image
+                          src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
+                          height={160}
+                          style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
+                        />
+                      </div>
+                    </Group>
+                  </Card.Section>
+                  <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
+                  {unit ? (
+                    <Text size="xl">
+                      <strong>Type:</strong> {unit_type}<br />
+                      <strong>Unit Size:</strong> {unit_size}<br />
+                      <strong>Force Mobility:</strong> {force_mobility}<br />
+                      <strong>Health:</strong> {unit_health}<br />
+                      <CustomProgressBarHealth value={Number(unit_health)} />
 
-                <strong>Force Readiness:</strong> {force_readiness}<br />
-                <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
+                      <strong>Force Readiness:</strong> {force_readiness}<br />
+                      <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
 
-                <strong>Force Skill:</strong> {force_skill}<br />
-                <CustomProgressBarSkill value={Number(getForceSkill((force_skill)))} />
+                      <strong>Force Skill:</strong> {force_skill}<br />
+                      <CustomProgressBarSkill value={Number(getForceSkill((force_skill)))} />
 
-              </Text>
-            ) : (
-              <Text size="sm">Unit not found</Text>
-            )}              
-            </Card>
-            </Grid.Col>
+                    </Text>
+                  ) : (
+                    <Text size="sm">Unit not found</Text>
+                  )}
+                </Card>
+              </Grid.Col>
             </Grid>
             <Group justify="center" mt="xl">
               <Button onClick={nextStep}>Start Engagement</Button>
@@ -263,14 +263,14 @@ function BattlePage() {
             <p>Phase 2: Tactical Advantage</p>
             <Grid>
               <Grid.Col span={6}>
-              <h1>Friendly {selectedUnit}</h1>
+                <h1>Friendly {selectedUnit}</h1>
                 <p>Under ISR coverage?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 <p>Working GPS?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
               </Grid.Col>
               <Grid.Col span={6}>
-              <h1>Enemy INF-BRIG-C</h1>
+                <h1>Enemy INF-BRIG-C</h1>
                 <p>Under ISR coverage?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                 <p>Working GPS?</p>
@@ -287,14 +287,14 @@ function BattlePage() {
             <p>Phase 3: Fire Support</p>
             <Grid>
               <Grid.Col span={6}>
-              <h1>Friendly {selectedUnit}</h1>
+                <h1>Friendly {selectedUnit}</h1>
                 <p>Working communications?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 <p>Within fire support range?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
               </Grid.Col>
               <Grid.Col span={6}>
-              <h1>Enemy INF-BRIG-C</h1>
+                <h1>Enemy INF-BRIG-C</h1>
                 <p>Working communications?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                 <p>Within fire support range?</p>
@@ -311,14 +311,14 @@ function BattlePage() {
             <p>Phase 4: Terrain</p>
             <Grid>
               <Grid.Col span={6}>
-              <h1>Friendly {selectedUnit}</h1>
+                <h1>Friendly {selectedUnit}</h1>
                 <p>Higher ground?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 <p>Accessible by pattern force?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
               </Grid.Col>
               <Grid.Col span={6}>
-              <h1>Enemy INF-BRIG-C</h1>
+                <h1>Enemy INF-BRIG-C</h1>
                 <p>Higher ground?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                 <p>Accessible by pattern force?</p>

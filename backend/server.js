@@ -53,13 +53,16 @@ app.get('/api/sections/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 app.delete('/api/sections/:id', async (req, res) => {
-  console.log("hello");
   const { id } = req.params;
   console.log("Deleting", id);
   try {
-    await db.query('DELETE FROM sections WHERE sectionid = $1', [id]);
+    const client = await pool.connect();
+    await client.query('BEGIN');
+    const deleteQuery = 'DELETE FROM sections WHERE sectionid = $1';
+    const result = await client.query(deleteQuery, [id]);
+    await client.query('COMMIT');
+    client.release();
     res.status(200).json({ message: 'Section deleted successfully' });
   } catch (error) {
     console.error('Error deleting section:', error);
