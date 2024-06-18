@@ -135,7 +135,7 @@ export default function LandingPage() {
               onChange={setRole}
             />
           </div>
-          {(role === 'Observer' || role === 'Student') && (
+          {(role === 'Student') && (
             <div style={{ margin: '10px'}} >
               <SegmentedControl
                 size="lg"
