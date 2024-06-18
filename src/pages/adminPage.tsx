@@ -1,5 +1,5 @@
 // pages/adminPage.js
-import React, { useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   AppShell,
   Burger,
@@ -14,15 +14,17 @@ import {
   TextInput,
   useMantineTheme,
   MantineProvider,
-  useMantineColorScheme, 
+  useMantineColorScheme,
   useComputedColorScheme,
   FocusTrap,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
-import { sections as initialSections } from '../data/sections';
+//import { sections as initialSections } from '../data/sections';
 import { useUserRole } from '../context/UserContext';
-import { FaSun, FaMoon, FaArrowAltCircleLeft} from "react-icons/fa";
+import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
+import axios from 'axios';
+import { Section } from './landingPage';
 
 
 function AdminPage() {
@@ -31,11 +33,11 @@ function AdminPage() {
   const navigate = useNavigate();
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
-  const [sections, setSections] = useState(initialSections);
+  //const [sections, setSections] = useState(initialSections);
   const theme = useMantineTheme();
   const [newSectionName, setNewSectionName] = useState('');
   const [modalOpened, setModalOpened] = useState(false);
-  const { userRole, setUserRole, userSection, setUserSection} = useUserRole();
+  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
 
   useEffect(() => {
     if (userRole !== 'Administrator') {
@@ -51,6 +53,21 @@ function AdminPage() {
     navigate('/');
   };
 
+  const [sections, setSections] = useState<Section[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get<Section[]>('http://10.0.1.226:5000/api/sections');
+        setSections(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+
   const trapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,27 +76,39 @@ function AdminPage() {
     }
   }, []);
 
-  const handleCheckboxChange = (sectionID: string) => {
+  const handleCheckboxChange = (sectionid: string) => {
     setSelectedSections((prev) =>
-      prev.includes(sectionID) ? prev.filter((id) => id !== sectionID) : [...prev, sectionID]
+      prev.includes(sectionid) ? prev.filter((id) => id !== sectionid) : [...prev, sectionid]
     );
   };
 
 
-  const handleCreateNewSection = () => {
+  const handleCreateNewSection = async () => {
     if (newSectionName.trim()) {
-      setSections((prevSections) => [
-        ...prevSections,
-        { sectionID: newSectionName.trim(), isOnline: false }, // Default to offline
-      ]);
-      setNewSectionName('');
-      closeModal();
+      try {
+        // Make POST request to backend
+        const response = await axios.post('http://10.0.1.226:5000/api/sections', {
+          sectionid: newSectionName.trim(),
+          isonline: false, // Default to offline
+        });
+
+        // Assuming successful creation, update frontend state
+        setSections((prevSections) => [
+          ...prevSections,
+          { sectionid: newSectionName.trim(), isonline: false },
+        ]);
+        setNewSectionName('');
+        closeModal();
+      } catch (error) {
+        console.error('Error creating new section:', error);
+        // Add any error handling for the frontend here
+      }
     }
   };
 
-  const handleLaunchSession = (sectionID: string) => {
+  const handleLaunchSession = (sectionid: string) => {
     setUserSection(selectedSection);
-    navigate(`/sectionControls/${sectionID}`);
+    navigate(`/sectionControls/${sectionid}`);
   }
 
   const openModal = () => {
@@ -91,15 +120,28 @@ function AdminPage() {
   };
 
 
-  const handleDeleteSections = () => {
-    setSections((prevSections) =>
-      prevSections.filter((section) => !selectedSections.includes(section.sectionID))
-    );
-    setSelectedSections([]);
+  const handleDeleteSections = async () => {
+    try {
+      console.log("Section ID: ", selectedSections);
+      // Delete selected sections from the database
+      await Promise.all(
+        selectedSections.map((sectionId) =>
+          axios.delete(`http://10.0.1.226:5000/api/sections/${sectionId}`)
+        )
+      );
+
+      // Update the state after successful deletion
+      setSections((prevSections) =>
+        prevSections.filter((section) => !selectedSections.includes(section.sectionid))
+      );
+      setSelectedSections([]);
+    } catch (error) {
+      console.error('Error deleting sections:', error);
+    }
   };
 
-  const handleRowDoubleClick = (sectionID: string) => {
-    navigate(`/sectionControls/${sectionID}`);
+  const handleRowDoubleClick = (sectionid: string) => {
+    navigate(`/sectionControls/${sectionid}`);
   };
 
   // Function to render the sections table
@@ -116,32 +158,32 @@ function AdminPage() {
         <tbody>
           {sections.map((section) => (
             <tr
-              key={section.sectionID}
-              onClick={() => setSelectedSection(section.sectionID)}
-              onDoubleClick={() => handleRowDoubleClick(section.sectionID)}
+              key={section.sectionid}
+              onClick={() => setSelectedSection(section.sectionid)}
+              onDoubleClick={() => handleRowDoubleClick(section.sectionid)}
               style={{
                 cursor: 'pointer',
-                backgroundColor: selectedSection === section.sectionID ? theme.colors.gray[0] : '',
+                backgroundColor: selectedSection === section.sectionid ? theme.colors.gray[0] : '',
               }}
             >
-              <td>{section.sectionID}</td>
+              <td>{section.sectionid}</td>
               <td>
                 <Box
                   style={{
-                    backgroundColor: section.isOnline ? theme.colors.green[0] : theme.colors.red[0],
-                    color: section.isOnline ? theme.colors.green[9] : theme.colors.red[9],
+                    backgroundColor: section.isonline ? theme.colors.green[0] : theme.colors.red[0],
+                    color: section.isonline ? theme.colors.green[9] : theme.colors.red[9],
                     padding: '4px',
                     borderRadius: '4px',
                     display: 'inline-block',
                   }}
                 >
-                  {section.isOnline ? 'Online' : 'Offline'}
+                  {section.isonline ? 'Online' : 'Offline'}
                 </Box>
               </td>
               <td>
                 <Checkbox
-                  checked={selectedSections.includes(section.sectionID)}
-                  onChange={() => handleCheckboxChange(section.sectionID)}
+                  checked={selectedSections.includes(section.sectionid)}
+                  onChange={() => handleCheckboxChange(section.sectionid)}
                 />
               </td>
             </tr>
@@ -164,36 +206,36 @@ function AdminPage() {
       >
         <AppShell.Header>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}>
-            <FaArrowAltCircleLeft />
-          </Button>
-          <Image
-            src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
-            radius="md"
-            h={50}
-            fallbackSrc="https://placehold.co/600x400?text=Placeholder"
-            onClick={handleLogoClick}
-            style={{ cursor: 'pointer', scale: '1', padding:'8px' }}
-          />
+            <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}>
+              <FaArrowAltCircleLeft />
+            </Button>
+            <Image
+              src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
+              radius="md"
+              h={50}
+              fallbackSrc="https://placehold.co/600x400?text=Placeholder"
+              onClick={handleLogoClick}
+              style={{ cursor: 'pointer', scale: '1', padding: '8px' }}
+            />
           </div>
         </AppShell.Header>
         <AppShell.Main>
           <div className="App">
             <h1>Admin Page</h1>
             {renderSectionsTable()}
-            <div style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
-                <Button
-                  style={{height: '30px', width: '250px',textAlign: "center"}}
-                  mt="xl"
-                  size="md"
-                  onClick={() => selectedSection && handleLaunchSession(selectedSection)} // Update route
-                  disabled={!selectedSection}
-                >
-                  Launch Session
+            <div style={{ display: "flex", justifyContent: "center", textAlign: "center" }}>
+              <Button
+                style={{ height: '30px', width: '250px', textAlign: "center" }}
+                mt="xl"
+                size="md"
+                onClick={() => selectedSection && handleLaunchSession(selectedSection)} // Update route
+                disabled={!selectedSection}
+              >
+                Launch Session
               </Button>
-              </div>
-            <Group mt="md" style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
-              <Button color="blue" onClick={openModal} style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
+            </div>
+            <Group mt="md" style={{ display: "flex", justifyContent: "center", textAlign: "center" }}>
+              <Button color="blue" onClick={openModal} style={{ display: "flex", justifyContent: "center", textAlign: "center" }}>
                 New Section
               </Button>
               <Button color="red" onClick={handleDeleteSections} disabled={selectedSections.length === 0}>
@@ -202,25 +244,25 @@ function AdminPage() {
             </Group>
           </div>
         </AppShell.Main>
-          <Modal opened={modalOpened} onClose={closeModal} title="New Section" centered>
+        <Modal opened={modalOpened} onClose={closeModal} title="New Section" centered>
           <FocusTrap>
-          <div>
-            <TextInput
-              autoFocus
-              label="Section Name"
-              placeholder="Enter section name"
-              value={newSectionName}
-              onChange={(event) => setNewSectionName(event.currentTarget.value)}
-            />
+            <div>
+              <TextInput
+                autoFocus
+                label="Section Name"
+                placeholder="Enter section name"
+                value={newSectionName}
+                onChange={(event) => setNewSectionName(event.currentTarget.value)}
+              />
 
-            <Button fullWidth mt="md" onClick={handleCreateNewSection} disabled={!newSectionName.trim()}>
-              Create
-            </Button>
-          </div>
-        </FocusTrap>  
-      </Modal>
-    </AppShell>
-  </MantineProvider>
+              <Button fullWidth mt="md" onClick={handleCreateNewSection} disabled={!newSectionName.trim()}>
+                Create
+              </Button>
+            </div>
+          </FocusTrap>
+        </Modal>
+      </AppShell>
+    </MantineProvider>
   );
 }
 
