@@ -85,6 +85,28 @@ app.post('/api/sections', async (req, res) => {
   }
 });
 
+// Endpoint to update the isonline status of a section
+app.put('/api/sections/:id', async (req, res) => {
+  const { id } = req.params;
+  const { isonline } = req.body;
+
+  try {
+    const result = await pool.query('UPDATE sections SET isonline = $1 WHERE sectionid = $2 RETURNING *', [
+      isonline,
+      id,
+    ]);
+
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]); // Respond with updated section data
+    } else {
+      res.status(404).json({ message: 'Section not found' });
+    }
+  } catch (error) {
+    console.error('Error updating section:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
