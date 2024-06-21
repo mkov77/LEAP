@@ -27,8 +27,9 @@ function SectionControls() {
   const navigate = useNavigate();
   const theme = useMantineTheme();
   const [engagementsData, setEngagementsData] = useState<Engagement[]>([]);
-  const [sectionOnline, setSectionOnline] = useState(false); // Added state for sectionOnline
+  const [sectionOnline, setSectionOnline] = useState(false); 
   const { userRole, setUserRole } = useUserRole();
+
 
   useEffect(() => {
     if (userRole !== 'Administrator') {
@@ -36,12 +37,51 @@ function SectionControls() {
     }
   }, [navigate, userRole]);
 
+  useEffect(() => {
+    // Fetch section data including isonline status
+    const fetchSectionData = async () => {
+      try {
+        const response = await fetch(`http://10.0.1.226:5000/api/sections/${sectionId}`);
+        if (response.ok) {
+          const sectionData = await response.json();
+          setSectionOnline(sectionData.isonline); // Update sectionOnline state based on fetched data
+        } else {
+          console.error('Failed to fetch section data');
+        }
+      } catch (error) {
+        console.error('Error fetching section data:', error);
+      }
+    };
+
+    fetchSectionData(); // Call the function to fetch section data
+  }, [sectionId]); // Fetch data whenever sectionId changes
+
   const handleLogoClick = () => {
     navigate('/'); // Navigate to the main login page
   };
 
   const handleArrowClick = () => {
     navigate('/admin');
+  };
+
+  const toggleSectionOnline = async () => {
+    try {
+      const response = await fetch(`http://10.0.1.226:5000/api/sections/${sectionId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isonline: !sectionOnline }), // Toggle the current state
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update section status');
+      }
+
+      setSectionOnline((prev) => !prev); // Update local state after successful toggle
+    } catch (error) {
+      console.error('Error toggling section online status:', error);
+    }
   };
 
   useEffect(() => {
@@ -96,11 +136,11 @@ function SectionControls() {
             <h1><strong>{sectionId}</strong> Controls </h1>
             <Divider my="md" />
             <Switch
-        checked={sectionOnline}
-        onChange={() => setSectionOnline((prev) => !prev)}
-        color={sectionOnline ? 'teal' : 'red'}
-        size="md"
-        label={sectionOnline ? 'Section Online' : 'Section Offline'}
+         checked={sectionOnline}
+         onChange={toggleSectionOnline} // Call toggleSectionOnline function on change
+         color={sectionOnline ? 'teal' : 'red'}
+         size="md"
+         label={sectionOnline ? 'Section Online' : 'Section Offline'}
         thumbIcon={
           sectionOnline ? (
             <IconCheck
