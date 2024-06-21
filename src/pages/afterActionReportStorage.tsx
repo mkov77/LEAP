@@ -44,6 +44,7 @@ export default function AAR() {
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
   const [scrolled, setScrolled] = useState(false);
  // const [isOpen, setOpen] = useState(false);
+ 
 
   const handleLogoClick = () => {
     navigate('/'); // Navigate to the main login page
@@ -208,11 +209,21 @@ export default function AAR() {
   ));
 
   const disableScroll = () => {
-    document.body.style.overflow = 'hidden';
+    //document.body.style.overflow = 'hidden';
+
+    const container = document.querySelector('.toggle-details') as HTMLElement | null;
+    if (container){
+      container.style.overflow = 'hidden';
+    }
   };
 
   const enableScroll = () => {
-    document.body.style.overflow = '';
+    //document.body.style.overflow = '';
+
+    const container = document.querySelector('.toggle-details') as HTMLElement | null;
+    if (container){
+      container.style.overflow = '';
+    }
   };
 
 

@@ -26,6 +26,7 @@
     "@types/node": "^16.18.98",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "baseui": "^14.0.0",
     "embla-carousel-react": "^7.1.0",
     "react": "^18.3.1",
     "react-d3-tree": "^3.6.2",
