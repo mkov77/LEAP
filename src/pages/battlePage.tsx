@@ -11,6 +11,7 @@ import { Unit } from '../components/Cards';
 import classes from './battlePage.module.css';
 import { read } from 'fs';
 import axios from 'axios';
+import { Tactics } from './afterActionReportStorage';
 
 function BattlePage() {
   const [mobileOpened] = useDisclosure(false);
@@ -126,6 +127,7 @@ function BattlePage() {
     }
   };
 
+
   // Update user answers
   const [question1, setQuestion1] = useState('Yes')
   const [question2, setQuestion2] = useState('Yes')
@@ -150,6 +152,17 @@ function BattlePage() {
 
     // Example of further actions:
     // Submit answers to backend, navigate to next step, etc.
+  };
+
+  // Variable Conditions and corresponding weights
+  const weights: Record<WeightKeys, { yes: number; no: number }> = {
+    awareOfPresence: { yes: 20, no: 0 },
+    logisticsSupportRange: { yes: 25, no: 0 },
+    isrCoverage: { yes: 10, no: 0 },
+    gpsWorking: { yes: 10, no: 0 },
+    communicationsWorking: { yes: 10, no: 0 },
+    fireSupportRange: { yes: 15, no: 0 },
+    patternForceRange: { yes: 10, no: 0 }
   };
 
   type WeightKeys = 'awareOfPresence' | 'logisticsSupportRange' | 'isrCoverage' | 'gpsWorking' | 'communicationsWorking' | 'fireSupportRange' | 'patternForceRange';
@@ -180,10 +193,29 @@ function BattlePage() {
     return score;
   };
 
-  
+  //printing scores into the Engagement Data card in AAR
+  const tactics: Tactics[] = [
+    { ID: 'Aware of OPFOR?', blueScore: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], redScore: 0 },
+    { ID: 'Within Logistics Support Range?', blueScore:  weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], redScore: 25 },
+    { ID: 'Within RPA/ISR Coverage?', blueScore: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], redScore: 0 },
+    { ID: 'Working GPS?', blueScore: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], redScore: 0 },
+    { ID: 'Working Communications?', blueScore: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], redScore: 15},
+    { ID: 'Within Fire Support Range?', blueScore: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], redScore: 0 },
+    { ID: 'Within Range of a Pattern Force?', blueScore: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], redScore: 15 }
+  ]
 
+  //maps each tactic and its corresponding blue/red score to a row
+  const tacticToRow = (tactics: Tactics[]) => (
+    tactics.map((tactic) => (
+      <Table.Tr key={tactic.ID}>
+        <Table.Td>{tactic.ID}</Table.Td>
+        <Table.Td>{tactic.blueScore}</Table.Td>
+        <Table.Td>{tactic.redScore}</Table.Td>
+      </Table.Tr>
+    ))
+  );
 
-
+  //sets color of readiness bar in inital display based on readiness value
   let readinessColor = 'green';
   const getReadinessProgress = (force_readiness: string | undefined) => {
     switch (force_readiness) {
@@ -370,16 +402,16 @@ function BattlePage() {
               <Grid.Col span={4}>
                 <h1>Friendly {selectedUnit}</h1>
                 <p>Aware of OPFOR presence?</p>
-                <SegmentedControl onChange = {setQuestion1} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                <SegmentedControl onChange={setQuestion1} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 <p>Within logistics support range?</p>
-                <SegmentedControl onChange = {setQuestion2} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                <SegmentedControl onChange={setQuestion2} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
               </Grid.Col>
               <Grid.Col span={6}>
                 <h1>Enemy INF-BRIG-C</h1>
                 <p>Aware of OPFOR presence?</p>
-                <SegmentedControl onChange = {setQuestion3} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                <SegmentedControl onChange={setQuestion3} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                 <p>Within logistics support range?</p>
-                <SegmentedControl onChange = {setQuestion4} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                <SegmentedControl onChange={setQuestion4} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
               </Grid.Col>
             </Grid>
             <Group justify="center" mt="xl">
@@ -395,16 +427,16 @@ function BattlePage() {
               <Grid.Col span={6}>
                 <h1>Friendly {selectedUnit}</h1>
                 <p>Under ISR coverage?</p>
-                <SegmentedControl onChange = {setQuestion5} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                <SegmentedControl onChange={setQuestion5} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 <p>Working GPS?</p>
-                <SegmentedControl onChange = {setQuestion6} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                <SegmentedControl onChange={setQuestion6} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
               </Grid.Col>
               <Grid.Col span={6}>
                 <h1>Enemy INF-BRIG-C</h1>
                 <p>Under ISR coverage?</p>
-                <SegmentedControl onChange = {setQuestion7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                <SegmentedControl onChange={setQuestion7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                 <p>Working GPS?</p>
-                <SegmentedControl onChange = {setQuestion8} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                <SegmentedControl onChange={setQuestion8} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
               </Grid.Col>
             </Grid>
             <Group justify="center" mt="xl">
@@ -468,6 +500,46 @@ function BattlePage() {
             <h1>After-Action Review</h1>
             <Text size="xl">Calculated Base Value: {baseValue.toFixed(2)}</Text>
             <Text size="xl">Real-Time Input Score: {calculateRealTimeScore()}</Text>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
+              <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px' }} display={'flex'}>
+                <Card.Section >
+                  <div style={{ textAlign: 'center' }}>
+                    <h2>Engagement Data</h2>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    Engagement ID:
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
+                    <Progress.Root style={{ width: '200px', height: '25px' }}>
+                      <Progress.Section
+                        className={classes.progressSection}
+                        value={30 * .15}
+                        color="#4e87c1">
+                      </Progress.Section>
+
+
+                    </Progress.Root>
+                    <Progress.Root style={{ width: '200px', height: '25px' }}>
+                      <Progress.Section
+                        className={classes.progressSection}
+                        value={30 * .15}
+                        color="#bd3058">
+                      </Progress.Section>
+                    </Progress.Root>
+                  </div>
+                  <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center' }}>
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th>Tactic</Table.Th>
+                        <Table.Th>Blue Score</Table.Th>
+                        <Table.Th>Red Score</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
+                  </Table>
+                </Card.Section>
+              </Card>
+            </div>
             <Group justify="center" mt="xl">
               <Button onClick={() => { navigate(closeLocation); setSelectedUnit(null) }}>Done</Button>
             </Group>

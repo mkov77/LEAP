@@ -79,11 +79,6 @@ export default function AAR() {
     navigate(`/studentPage/${sectionId}`);
   };
 
-  {/*type Tactic = {
-    ID: string;
-    blueScore: number;
-    redScore: number;
-  } */}
 
 const tactics: Tactics[] = [
     { ID: 'Aware of OPFOR?', blueScore: 20, redScore: 0 },
@@ -105,13 +100,6 @@ const tactics: Tactics[] = [
     ))
   );
 
-  // const tacticRows = Tactics.map((tactic) => (
-  //   <Table.Tr key={tactic.ID}>
-  //     <Table.Td>{tactic.ID}</Table.Td>
-  //     <Table.Td>{tactic.blueScore}</Table.Td>
-  //     <Table.Td>{tactic.redScore}</Table.Td>
-  //   </Table.Tr>
-  // ));
 
   {/*const engagementData = [
     { timeStamp: ':00:39', engagementID: '001', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics },
