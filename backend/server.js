@@ -107,6 +107,78 @@ app.put('/api/sections/:id', async (req, res) => {
   }
 });
 
+// Endpoint to create an engagement
+app.post('/api/engagements', async (req, res) => {
+  const {
+    SectionID,
+    FriendlyID,
+    EnemyID,
+    FriendlyBaseScore,
+    EnemyBaseScore,
+    FriendlyTacticsScore,
+    EnemyTacticsScore,
+    FriendlyTotalScore,
+    EnemyTotalScore,
+    isWin
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO engagements 
+      (sectionid, friendlyid, enemyid, friendlybasescore, enemybasescore, 
+       friendlytacticsscore, enemytacticsscore, friendlytotalscore, enemytotalscore, iswin) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+       RETURNING *`,
+      [
+        SectionID,
+        FriendlyID,
+        EnemyID,
+        FriendlyBaseScore,
+        EnemyBaseScore,
+        FriendlyTacticsScore,
+        EnemyTacticsScore,
+        FriendlyTotalScore,
+        EnemyTotalScore,
+        isWin
+      ]
+    );
+
+    res.json(result.rows[0]); // Respond with the newly created engagement data
+  } catch (error) {
+    console.error('Error creating new engagement:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Endpoint to make record tactics
+app.post('/api/tactics', async (req, res) => {
+
+  console.log("Attempting to store tactics record")
+  const {
+    FriendlyAwareness, EnemyAwareness,
+    FriendlyLogistics, EnemyLogistics, FriendlyCoverage, EnemyCoverage,
+    FriendlyGPS, EnemyGPS, FriendlyComms, EnemyComms, FriendlyFire,
+    EnemyFire, FriendlyPattern, EnemyPattern
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO Tactics (FriendlyAwareness, EnemyAwareness, FriendlyLogistics, EnemyLogistics, FriendlyCoverage, EnemyCoverage,
+       FriendlyGPS, EnemyGPS, FriendlyComms, EnemyComms, FriendlyFire, EnemyFire, FriendlyPattern, EnemyPattern)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`,
+      [
+        FriendlyAwareness, EnemyAwareness, FriendlyLogistics,
+        EnemyLogistics, FriendlyCoverage, EnemyCoverage, FriendlyGPS, EnemyGPS,
+        FriendlyComms, EnemyComms, FriendlyFire, EnemyFire, FriendlyPattern, EnemyPattern
+      ]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error recording tactics:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

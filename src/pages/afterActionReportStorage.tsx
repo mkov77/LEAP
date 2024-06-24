@@ -100,16 +100,6 @@ const tactics: Tactics[] = [
     ))
   );
 
-
-  {/*const engagementData = [
-    { timeStamp: ':00:39', engagementID: '001', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics },
-    { timeStamp: ':00:50', engagementID: '002', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics },
-    { timeStamp: ':01:39', engagementID: '002', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics },
-    { timeStamp: ':03:39', engagementID: '003', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics },
-    { timeStamp: ':07:39', engagementID: '004', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics },
-    { timeStamp: ':09:39', engagementID: '005', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics }
-  ]; */}
-
   const engagementData: engagementData[] = [
     { timeStamp: '2024-06-21', engagementID: '1', friendlyUnitName: 'Unit A', enemyUnitName: 'Enemy A' },
     { timeStamp: '2024-06-22', engagementID: '2', friendlyUnitName: 'Unit B', enemyUnitName: 'Enemy B' },
