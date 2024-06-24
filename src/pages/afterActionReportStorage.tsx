@@ -33,6 +33,31 @@ import cx from 'clsx';
 import classes from './TableReviews.module.css'
 import { timeStamp } from 'console';
 
+export interface recentEngagementData {
+  unit_type: string;
+  role_type: string;
+  unit_size: string;
+  force_posture: string;
+  force_mobility: string;
+  force_readiness: string;
+  force_skill: string;
+  section: number;
+}
+
+export interface Tactics {
+  ID: string;
+  blueScore: number;
+  redScore: number;
+}
+
+export interface engagementData {
+  timeStamp: string;
+  engagementID: string;
+  friendlyUnitName: string;
+  enemyUnitName: string;
+
+}
+
 
 export default function AAR() {
   const navigate = useNavigate();
@@ -44,6 +69,7 @@ export default function AAR() {
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
   const [scrolled, setScrolled] = useState(false);
   // const [isOpen, setOpen] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const handleLogoClick = () => {
     navigate('/'); // Navigate to the main login page
@@ -53,30 +79,18 @@ export default function AAR() {
     navigate(`/studentPage/${sectionId}`);
   };
 
-  useEffect(() => {
-    if (isOpen !== null) {
-      disableScroll();
-    } else {
-      enableScroll();
-    }
-  })
 
-  type Tactic = {
-    ID: string;
-    blueScore: number;
-    redScore: number;
-  }
+const tactics: Tactics[] = [
+    { ID: 'Aware of OPFOR?', blueScore: 20, redScore: 0 },
+    { ID: 'Within Logistics Support Range?', blueScore: 0, redScore: 25 },
+    { ID: 'Within RPA/ISR Coverage?', blueScore: 10, redScore: 0 },
+    { ID: 'Working GPS?', blueScore: 10, redScore: 0 },
+    { ID: 'Within Fire Support Range?', blueScore: 10, redScore: 0 },
+    { ID: 'Within Range of a Pattern Force?', blueScore: 0, redScore: 15 }
+  ] 
 
-  const Tactics: Tactic[] = [
-    { ID: 'Aware of OPFOR', blueScore: 20, redScore: 0 },
-    { ID: 'Logisitic Support Range', blueScore: 0, redScore: 25 },
-    { ID: 'Fire Support Range', blueScore: 10, redScore: 0 },
-    { ID: 'GPS', blueScore: 10, redScore: 0 },
-    { ID: 'Communications', blueScore: 10, redScore: 0 },
-    { ID: 'Pattern Force', blueScore: 0, redScore: 15 }
-  ]
 
-  const tacticToRow = (tactics: Tactic[]) => (
+   const tacticToRow = (tactics: Tactics[]) => (
     tactics.map((tactic) => (
       <Table.Tr key={tactic.ID}>
         <Table.Td>{tactic.ID}</Table.Td>
@@ -86,24 +100,21 @@ export default function AAR() {
     ))
   );
 
-  const tacticRows = Tactics.map((tactic) => (
-    <Table.Tr key={tactic.ID}>
-      <Table.Td>{tactic.ID}</Table.Td>
-      <Table.Td>{tactic.blueScore}</Table.Td>
-      <Table.Td>{tactic.redScore}</Table.Td>
-    </Table.Tr>
-  ));
 
-  const engagementData = [
+  {/*const engagementData = [
     { timeStamp: ':00:39', engagementID: '001', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics },
     { timeStamp: ':00:50', engagementID: '002', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics },
     { timeStamp: ':01:39', engagementID: '002', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics },
     { timeStamp: ':03:39', engagementID: '003', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics },
     { timeStamp: ':07:39', engagementID: '004', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics },
     { timeStamp: ':09:39', engagementID: '005', friendlyUnitName: 'INF-BRIG-A', enemyUnitName: 'PLA-BRIG-B', tactic: Tactics }
+  ]; */}
+
+  const engagementData: engagementData[] = [
+    { timeStamp: '2024-06-21', engagementID: '1', friendlyUnitName: 'Unit A', enemyUnitName: 'Enemy A' },
+    { timeStamp: '2024-06-22', engagementID: '2', friendlyUnitName: 'Unit B', enemyUnitName: 'Enemy B' },
+    // Add more objects as needed
   ];
-
-
 
   let index: number = 0;
 
@@ -127,122 +138,38 @@ export default function AAR() {
           <Progress.Section
             className={classes.progressSection}
             value={30 * .15}
-            color="#1864ab">
+            color="#4e87c1">
           </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={90 * .02}
-            color="#1971c2">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={70 * .25}
-            color="#1c7ed6">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={90 * .10}
-            color="#228be6">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={50 * .10}
-            color="#339af0">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={90 * .04}
-            color="#4dabf7">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={70 * .04}
-            color="#74c0fc">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={40 * .30}
-            color="#a5d8ff">
-          </Progress.Section>
-
-
         </Progress.Root>
       </Table.Td>
       <Table.Td>{rowData.enemyUnitName}</Table.Td>
       <Table.Td>
-        <Group justify="space-between">
-          {/*}  <Text fz="xs" c="teal" fw={700}>
-                {BlueForce.forceSkill.toFixed(0)}%
-              </Text>
-              <Text fz="xs" c="red" fw={700}>
-                {negativeReviews.toFixed(0)}%
-              </Text> */}
-        </Group>
         <Progress.Root style={{ width: '600px', height: '50px' }}>
           <Progress.Section
             className={classes.progressSection}
             value={30 * .15}
-            color="#c92a2a">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={90 * .02}
-            color="#e03131">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={70 * .25}
-            color="#f03e3e">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={50 * .10}
-            color="#fa5252">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={30 * .10}
-            color="#ff6b6b">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={90 * .04}
-            color="#ff8787">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={70 * .04}
-            color="#ffa8a8">
-          </Progress.Section>
-          <Progress.Section
-            className={classes.progressSection}
-            value={50 * .30}
-            color="#ffc9c9">
+            color="#bd3058">
           </Progress.Section>
         </Progress.Root>
       </Table.Td>
     </Table.Tr>
   ));
 
-  const disableScroll = () => {
-    //document.body.style.overflow = 'hidden';
-
-    const container = document.querySelector('.toggle-details') as HTMLElement | null;
-    if (container){
-      container.style.overflow = 'hidden';
-    }
+  const updateProgress = () => {
+    const scrollPx = document.documentElement.scrollTop;
+    const winHeightPx =
+      document.documentElement.scrollHeight -
+      document.documentElement.clientHeight;
+    const scrolled = (scrollPx / winHeightPx) * 100;
+    setProgress(scrolled);
   };
 
-  const enableScroll = () => {
-    //document.body.style.overflow = '';
-
-    const container = document.querySelector('.toggle-details') as HTMLElement | null;
-    if (container){
-      container.style.overflow = '';
-    }
-  };
-
-
+  useEffect(() => {
+    window.addEventListener('scroll', updateProgress);
+    return () => {
+      window.removeEventListener('scroll', updateProgress);
+    };
+  }, []);
 
 
   return (
@@ -274,12 +201,12 @@ export default function AAR() {
         </AppShell.Header>
 
         <AppShell.Main>
-          <h1 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>Log of After Action Reports</h1>
+          <h1 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>Log of After Action Reviews</h1>
           <h2 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>Section: {sectionId}</h2>
           <AppShell>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
-              <Card shadow="sm" padding="lg" radius="md" withBorder style={{ width: '600px' }} display={'flex'}>
-                <Card.Section>
+              <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px' }} display={'flex'}>
+                <Card.Section >
                   <div style={{ textAlign: 'center' }}>
                     <h2>Most Recent Engagement</h2>
                   </div>
@@ -293,41 +220,6 @@ export default function AAR() {
                         value={30 * .15}
                         color="#4e87c1">
                       </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={90 * .02}
-                        color="#1971c2">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={70 * .25}
-                        color="#1c7ed6">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={90 * .10}
-                        color="#228be6">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={50 * .10}
-                        color="#339af0">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={90 * .04}
-                        color="#4dabf7">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={70 * .04}
-                        color="#74c0fc">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={40 * .30}
-                        color="#a5d8ff">
-                      </Progress.Section>
 
 
                     </Progress.Root>
@@ -336,41 +228,6 @@ export default function AAR() {
                         className={classes.progressSection}
                         value={30 * .15}
                         color="#bd3058">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={90 * .02}
-                        color="#e03131">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={70 * .25}
-                        color="#f03e3e">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={50 * .10}
-                        color="#fa5252">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={30 * .10}
-                        color="#ff6b6b">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={90 * .04}
-                        color="#ff8787">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={70 * .04}
-                        color="#ffa8a8">
-                      </Progress.Section>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={50 * .30}
-                        color="#ffc9c9">
                       </Progress.Section>
                     </Progress.Root>
                   </div>
@@ -382,13 +239,13 @@ export default function AAR() {
                         <Table.Th>Red Score</Table.Th>
                       </Table.Tr>
                     </Table.Thead>
-                    <Table.Tbody>{tacticRows}</Table.Tbody>
+                    <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
                   </Table>
                 </Card.Section>
               </Card>
             </div>
 
-            <Table verticalSpacing={'xs'} style={{ width: '100%', tableLayout: 'fixed' }}>
+            <Table verticalSpacing={'xs'} style={{ width: '100%', tableLayout: 'fixed', justifyContent: 'space-between' }}>
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>Time Stamp</Table.Th>
@@ -397,12 +254,11 @@ export default function AAR() {
                   <Table.Th>Friendly Bar</Table.Th>
                   <Table.Th>Enemy Unit Name</Table.Th>
                   <Table.Th>Enemy Bar</Table.Th>
-                  <Table.Th style={{ width: '425px' }}></Table.Th>
                 </Table.Tr>
               </Table.Thead>
               {engagementData.map((row, index) => (
                 <Table.Tbody>
-                  <Table.Tr key={index}>
+                  <Table.Tr key={index} >
                     <Table.Td>{row.timeStamp}</Table.Td>
                     <Table.Td>{row.engagementID}</Table.Td>
                     <Table.Td>{row.friendlyUnitName}</Table.Td>
@@ -410,110 +266,42 @@ export default function AAR() {
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
                         <Progress.Section
                           className={classes.progressSection}
-                          value={30 * .15}
-                          color="#1864ab">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={90 * .02}
-                          color="#1971c2">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={70 * .25}
-                          color="#1c7ed6">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={90 * .10}
-                          color="#228be6">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={50 * .10}
-                          color="#339af0">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={90 * .04}
-                          color="#4dabf7">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={70 * .04}
-                          color="#74c0fc">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={40 * .30}
-                          color="#a5d8ff">
+                          value={40}
+                          color="#4e87c1">
+                          40%
                         </Progress.Section>
                       </Progress.Root>
                     </Table.Td>
                     <Table.Td>{row.enemyUnitName}</Table.Td>
                     <Table.Td>
-                      <Progress.Root style={{ width: '200px', height: '25px' }}>
+                      <Progress.Root style={{ width: '200px', height: '25px', display: 'flex' }}>
                         <Progress.Section
                           className={classes.progressSection}
-                          value={30 * .15}
-                          color="#c92a2a">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={90 * .02}
-                          color="#e03131">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={70 * .25}
-                          color="#f03e3e">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={50 * .10}
-                          color="#fa5252">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={30 * .10}
-                          color="#ff6b6b">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={90 * .04}
-                          color="#ff8787">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={70 * .04}
-                          color="#ffa8a8">
-                        </Progress.Section>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={50 * .30}
-                          color="#ffc9c9">
+                          value={60}
+                          color="#bd3058">
+                          60%
                         </Progress.Section>
                       </Progress.Root>
                     </Table.Td>
 
-                    <Table.Td>
+                    <Table.Td style={{ display: 'flex' }}>
                       <Button className='.toggle-details' size="xs" onClick={() => handleToggle(index)}>
                         {isOpen[index] ? 'Collapse' : 'Expand'}
                       </Button>
                     </Table.Td>
                   </Table.Tr>
-                  <Table.Tr>
-                    <Collapse in={isOpen[index]}>
-                      <div>
-                        <Table verticalSpacing={'xs'} style={{ width: '100%', overflowX: 'auto' }}>
+                  <Table.Tr style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Collapse in={isOpen[index]} style={{ width: '100%' }}>
+                      <div style={{ justifyContent: 'center', width: '100%', display: 'flex', marginLeft: '300%' }}>
+                        <Table verticalSpacing={'xs'} style={{ maxWidth: '100%', width: '1000px' }} display={'fixed'}>
                           <Table.Thead>
                             <Table.Tr>
-                              <Table.Th>Tactic</Table.Th>
-                              <Table.Th>Blue Score</Table.Th>
-                              <Table.Th>Red Score</Table.Th>
+                              <Table.Th style={{ width: '1000px' }}>Tactic</Table.Th>
+                              <Table.Th style={{ width: '250px', marginLeft: '100px' }}>Blue Score</Table.Th>
+                              <Table.Th style={{ width: '150px', marginLeft: '100px' }}>Red Score</Table.Th>
                             </Table.Tr>
                           </Table.Thead>
-                          <Table.Tbody>{tacticToRow(row.tactic)}</Table.Tbody>
+                          <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
                         </Table>
                       </div>
                     </Collapse>
