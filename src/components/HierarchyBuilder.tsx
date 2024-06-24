@@ -124,19 +124,20 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units');
-          const normalizedData = response.data.map(unit => ({
-            ...unit,
-            children: unit.children || [] // Ensure children is an array
-          }));
-          console.log('Normalized Data:', normalizedData);
-          setUnits(normalizedData);
+          console.log('Fetching data for section:', userSection);
+          const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units', {
+            params: {
+              sectionid: userSection  // Pass userSection as a query parameter
+            }
+          });
+          setUnits(response.data);
         } catch (error) {
           console.error('Error fetching data:', error);
         }
       };
+    
       fetchData();
-    }, []);
+    }, [userSection]);
 
     useEffect(() => {
       // Convert the data to the RawNodeDatum format
