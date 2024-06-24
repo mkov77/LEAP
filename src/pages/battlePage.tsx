@@ -12,6 +12,7 @@ import classes from './battlePage.module.css';
 import { read } from 'fs';
 import axios from 'axios';
 import { Tactics } from './afterActionReportStorage';
+import { text } from 'node:stream/consumers';
 
 function BattlePage() {
   const [mobileOpened] = useDisclosure(false);
@@ -39,6 +40,7 @@ function BattlePage() {
     };
     fetchData();
   }, []);
+
 
   const unit = units.find((u) => u.unit_id === selectedUnit);
   const {
@@ -136,14 +138,14 @@ function BattlePage() {
   const [question5, setQuestion5] = useState('Yes')
   const [question6, setQuestion6] = useState('Yes')
   const [question7, setQuestion7] = useState('Yes')
-  const [question8, setQuestion8] = useState('Yes')
+  // const [question8, setQuestion8] = useState('Yes')
 
   const finalizeTactics = () => {
     // Process all phase answers here
     console.log('Phase 1 Answers:', question1, question2);
     console.log('Phase 2 Answers:', question3, question4);
     console.log('Phase 3 Answers:', question5, question6);
-    console.log('Phase 4 Answers:', question7, question8);
+    console.log('Phase 4 Answers:', question7);
 
     const score = calculateRealTimeScore();
     setRealTimeScore(score);
@@ -215,7 +217,7 @@ function BattlePage() {
     ))
   );
 
-  //sets color of readiness bar in inital display based on readiness value
+  //sets color of readiness bar in inital display based on readiness
   let readinessColor = 'green';
   const getReadinessProgress = (force_readiness: string | undefined) => {
     switch (force_readiness) {
@@ -315,9 +317,17 @@ function BattlePage() {
   };
 
 
+  const unitNull = () => {
+    console.log("Testing",unit_id)
+    if (unit_id !== undefined){
+      // navigate(closeLocation);
+      return true;
+    }
+  }
+
+if (unitNull() ){
   return (
     <MantineProvider defaultColorScheme='dark'>
-
       <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
         <Stepper.Step allowStepSelect={false} icon={<IconSwords stroke={1.5} style={{ width: rem(27), height: rem(27) }} />}>
           <div>
@@ -402,16 +412,16 @@ function BattlePage() {
               <Grid.Col span={4}>
                 <h1>Friendly {selectedUnit}</h1>
                 <p>Aware of OPFOR presence?</p>
-                <SegmentedControl onChange={setQuestion1} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                <SegmentedControl value={question1} onChange={setQuestion1} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 <p>Within logistics support range?</p>
-                <SegmentedControl onChange={setQuestion2} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                <SegmentedControl value={question2} onChange={setQuestion2} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
               </Grid.Col>
               <Grid.Col span={6}>
                 <h1>Enemy INF-BRIG-C</h1>
                 <p>Aware of OPFOR presence?</p>
-                <SegmentedControl onChange={setQuestion3} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                 <p>Within logistics support range?</p>
-                <SegmentedControl onChange={setQuestion4} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
               </Grid.Col>
             </Grid>
             <Group justify="center" mt="xl">
@@ -427,16 +437,16 @@ function BattlePage() {
               <Grid.Col span={6}>
                 <h1>Friendly {selectedUnit}</h1>
                 <p>Under ISR coverage?</p>
-                <SegmentedControl onChange={setQuestion5} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                <SegmentedControl value={question3} onChange={setQuestion3} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 <p>Working GPS?</p>
-                <SegmentedControl onChange={setQuestion6} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                <SegmentedControl value={question4} onChange={setQuestion4} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
               </Grid.Col>
               <Grid.Col span={6}>
                 <h1>Enemy INF-BRIG-C</h1>
                 <p>Under ISR coverage?</p>
-                <SegmentedControl onChange={setQuestion7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                <SegmentedControl  size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                 <p>Working GPS?</p>
-                <SegmentedControl onChange={setQuestion8} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
               </Grid.Col>
             </Grid>
             <Group justify="center" mt="xl">
@@ -452,9 +462,9 @@ function BattlePage() {
               <Grid.Col span={6}>
                 <h1>Friendly {selectedUnit}</h1>
                 <p>Working communications?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                <SegmentedControl value={question5} onChange={setQuestion5} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 <p>Within fire support range?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                <SegmentedControl value={question6} onChange={setQuestion6} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
               </Grid.Col>
               <Grid.Col span={6}>
                 <h1>Enemy INF-BRIG-C</h1>
@@ -476,15 +486,15 @@ function BattlePage() {
             <Grid>
               <Grid.Col span={6}>
                 <h1>Friendly {selectedUnit}</h1>
-                <p>Higher ground?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                {/* <p>Higher ground?</p>
+                <SegmentedControl value={question7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} /> */}
                 <p>Accessible by pattern force?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                <SegmentedControl value={question7} onChange={setQuestion7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
               </Grid.Col>
               <Grid.Col span={6}>
                 <h1>Enemy INF-BRIG-C</h1>
-                <p>Higher ground?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                {/* <p>Higher ground?</p>
+                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled /> */}
                 <p>Accessible by pattern force?</p>
                 <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
               </Grid.Col>
@@ -509,6 +519,7 @@ function BattlePage() {
                   <div style={{ textAlign: 'center' }}>
                     Engagement ID:
                   </div>
+                  
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
                     <Progress.Root style={{ width: '200px', height: '25px' }}>
                       <Progress.Section
@@ -548,6 +559,13 @@ function BattlePage() {
       </Stepper>
     </MantineProvider>
   );
+}
+else {
+  navigate(`/`);
+  return(
+    <h1>Error.</h1>
+  )
+}
 }
 
 export default BattlePage;
