@@ -59,13 +59,13 @@ function BattlePage() {
   } = unit || {};
 
   const updateUnitHealth = async (id: number, newHealth: number) => {
-    const url = `/api/units`;
+    const url = `http://localhost:5000/api/units/health`; // Corrected URL to point to the server running on port 5000
     const options = {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id, health: newHealth }), // Send both id and newHealth in the body
+      body: JSON.stringify({ id, newHealth }), // Send both id and newHealth in the body
     };
   
     try {
@@ -79,7 +79,7 @@ function BattlePage() {
     } catch (error) {
       console.error('Error updating unit health:', error);
     }
-  };  
+  };
 
   const calculateBaseValue = (unit: Unit) => {
     const unitTypeValues: Record<string, number> = {
@@ -171,6 +171,7 @@ function BattlePage() {
     const enemyTotalScore = 15;
     const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
     const isWin = friendlyTotalScore > enemyTotalScore;
+    console.log('ID: ',id);
     updateUnitHealth(Number(id),0);
 
     // Process all phase answers here

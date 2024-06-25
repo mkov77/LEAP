@@ -252,6 +252,27 @@ app.put('/api/units/', async (req, res) => {
 //   }
 // });
 
+app.put('/api/units/health', async (req, res) => {
+  const { id, newHealth } = req.body; // Ensure request body contains id and newHealth
+
+  try {
+    const result = await pool.query('UPDATE units SET unit_health = $1 WHERE id = $2 RETURNING *', [
+      newHealth,
+      id,
+    ]);
+
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]); // Respond with updated unit data
+    } else {
+      res.status(404).json({ message: 'Unit not found' });
+    }
+  } catch (error) {
+    console.error('Error updating unit health:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 
 
 app.listen(port, () => {
