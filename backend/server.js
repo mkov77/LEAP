@@ -47,7 +47,7 @@ app.get('/api/tactics/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query('SELECT * FROM tactics WHERE engagementid = $1', [id]);
- 
+
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);
