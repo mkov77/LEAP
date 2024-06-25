@@ -27,6 +27,30 @@ app.get('/api/sections', async (req, res) => {
   }
 });
 
+// End point to get engagements
+app.get('/api/engagements', async (req, res) => {
+  console.log('Attempting to engagements')
+  try {
+    const result = await pool.query('SELECT * FROM engagements');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// Endpoint to get tactics
+app.get('/api/tactics', async (req, res) => {
+  console.log('Attempting to retrieve tactics')
+  try {
+    const result = await pool.query('SELECT * FROM tactics');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
 // Endpoint to fetch data from 'units' table
 app.get('/api/units/sectionSort', async (req, res) => {
   const sectionid = req.query.sectionid;
@@ -196,6 +220,7 @@ app.post('/api/tactics', async (req, res) => {
 
 app.put('/api/units/update', async (req, res) => {
   const {
+    parent_id,
     unit_id,
     unit_type,
     unit_health,
@@ -204,21 +229,23 @@ app.put('/api/units/update', async (req, res) => {
     force_posture,
     force_readiness,
     force_skill,
-  } = req.params;
- 
- 
+  } = req.body; // Use req.body instead of req.params
+
   try {
     const result = await pool.query(
       `UPDATE units
-           SET unit_type = $1,
-               unit_health = $2,
-               role_type = $3,
-               unit_size = $4,
-               force_posture = $5,
-               force_readiness = $6,
-               force_skill = $7
-           WHERE unit_id = $8
-           RETURNING *`,
+       SET unit_type = $1,
+           unit_health = $2,
+           role_type = $3,
+           unit_size = $4,
+           force_posture = $5,
+           force_readiness = $6,
+           force_skill = $7
+       WHERE unit_id = $8;
+
+      UPDATE units
+      SET children = array_append(children, $8)
+      WHERE unit_id = $9;`,
       [
         unit_type,
         unit_health,
@@ -227,10 +254,11 @@ app.put('/api/units/update', async (req, res) => {
         force_posture,
         force_readiness,
         force_skill,
-        unit_id
+        unit_id,
+        parent_id
       ]
     );
- 
+
     if (result.rows.length === 0) {
       res.status(404).json({ error: 'Unit not found' });
     } else {

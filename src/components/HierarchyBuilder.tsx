@@ -131,6 +131,7 @@ function Hierarchy() {
     forceReadiness: '',
     forceSkill: ''
   });
+  const [selectedNode, setSelectedNode] = useState('');
  
  
  
@@ -166,13 +167,9 @@ function Hierarchy() {
     }
   }, [units]);
  
-  const handleFormSubmit = () => {
-    close();
  
-  }
- 
-  const handleNodeClick = () => {
- 
+  const handleNodeClick = (nodeData: RawNodeDatum) => {
+    setSelectedNode(nodeData.name);
     if (userRole === "Administrator") {
       open();
     }
@@ -184,23 +181,22 @@ function Hierarchy() {
  
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
- 
- 
- 
+    
+
+
     try {
-      const response = await axios.put(`http://10.0.1.226:5000/api/units/sectionSort`, {
-        params: {
-          unit_id: formValues.unitName,
-          unit_type: formValues.unitType,
-          unit_health: formValues.unitHealth,
-          role_type: formValues.unitRole,
-          unit_size: formValues.unitSize,
-          force_posture: formValues.forcePosture,
-          force_readiness: formValues.forceReadiness,
-          force_skill: formValues.forceSkill,
-        }
+      const response = await axios.put(`http://10.0.1.226:5000/api/units/update`, {
+        parent_id: selectedNode,
+        unit_id: formValues.unitName,
+        unit_type: formValues.unitType,
+        unit_health: formValues.unitHealth,
+        role_type: formValues.unitRole,
+        unit_size: formValues.unitSize,
+        force_posture: formValues.forcePosture,
+        force_readiness: formValues.forceReadiness,
+        force_skill: formValues.forceSkill,
       });
- 
+  
       if (response.status === 200) {
         // Successfully updated the unit, update the state to reflect the changes
         setUnits(prevUnits => prevUnits.map(unit => unit.unit_id === formValues.unitName ? response.data : unit));
@@ -210,7 +206,7 @@ function Hierarchy() {
     } catch (error) {
       console.error('Error updating unit:', error);
     }
- 
+  
     // Close the modal
     close();
   };
@@ -243,12 +239,12 @@ function Hierarchy() {
           pathFunc={'step'}
           zoom={1.2}
           scaleExtent={{ min: 0.5, max: 3 }}
-          renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} toggleModal={handleNodeClick} />}
-          onNodeClick={handleNodeClick}
+          renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} toggleModal={() => handleNodeClick(rd3tProps.nodeDatum)} />}
+          onNodeClick={() => handleNodeClick}
  
  
         />) : (
-        <Button onClick={handleNodeClick}>Add Parent</Button>
+        <Button onClick={() => handleNodeClick}>Add Parent</Button>
       )
  
       }
