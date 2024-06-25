@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
-import { Table, Progress, Text, AppShell, Group, Skeleton, Image, Stepper, Button, SegmentedControl, rem, Modal, useMantineColorScheme, useComputedColorScheme, MantineProvider, Grid, Card, Center } from '@mantine/core';
+import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconSwords, IconHeartbeat, IconNumber1Small, IconNumber2Small, IconNumber3Small, IconNumber4Small } from '@tabler/icons-react';
@@ -167,6 +167,8 @@ function BattlePage() {
     patternForceRange: { yes: 10, no: 0 }
   };
 
+  let tooltipContent = 'Total Calculated Value (Friendly): ' + ((Number(realTimeScore) * .30) + (baseValue * .70)) + '%';
+
   type WeightKeys = 'awareOfPresence' | 'logisticsSupportRange' | 'isrCoverage' | 'gpsWorking' | 'communicationsWorking' | 'fireSupportRange' | 'patternForceRange';
 
   const calculateRealTimeScore = () => {
@@ -198,10 +200,10 @@ function BattlePage() {
   //printing scores into the Engagement Data card in AAR
   const tactics: Tactics[] = [
     { ID: 'Aware of OPFOR?', blueScore: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], redScore: 0 },
-    { ID: 'Within Logistics Support Range?', blueScore:  weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], redScore: 25 },
+    { ID: 'Within Logistics Support Range?', blueScore: weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], redScore: 25 },
     { ID: 'Within RPA/ISR Coverage?', blueScore: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], redScore: 0 },
     { ID: 'Working GPS?', blueScore: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], redScore: 0 },
-    { ID: 'Working Communications?', blueScore: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], redScore: 15},
+    { ID: 'Working Communications?', blueScore: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], redScore: 15 },
     { ID: 'Within Fire Support Range?', blueScore: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], redScore: 0 },
     { ID: 'Within Range of a Pattern Force?', blueScore: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], redScore: 15 }
   ]
@@ -318,254 +320,253 @@ function BattlePage() {
 
 
   const unitNull = () => {
-    console.log("Testing",unit_id)
-    if (unit_id !== undefined){
+    console.log("Testing", unit_id)
+    if (unit_id !== undefined) {
       // navigate(closeLocation);
       return true;
     }
   }
 
-if (unitNull() ){
-  return (
-    <MantineProvider defaultColorScheme='dark'>
-      <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
-        <Stepper.Step allowStepSelect={false} icon={<IconSwords stroke={1.5} style={{ width: rem(27), height: rem(27) }} />}>
-          <div>
-            <Grid justify='center' align='flex-start' gutter={100}>
-              <Grid.Col span={4}>
-                <Card withBorder radius="md" className={classes.card} >
-                  <Card.Section className={classes.imageSection} mt="md" >
-                    <Group>
-                      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-                        <Image
-                          src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
-                          height={160}
-                          style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
-                        />
-                      </div>
-                    </Group>
-                  </Card.Section>
-                  <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
-                  {unit ? (
-                    <Text size="xl" style={{ whiteSpace: 'pre-line' }}>
-                      <strong>Type:</strong> {unit_type}<br />
-                      <strong>Unit Size:</strong> {unit_size}<br />
-                      <strong>Force Mobility:</strong> {force_mobility}<br />
-                      <strong>Health:</strong> {unit_health}<br />
-                      <CustomProgressBarHealth value={Number(unit_health)} />
+  if (unitNull()) {
+    return (
+      <MantineProvider defaultColorScheme='dark'>
+        <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
+          <Stepper.Step allowStepSelect={false} icon={<IconSwords stroke={1.5} style={{ width: rem(27), height: rem(27) }} />}>
+            <div>
+              <Grid justify='center' align='flex-start' gutter={100}>
+                <Grid.Col span={4}>
+                  <Card withBorder radius="md" className={classes.card} >
+                    <Card.Section className={classes.imageSection} mt="md" >
+                      <Group>
+                        <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                          <Image
+                            src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
+                            height={160}
+                            style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
+                          />
+                        </div>
+                      </Group>
+                    </Card.Section>
+                    <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
+                    {unit ? (
+                      <Text size="xl" style={{ whiteSpace: 'pre-line' }}>
+                        <strong>Type:</strong> {unit_type}<br />
+                        <strong>Unit Size:</strong> {unit_size}<br />
+                        <strong>Force Mobility:</strong> {force_mobility}<br />
+                        <strong>Health:</strong> {unit_health}<br />
+                        <CustomProgressBarHealth value={Number(unit_health)} />
 
-                      <strong>Force Readiness:</strong> {force_readiness}<br />
-                      <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
+                        <strong>Force Readiness:</strong> {force_readiness}<br />
+                        <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
 
-                      <strong>Force Skill:</strong> {force_skill}<br />
-                      <CustomProgressBarReadiness value={Number(getForceSkill((force_skill)))} />
-                    </Text>
-                  ) : (
-                    <Text size="sm">Unit not found</Text>
-                  )}
-                </Card>
-              </Grid.Col>
-              <Grid.Col span={4}>
-                <Card withBorder radius="md" className={classes.card} >
-                  <Card.Section className={classes.imageSection} mt="md" >
-                    <Group>
-                      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-                        <Image
-                          src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
-                          height={160}
-                          style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
-                        />
-                      </div>
-                    </Group>
-                  </Card.Section>
-                  <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
-                  {unit ? (
-                    <Text size="xl">
-                      <strong>Type:</strong> {unit_type}<br />
-                      <strong>Unit Size:</strong> {unit_size}<br />
-                      <strong>Force Mobility:</strong> {force_mobility}<br />
-                      <strong>Health:</strong> {unit_health}<br />
-                      <CustomProgressBarHealth value={Number(unit_health)} />
+                        <strong>Force Skill:</strong> {force_skill}<br />
+                        <CustomProgressBarReadiness value={Number(getForceSkill((force_skill)))} />
+                      </Text>
+                    ) : (
+                      <Text size="sm">Unit not found</Text>
+                    )}
+                  </Card>
+                </Grid.Col>
+                <Grid.Col span={4}>
+                  <Card withBorder radius="md" className={classes.card} >
+                    <Card.Section className={classes.imageSection} mt="md" >
+                      <Group>
+                        <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                          <Image
+                            src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
+                            height={160}
+                            style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
+                          />
+                        </div>
+                      </Group>
+                    </Card.Section>
+                    <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
+                    {unit ? (
+                      <Text size="xl">
+                        <strong>Type:</strong> {unit_type}<br />
+                        <strong>Unit Size:</strong> {unit_size}<br />
+                        <strong>Force Mobility:</strong> {force_mobility}<br />
+                        <strong>Health:</strong> {unit_health}<br />
+                        <CustomProgressBarHealth value={Number(unit_health)} />
 
-                      <strong>Force Readiness:</strong> {force_readiness}<br />
-                      <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
+                        <strong>Force Readiness:</strong> {force_readiness}<br />
+                        <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
 
-                      <strong>Force Skill:</strong> {force_skill}<br />
-                      <CustomProgressBarSkill value={Number(getForceSkill((force_skill)))} />
+                        <strong>Force Skill:</strong> {force_skill}<br />
+                        <CustomProgressBarSkill value={Number(getForceSkill((force_skill)))} />
 
-                    </Text>
-                  ) : (
-                    <Text size="sm">Unit not found</Text>
-                  )}
-                </Card>
-              </Grid.Col>
-            </Grid>
-            <Group justify="center" mt="xl">
-              <Button onClick={nextStep}>Start Engagement</Button>
-            </Group>
-          </div>
-        </Stepper.Step>
-        <Stepper.Step allowStepSelect={false} label="Force Strength" icon={<IconNumber1Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />}>
-          <div>
-            <p>Phase 1: Force Strength</p>
-            <Grid>
-              <Grid.Col span={4}>
-                <h1>Friendly {selectedUnit}</h1>
-                <p>Aware of OPFOR presence?</p>
-                <SegmentedControl value={question1} onChange={setQuestion1} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-                <p>Within logistics support range?</p>
-                <SegmentedControl value={question2} onChange={setQuestion2} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <h1>Enemy INF-BRIG-C</h1>
-                <p>Aware of OPFOR presence?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-                <p>Within logistics support range?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-              </Grid.Col>
-            </Grid>
-            <Group justify="center" mt="xl">
-              <Button onClick={nextStep}>Continue</Button>
-            </Group>
-
-          </div>
-        </Stepper.Step>
-        <Stepper.Step allowStepSelect={false} label="Tactical Advantage" icon={<IconNumber2Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />}>
-          <div>
-            <p>Phase 2: Tactical Advantage</p>
-            <Grid>
-              <Grid.Col span={6}>
-                <h1>Friendly {selectedUnit}</h1>
-                <p>Under ISR coverage?</p>
-                <SegmentedControl value={question3} onChange={setQuestion3} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-                <p>Working GPS?</p>
-                <SegmentedControl value={question4} onChange={setQuestion4} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <h1>Enemy INF-BRIG-C</h1>
-                <p>Under ISR coverage?</p>
-                <SegmentedControl  size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-                <p>Working GPS?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-              </Grid.Col>
-            </Grid>
-            <Group justify="center" mt="xl">
-              <Button onClick={prevStep}>Go Back</Button>
-              <Button onClick={nextStep}>Next Phase</Button>
-            </Group>
-          </div>
-        </Stepper.Step>
-        <Stepper.Step allowStepSelect={false} label="Fire Support" icon={<IconNumber3Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />} >
-          <div>
-            <p>Phase 3: Fire Support</p>
-            <Grid>
-              <Grid.Col span={6}>
-                <h1>Friendly {selectedUnit}</h1>
-                <p>Working communications?</p>
-                <SegmentedControl value={question5} onChange={setQuestion5} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-                <p>Within fire support range?</p>
-                <SegmentedControl value={question6} onChange={setQuestion6} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <h1>Enemy INF-BRIG-C</h1>
-                <p>Working communications?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-                <p>Within fire support range?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-              </Grid.Col>
-            </Grid>
-            <Group justify="center" mt="xl">
-              <Button onClick={prevStep}>Go Back</Button>
-              <Button onClick={nextStep}>Next Phase</Button>
-            </Group>
-          </div>
-        </Stepper.Step>
-        <Stepper.Step allowStepSelect={false} label="Terrain" icon={<IconNumber4Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />}>
-          <div>
-            <p>Phase 4: Terrain</p>
-            <Grid>
-              <Grid.Col span={6}>
-                <h1>Friendly {selectedUnit}</h1>
-                {/* <p>Higher ground?</p>
-                <SegmentedControl value={question7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} /> */}
-                <p>Accessible by pattern force?</p>
-                <SegmentedControl value={question7} onChange={setQuestion7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <h1>Enemy INF-BRIG-C</h1>
-                {/* <p>Higher ground?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled /> */}
-                <p>Accessible by pattern force?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-              </Grid.Col>
-            </Grid>
-            <Group justify="center" mt="xl">
-              <Button onClick={prevStep}>Go Back</Button>
-              <Button onClick={finalizeTactics}>Finalize Tactics</Button>
-            </Group>
-          </div>
-        </Stepper.Step>
-        <Stepper.Step allowStepSelect={false} icon={<IconHeartbeat stroke={1.5} style={{ width: rem(35), height: rem(35) }} />}>
-          <div>
-            <h1>After-Action Review</h1>
-            <Text size="xl">Calculated Base Value: {baseValue.toFixed(2)}</Text>
-            <Text size="xl">Real-Time Input Score: {calculateRealTimeScore()}</Text>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
-              <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px' }} display={'flex'}>
-                <Card.Section >
-                  <div style={{ textAlign: 'center' }}>
-                    <h2>Engagement Data</h2>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    Engagement ID:
-                  </div>
-                  
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
-                    <Progress.Root style={{ width: '200px', height: '25px' }}>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={30 * .15}
-                        color="#4e87c1">
-                      </Progress.Section>
-
-
-                    </Progress.Root>
-                    <Progress.Root style={{ width: '200px', height: '25px' }}>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={30 * .15}
-                        color="#bd3058">
-                      </Progress.Section>
-                    </Progress.Root>
-                  </div>
-                  <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center' }}>
-                    <Table.Thead>
-                      <Table.Tr>
-                        <Table.Th>Tactic</Table.Th>
-                        <Table.Th>Blue Score</Table.Th>
-                        <Table.Th>Red Score</Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
-                  </Table>
-                </Card.Section>
-              </Card>
+                      </Text>
+                    ) : (
+                      <Text size="sm">Unit not found</Text>
+                    )}
+                  </Card>
+                </Grid.Col>
+              </Grid>
+              <Group justify="center" mt="xl">
+                <Button onClick={nextStep}>Start Engagement</Button>
+              </Group>
             </div>
-            <Group justify="center" mt="xl">
-              <Button onClick={() => { navigate(closeLocation); setSelectedUnit(null) }}>Done</Button>
-            </Group>
-          </div>
-        </Stepper.Step>
-      </Stepper>
-    </MantineProvider>
-  );
-}
-else {
-  navigate(`/`);
-  return(
-    <h1>Error.</h1>
-  )
-}
+          </Stepper.Step>
+          <Stepper.Step allowStepSelect={false} label="Force Strength" icon={<IconNumber1Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />}>
+            <div>
+              <p>Phase 1: Force Strength</p>
+              <Grid>
+                <Grid.Col span={4}>
+                  <h1>Friendly {selectedUnit}</h1>
+                  <p>Aware of OPFOR presence?</p>
+                  <SegmentedControl value={question1} onChange={setQuestion1} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <p>Within logistics support range?</p>
+                  <SegmentedControl value={question2} onChange={setQuestion2} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <h1>Enemy INF-BRIG-C</h1>
+                  <p>Aware of OPFOR presence?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <p>Within logistics support range?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                </Grid.Col>
+              </Grid>
+              <Group justify="center" mt="xl">
+                <Button onClick={nextStep}>Continue</Button>
+              </Group>
+
+            </div>
+          </Stepper.Step>
+          <Stepper.Step allowStepSelect={false} label="Tactical Advantage" icon={<IconNumber2Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />}>
+            <div>
+              <p>Phase 2: Tactical Advantage</p>
+              <Grid>
+                <Grid.Col span={6}>
+                  <h1>Friendly {selectedUnit}</h1>
+                  <p>Under ISR coverage?</p>
+                  <SegmentedControl value={question3} onChange={setQuestion3} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <p>Working GPS?</p>
+                  <SegmentedControl value={question4} onChange={setQuestion4} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <h1>Enemy INF-BRIG-C</h1>
+                  <p>Under ISR coverage?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <p>Working GPS?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                </Grid.Col>
+              </Grid>
+              <Group justify="center" mt="xl">
+                <Button onClick={prevStep}>Go Back</Button>
+                <Button onClick={nextStep}>Next Phase</Button>
+              </Group>
+            </div>
+          </Stepper.Step>
+          <Stepper.Step allowStepSelect={false} label="Fire Support" icon={<IconNumber3Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />} >
+            <div>
+              <p>Phase 3: Fire Support</p>
+              <Grid>
+                <Grid.Col span={6}>
+                  <h1>Friendly {selectedUnit}</h1>
+                  <p>Working communications?</p>
+                  <SegmentedControl value={question5} onChange={setQuestion5} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <p>Within fire support range?</p>
+                  <SegmentedControl value={question6} onChange={setQuestion6} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <h1>Enemy INF-BRIG-C</h1>
+                  <p>Working communications?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <p>Within fire support range?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                </Grid.Col>
+              </Grid>
+              <Group justify="center" mt="xl">
+                <Button onClick={prevStep}>Go Back</Button>
+                <Button onClick={nextStep}>Next Phase</Button>
+              </Group>
+            </div>
+          </Stepper.Step>
+          <Stepper.Step allowStepSelect={false} label="Terrain" icon={<IconNumber4Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />}>
+            <div>
+              <p>Phase 4: Terrain</p>
+              <Grid>
+                <Grid.Col span={6}>
+                  <h1>Friendly {selectedUnit}</h1>
+                  {/* <p>Higher ground?</p>
+                <SegmentedControl value={question7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} /> */}
+                  <p>Accessible by pattern force?</p>
+                  <SegmentedControl value={question7} onChange={setQuestion7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <h1>Enemy INF-BRIG-C</h1>
+                  {/* <p>Higher ground?</p>
+                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled /> */}
+                  <p>Accessible by pattern force?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                </Grid.Col>
+              </Grid>
+              <Group justify="center" mt="xl">
+                <Button onClick={prevStep}>Go Back</Button>
+                <Button onClick={finalizeTactics}>Finalize Tactics</Button>
+              </Group>
+            </div>
+          </Stepper.Step>
+          <Stepper.Step allowStepSelect={false} icon={<IconHeartbeat stroke={1.5} style={{ width: rem(35), height: rem(35) }} />}>
+            <div>
+              <h1>After-Action Review</h1>
+              <Text size="xl">Calculated Base Value: {baseValue.toFixed(2)}</Text>
+              <Text size="xl">Real-Time Input Score: {calculateRealTimeScore()}</Text>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
+                <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px' }} display={'flex'}>
+                  <Card.Section >
+                    <div style={{ textAlign: 'center' }}>
+                      <h2>Engagement Data</h2>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      Engagement ID:
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
+                      <Progress.Root style={{ width: '200px', height: '25px' }}>
+                        <Tooltip label={tooltipContent}>
+                          <Progress.Section
+                            className={classes.progressSection}
+                            value={(baseValue * .70) + (Number(realTimeScore) * .30)}
+                            color="#4e87c1">
+                          </Progress.Section>
+                        </Tooltip>
+                      </Progress.Root>
+                      <Progress.Root style={{ width: '200px', height: '25px' }}>
+                        <Progress.Section
+                          className={classes.progressSection}
+                          value={55}
+                          color="#bd3058">
+                        </Progress.Section>
+                      </Progress.Root>
+                    </div>
+                    <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center' }}>
+                      <Table.Thead>
+                        <Table.Tr>
+                          <Table.Th>Tactic</Table.Th>
+                          <Table.Th>Blue Score</Table.Th>
+                          <Table.Th>Red Score</Table.Th>
+                        </Table.Tr>
+                      </Table.Thead>
+                      <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
+                    </Table>
+                  </Card.Section>
+                </Card>
+              </div>
+              <Group justify="center" mt="xl">
+                <Button onClick={() => { navigate(closeLocation); setSelectedUnit(null) }}>Done</Button>
+              </Group>
+            </div>
+          </Stepper.Step>
+        </Stepper>
+      </MantineProvider>
+    );
+  }
+  else {
+    navigate(`/`);
+    return (
+      <h1>Error.</h1>
+    )
+  }
 }
 
 export default BattlePage;
