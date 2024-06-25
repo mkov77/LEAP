@@ -40,9 +40,21 @@ export interface recentEngagementData {
 
 export interface Tactics {
   question: string;
-  //engagementid: string;
-  friendlytacticsscore: number;
-  enemytacticsscore: number;
+  friendlyawareness?: number;
+  enemyawareness?: number;
+  friendlylogistics?: number;
+  enemylogistics?: number;
+  friendlycoverage?: number;
+  enemycoverage?: number;
+  friendlygps?: number;
+  enemygps?: number;
+  friendlycomms?: number;
+  enemycomms?: number;
+  friendlyfire?: number;
+  enemyfire?: number;
+  friendlypattern?: number;
+  enemypattern?: number;
+  engagementid?: number;
 }
 
 // export interface engagementData {
@@ -79,6 +91,9 @@ export default function AAR() {
   const [progress, setProgress] = useState(0);
  // const [engagementsData, setEngagementsData] = useState<engagementData[]>([]);
   const [engagements, setEngagements] = useState<Engagement[]>([]);
+  const [tacticsMap, setTacticsMap] = useState<Map<string, Tactics[]>>(new Map()); // Changed: Added `tacticsMap` state for storing tactics data
+
+  
 
 
   const handleLogoClick = () => {
@@ -100,6 +115,24 @@ export default function AAR() {
           }
         });
         setEngagements(response.data);
+
+
+
+
+        const tacticsPromises = response.data.map(async (engagement) => {
+          const tacticsResponse = await axios.get<Tactics[]>(`http://10.0.1.226:5000/api/tactics/${engagement.engagementid}`);
+          return { engagementId: engagement.engagementid, tactics: tacticsResponse.data };
+        });
+
+        const tacticsData = await Promise.all(tacticsPromises);
+
+        const tacticsMap = new Map<string, Tactics[]>();
+        tacticsData.forEach((tacticsItem) => {
+          tacticsMap.set(tacticsItem.engagementId, tacticsItem.tactics);
+        });
+
+        setTacticsMap(tacticsMap);
+
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -110,24 +143,112 @@ export default function AAR() {
 
 
   const tactics: Tactics[] = [
-    { question: 'Aware of OPFOR?', friendlytacticsscore: 20, enemytacticsscore: 0 },
-    { question: 'Within Logistics Support Range?', friendlytacticsscore: 0, enemytacticsscore: 25 },
-    { question: 'Within RPA/ISR Coverage?', friendlytacticsscore: 10, enemytacticsscore: 0 },
-    { question: 'Working GPS?', friendlytacticsscore: 10, enemytacticsscore: 0 },
-    { question: 'Within Fire Support Range?', friendlytacticsscore: 10, enemytacticsscore: 0 },
-    { question: 'Within Range of a Pattern Force?', friendlytacticsscore: 0, enemytacticsscore: 15 }
+    { question: 'Aware of OPFOR?', friendlyawareness: 15, enemyawareness: 0 },
+    { question: 'Within Logistics Support Range?', friendlylogistics: 0, enemylogistics: 25 },
+    { question: 'Within RPA/ISR Coverage?', friendlycoverage: 10, enemycoverage: 0 },
+    { question: 'Working GPS?', friendlygps: 10, enemygps: 0 },
+    { question: 'Within Communications Range?', friendlycomms: 10, enemycomms: 0 },
+    { question: 'Within Fire Support Range?', friendlyfire: 10, enemyfire: 0 },
+    { question: 'Within Range of a Pattern Force?', friendlypattern: 0, enemypattern: 15 }
   ]
+  
 
 
-  const tacticToRow = (tactics: Tactics[]) => (
-    tactics.map((tactic) => (
-      <Table.Tr key={tactic.question}>
-        <Table.Td>{tactic.question}</Table.Td>
-        <Table.Td>{tactic.friendlytacticsscore}</Table.Td>
-        <Table.Td>{tactic.enemytacticsscore}</Table.Td>
+  // const tacticToRow = (tactics: Tactics[]) => (
+  //   tactics.map((tactic, index) => (
+  //     <React.Fragment key={index}>
+  //     <Table.Tr key={`question-${tactic.question}-friendlyawareness`}>
+  //       <Table.Td>{tactic.question}</Table.Td>
+  //       <Table.Td>{tactic.friendlyawareness}</Table.Td>
+  //       <Table.Td>{tactic.enemyawareness}</Table.Td>
+  //     </Table.Tr>
+  //     <Table.Tr key={`question-${tactic.question}-friendlylogistics`}>
+  //       <Table.Td>{tactic.question}</Table.Td>
+  //       <Table.Td>{tactic.friendlylogistics}</Table.Td>
+  //       <Table.Td>{tactic.enemylogistics}</Table.Td>
+  //     </Table.Tr>
+  //     <Table.Tr key={`question-${tactic.question}-friendlycoverage`}>
+  //       <Table.Td>{tactic.question}</Table.Td>
+  //       <Table.Td>{tactic.friendlycoverage}</Table.Td>
+  //       <Table.Td>{tactic.enemycoverage}</Table.Td>
+  //     </Table.Tr>
+  //     <Table.Tr key={`question-${tactic.question}-friendlygps`}>
+  //       <Table.Td>{tactic.question}</Table.Td>
+  //       <Table.Td>{tactic.friendlygps}</Table.Td>
+  //       <Table.Td>{tactic.enemygps}</Table.Td>
+  //     </Table.Tr>
+  //     <Table.Tr  key={`question-${tactic.question}-friendlycomms`}>
+  //       <Table.Td>{tactic.question}</Table.Td>
+  //       <Table.Td>{tactic.friendlycomms}</Table.Td>
+  //       <Table.Td>{tactic.enemycomms}</Table.Td>
+  //     </Table.Tr>
+  //     <Table.Tr  key={`question-${tactic.question}-friendlyfire`}>
+  //       <Table.Td>{tactic.question}</Table.Td>
+  //       <Table.Td>{tactic.friendlyfire}</Table.Td>
+  //       <Table.Td>{tactic.enemyfire}</Table.Td>
+  //     </Table.Tr>
+  //     <Table.Tr key={`question-${tactic.question}-friendlypattern`}>
+  //       <Table.Td>{tactic.question}</Table.Td>
+  //       <Table.Td>{tactic.friendlypattern}</Table.Td>
+  //       <Table.Td>{tactic.enemypattern}</Table.Td>
+  //     </Table.Tr>
+  //     </React.Fragment>
+  //   ))
+  // );
+
+
+  const renderTacticsRows = (tactics: Tactics[] | undefined) => { // Changed: Added `renderTacticsRows` function for rendering tactics rows
+
+
+    if (!tactics || tactics.length === 0) {
+    return (
+      <Table.Tr>
+        <Table.Td colSpan={3} align="center">No tactics data available</Table.Td>
       </Table.Tr>
-    ))
-  );
+    );
+  }
+    return tactics.map((tactic, index) => (
+      <React.Fragment key={index}>
+      <Table.Tr key={`tactic-${index}-awareness`}>
+        <Table.Td>{tactic.question}</Table.Td>
+        <Table.Td>{tactic.friendlyawareness}</Table.Td>
+        <Table.Td>{tactic.enemyawareness}</Table.Td>
+      </Table.Tr>
+      <Table.Tr  key={`tactic-${index}-logistics`}>
+        <Table.Td>{tactic.question}</Table.Td>
+        <Table.Td>{tactic.friendlylogistics}</Table.Td>
+        <Table.Td>{tactic.enemylogistics}</Table.Td>
+      </Table.Tr>
+      <Table.Tr key={`tactic-${index}-coverage`}>
+        <Table.Td>{tactic.question}</Table.Td>
+        <Table.Td>{tactic.friendlycoverage}</Table.Td>
+        <Table.Td>{tactic.enemycoverage}</Table.Td>
+      </Table.Tr>
+      <Table.Tr key={`tactic-${index}-gps`}>
+        <Table.Td>{tactic.question}</Table.Td>
+        <Table.Td>{tactic.friendlygps}</Table.Td>
+        <Table.Td>{tactic.enemygps}</Table.Td>
+      </Table.Tr>
+      <Table.Tr key={`tactic-${index}-comms`}>
+        <Table.Td>{tactic.question}</Table.Td>
+        <Table.Td>{tactic.friendlycomms}</Table.Td>
+        <Table.Td>{tactic.enemycomms}</Table.Td>
+      </Table.Tr>
+      <Table.Tr key={`tactic-${index}-fire`}>
+        <Table.Td>{tactic.question}</Table.Td>
+        <Table.Td>{tactic.friendlyfire}</Table.Td>
+        <Table.Td>{tactic.enemyfire}</Table.Td>
+      </Table.Tr>
+      <Table.Tr  key={`tactic-${index}-pattern`}>
+        <Table.Td>{tactic.question}</Table.Td>
+        <Table.Td>{tactic.friendlypattern}</Table.Td>
+        <Table.Td>{tactic.enemypattern}</Table.Td>
+      </Table.Tr>
+      
+      </React.Fragment>
+      
+    ));
+  };
 
   // const engagementData: engagementData[] = [
   //   { timeStamp: '2024-06-21', engagementID: '1', friendlyUnitName: 'Unit A', enemyUnitName: 'Enemy A' },
@@ -258,7 +379,7 @@ export default function AAR() {
                         <Table.Th>Enemy Score</Table.Th>
                       </Table.Tr>
                     </Table.Thead>
-                    <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
+                    <Table.Tbody>{renderTacticsRows(tacticsMap.get(engagements[engagements.length - 1].engagementid))}</Table.Tbody>
                   </Table>
                 </Card.Section>
               </Card>
@@ -284,8 +405,8 @@ export default function AAR() {
                 </Table.Tr>
               </Table.Thead>
               {engagements.map((row, index) => (
-                <Table.Tbody>
-                  <Table.Tr key={index} >
+                <Table.Tbody key={index}>
+                  <Table.Tr key={row.engagementid} >
                     <Table.Td>{row.engagementid}</Table.Td>
                     <Table.Td>{row.engagementid}</Table.Td>
                     <Table.Td>{row.friendlyid}</Table.Td>
@@ -328,7 +449,7 @@ export default function AAR() {
                               <Table.Th style={{ width: '150px', marginLeft: '100px' }}>Enemy Score</Table.Th>
                             </Table.Tr>
                           </Table.Thead>
-                          <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
+                          <Table.Tbody>{renderTacticsRows(tacticsMap.get(row.engagementid))}</Table.Tbody>
                         </Table>
                       </div>
                     </Collapse>

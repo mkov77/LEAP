@@ -300,23 +300,23 @@ function BattlePage() {
 
   //printing scores into the Engagement Data card in AAR
   const tactics: Tactics[] = [
-    { question: 'Aware of OPFOR?', friendlytacticsscore: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 0 },
-    { question: 'Within Logistics Support Range?', friendlytacticsscore: weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 25 },
-    { question: 'Within RPA/ISR Coverage?', friendlytacticsscore: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 0 },
-    { question: 'Working GPS?', friendlytacticsscore: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 0 },
-    { question: 'Working Communications?', friendlytacticsscore: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 15 },
-    { question: 'Within Fire Support Range?', friendlytacticsscore: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 0 },
-    { question: 'Within Range of a Pattern Force?', friendlytacticsscore: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 15 }
+    { question: 'Aware of OPFOR?', friendlyawareness: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], enemyawareness: 0 },
+    { question: 'Within Logistics Support Range?', friendlylogistics: weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], enemylogistics: 25 },
+    { question: 'Within RPA/ISR Coverage?', friendlycoverage: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], enemycoverage: 0 },
+    { question: 'Working GPS?', friendlygps: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], enemygps: 0 },
+    { question: 'Working Communications?', friendlycomms: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], enemycomms: 15 },
+    { question: 'Within Fire Support Range?', friendlyfire: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], enemyfire: 0 },
+    { question: 'Within Range of a Pattern Force?', friendlypattern: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], enemypattern: 15 }
   ]
 
   //maps each tactic and its corresponding blue/red score to a row
   const tacticToRow = (tactics: Tactics[]) => (
     tactics.map((tactic) => (
-      <Table.Tr key={tactic.question}>
-        <Table.Td>{tactic.question}</Table.Td>
-        <Table.Td>{tactic.friendlytacticsscore}</Table.Td>
-        <Table.Td>{tactic.enemytacticsscore}</Table.Td>
-      </Table.Tr>
+        <Table.Tr key={tactic.question}>
+          <Table.Td>{tactic.question}</Table.Td>
+          <Table.Td>{tactic.friendlyawareness}</Table.Td>
+          <Table.Td>{tactic.enemyawareness}</Table.Td>
+        </Table.Tr>
     ))
   );
 
@@ -618,26 +618,26 @@ function BattlePage() {
                       <h2>Engagement Data</h2>
                     </div>
                     {/* <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}> */}
-                      <Grid style={{justifyContent: 'center', alignItems: 'center'}}>
-                        <Group style={{ flex: 1, textAlign: 'center' }}>
-                          <Grid.Col>
-                            <Text size="lg">Friendly Baseline Score: </Text>
-                            <Text>{baseValue.toFixed(2)}</Text>
-                            <Text size="lg">Friendly Tactics Score:</Text>
-                            <Text> {calculateRealTimeScore()}</Text>
-                          </Grid.Col>
-                        </Group>
-                        <Group style={{ flex: 1, textAlign: 'center' }}>
-                          <Grid.Col>
-                            <Text size="lg">Enemy Baseline Score: </Text>
-                            <Text >
-                              {baseValue.toFixed(2)}
-                            </Text>
-                            <Text size="lg">Enemy Tactics Score:</Text>
-                            <Text> {calculateRealTimeScore()}</Text>
-                          </Grid.Col>
-                        </Group>
-                      </Grid>
+                    <Grid style={{ justifyContent: 'center', alignItems: 'center' }}>
+                      <Group style={{ flex: 1, textAlign: 'center' }}>
+                        <Grid.Col>
+                          <Text size="lg">Friendly Baseline Score: </Text>
+                          <Text>{baseValue.toFixed(2)}</Text>
+                          <Text size="lg">Friendly Tactics Score:</Text>
+                          <Text> {calculateRealTimeScore()}</Text>
+                        </Grid.Col>
+                      </Group>
+                      <Group style={{ flex: 1, textAlign: 'center' }}>
+                        <Grid.Col>
+                          <Text size="lg">Enemy Baseline Score: </Text>
+                          <Text >
+                            {baseValue.toFixed(2)}
+                          </Text>
+                          <Text size="lg">Enemy Tactics Score:</Text>
+                          <Text> {calculateRealTimeScore()}</Text>
+                        </Grid.Col>
+                      </Group>
+                    </Grid>
                     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
                         <Tooltip label={tooltipContentFriendly}>
