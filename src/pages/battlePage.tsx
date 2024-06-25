@@ -59,13 +59,13 @@ function BattlePage() {
   } = unit || {};
 
   const updateUnitHealth = async (id: number, newHealth: number) => {
-    const url = `/api/units/${id}/updateHealth`;
+    const url = `/api/units`;
     const options = {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ health: newHealth }),
+      body: JSON.stringify({ id, health: newHealth }), // Send both id and newHealth in the body
     };
   
     try {
@@ -79,7 +79,7 @@ function BattlePage() {
     } catch (error) {
       console.error('Error updating unit health:', error);
     }
-  };
+  };  
 
   const calculateBaseValue = (unit: Unit) => {
     const unitTypeValues: Record<string, number> = {
@@ -168,25 +168,22 @@ function BattlePage() {
   const finalizeTactics = async () => {
 
     // Dummy data for enemyscore
-    const enemyTotalScore = 50;
+    const enemyTotalScore = 15;
     const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
     const isWin = friendlyTotalScore > enemyTotalScore;
     updateUnitHealth(Number(id),0);
-    
 
     // Process all phase answers here
     console.log('Phase 1 Answers:', question1, question2);
     console.log('Phase 2 Answers:', question3, question4);
     console.log('Phase 3 Answers:', question5, question6);
     console.log('Phase 4 Answers:', question7);
-
+    console.log('RESULTS -> Enemy:', enemyTotalScore, 'Friendly:', friendlyTotalScore, 'Win?:', isWin)
 
     const score = calculateRealTimeScore();
     setRealTimeScore(score);
     setScoreFinalized(true); // Mark the score as finalized
     nextStep();
-
-    
 
     // Prepare data for engagement and tactics
     const engagementData = {
@@ -257,7 +254,7 @@ function BattlePage() {
       console.error('Error submitting data:', error);
     }
 
-  };
+  }; // End of finalize tactics
 
   // Variable Conditions and corresponding weights
   const weights: Record<WeightKeys, { yes: number; no: number }> = {
@@ -430,6 +427,7 @@ function BattlePage() {
     }
   }
 
+  if(unitNull()){
     return (
       <MantineProvider defaultColorScheme='dark'>
         <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
@@ -614,6 +612,7 @@ function BattlePage() {
               <h1>After-Action Review</h1>
               <Text size="xl">Calculated Base Value: {baseValue.toFixed(2)}</Text>
               <Text size="xl">Real-Time Input Score: {calculateRealTimeScore()}</Text>
+              <Text size="xl"></Text>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
                 <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px' }} display={'flex'}>
                   <Card.Section >
@@ -662,6 +661,14 @@ function BattlePage() {
         </Stepper>
       </MantineProvider>
     );
+  }
+  
+  else{
+    navigate('/')
+    return(
+      <Text> Error. Rerouting. </Text>
+    );
+  }
 }
 
 export default BattlePage;

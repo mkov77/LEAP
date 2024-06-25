@@ -182,28 +182,76 @@ app.post('/api/tactics', async (req, res) => {
   }
 });
 
-// Endpoint to update the health of a unit
-app.put('/api/units/:id/updateHealth', async (req, res) => {
-  console.log("Attempting to update the health of Unit ",id)
-  const { id } = req.params;
-  const { health } = req.body;
 
+app.put('/api/units/', async (req, res) => {
+  const {
+    unit_id,
+    unit_type,
+    unit_health,
+    role_type,
+    unit_size,
+    force_posture,
+    force_readiness,
+    force_skill,
+  } = req.params;
+ 
+ 
   try {
-    const result = await pool.query('UPDATE units SET health = $1 WHERE id = $2 RETURNING *', [
-      health,
-      id,
-    ]);
-
-    if (result.rows.length > 0) {
-      res.json(result.rows[0]); // Respond with updated unit data
+    const result = await pool.query(
+      `UPDATE units
+           SET unit_type = $1,
+               unit_health = $2,
+               role_type = $3,
+               unit_size = $4,
+               force_posture = $5,
+               force_readiness = $6,
+               force_skill = $7
+           WHERE unit_id = $8
+           RETURNING *`,
+      [
+        unit_type,
+        unit_health,
+        role_type,
+        unit_size,
+        force_posture,
+        force_readiness,
+        force_skill,
+        unit_id
+      ]
+    );
+ 
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Unit not found' });
     } else {
-      res.status(404).json({ message: 'Unit not found' });
+      res.json(result.rows[0]);
     }
   } catch (error) {
-    console.error('Error updating unit health:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Error updating unit:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+// Endpoint to update the health of a unit
+// app.put('/api/units', async (req, res) => {
+//   const { id, health } = req.body; // Get id from request body
+
+//   try {
+//     const result = await pool.query('UPDATE units SET unit_health = $1 WHERE id = $2 RETURNING *', [
+//       health,
+//       id,
+//     ]);
+
+//     if (result.rows.length > 0) {
+//       res.json(result.rows[0]); // Respond with updated unit data
+//     } else {
+//       res.status(404).json({ message: 'Unit not found' });
+//     }
+//   } catch (error) {
+//     console.error('Error updating unit health:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
+
 
 
 app.listen(port, () => {
