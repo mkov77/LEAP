@@ -46,8 +46,8 @@ app.get('/api/tactics/:id', async (req, res) => {
   console.log('Attempting to retrieve tactics')
   const { id } = req.params;
   try {
-    const result = await pool.query('SELECT * FROM engagements WHERE engagementid = $1', [id]);
-
+    const result = await pool.query('SELECT * FROM tactics WHERE engagementid = $1', [id]);
+ 
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);
@@ -56,6 +56,19 @@ app.get('/api/tactics/:id', async (req, res) => {
 });
 
 // Endpoint to fetch data from 'units' table
+
+app.get('/api/units/sectionOrNullSort', async (req, res) => {
+  const sectionid = req.query.sectionid;
+  try {
+    const result = await pool.query('SELECT * FROM units WHERE section = $1 OR section IS NULL', [sectionid]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('sectionid: ', [sectionid]);
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
 app.get('/api/units/sectionSort', async (req, res) => {
   const sectionid = req.query.sectionid;
   try {
@@ -233,6 +246,8 @@ app.put('/api/units/update', async (req, res) => {
     force_posture,
     force_readiness,
     force_skill,
+    section_id,
+    root
   } = req.body;
 
   try {
@@ -245,8 +260,10 @@ app.put('/api/units/update', async (req, res) => {
           unit_size = $4,
           force_posture = $5,
           force_readiness = $6,
-          force_skill = $7
-      WHERE unit_id = $8
+          force_skill = $7,
+          section = $8,
+          root = $9
+      WHERE unit_id = $10
       RETURNING *;
     `;
     const updateValues = [
@@ -257,6 +274,8 @@ app.put('/api/units/update', async (req, res) => {
       force_posture,
       force_readiness,
       force_skill,
+      section_id,
+      root,
       unit_id,
     ];
 

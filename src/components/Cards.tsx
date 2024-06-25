@@ -19,7 +19,8 @@ export interface Unit {
   force_readiness: string;
   force_skill: string;
   children: string[];
-  id: number
+  id: number;
+  root: boolean
 }
 
 interface CardProps {
