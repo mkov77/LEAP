@@ -10,15 +10,7 @@ import {
   Table,
   Checkbox,
   Button,
-  Modal,
-  TextInput,
-  useMantineTheme,
   MantineProvider,
-  useMantineColorScheme,
-  useComputedColorScheme,
-  FocusTrap,
-  ScrollArea,
-  Anchor,
   Progress,
   Card,
   Text,
@@ -29,9 +21,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
 import { useUserRole } from '../context/UserContext';
 import { useUnitProvider } from '../context/UnitContext';
-import cx from 'clsx';
+
 import classes from './TableReviews.module.css'
 import { timeStamp } from 'console';
+import BattlePage from './battlePage';
+import axios from 'axios';
 
 export interface recentEngagementData {
   unit_type: string;
@@ -46,8 +40,8 @@ export interface recentEngagementData {
 
 export interface Tactics {
   ID: string;
-  blueScore: number;
-  redScore: number;
+  friendlyScore: number;
+  enemyScore: number;
 }
 
 export interface engagementData {
@@ -56,6 +50,12 @@ export interface engagementData {
   friendlyUnitName: string;
   enemyUnitName: string;
 
+}
+
+export interface Engagement {
+  friendlyid: string;
+  enemyid: string;
+  engagementid: string;
 }
 
 
@@ -70,6 +70,9 @@ export default function AAR() {
   const [scrolled, setScrolled] = useState(false);
   // const [isOpen, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [engagementsData, setEngagementsData] = useState<engagementData[]>([]);
+  const [engagements, setEngagements] = useState<Engagement[]>([]);
+
 
   const handleLogoClick = () => {
     navigate('/'); // Navigate to the main login page
@@ -80,28 +83,65 @@ export default function AAR() {
   };
 
 
-const tactics: Tactics[] = [
-    { ID: 'Aware of OPFOR?', blueScore: 20, redScore: 0 },
-    { ID: 'Within Logistics Support Range?', blueScore: 0, redScore: 25 },
-    { ID: 'Within RPA/ISR Coverage?', blueScore: 10, redScore: 0 },
-    { ID: 'Working GPS?', blueScore: 10, redScore: 0 },
-    { ID: 'Within Fire Support Range?', blueScore: 10, redScore: 0 },
-    { ID: 'Within Range of a Pattern Force?', blueScore: 0, redScore: 15 }
-  ] 
+  // useEffect(() => {
+  //   const fetchEngagementData = async () => {
+  //     try {
+  //       const response = await fetch(`http://10.0.1.226:5000/api/engagements`);
+  //       if (response.ok) {
+  //         const engagementData = await response.json();
+  //         setEngagementsData(engagementsData);
+  //       } else {
+  //         console.error('Failed to fetch engagement data');
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching engagement data:', error);
+  //     }
+  //   };
+  //   fetchEngagementData();
+  // }, []);
+
+  
+  useEffect(() => {
+    const fetchEngagementData = async () => {
+      try {
+        console.log('Fetching data for engagement:', sectionId);
+        const response = await axios.get<Engagement[]>(`http://10.0.1.226:5000/api/engagements/${sectionId}`, {
+          params: {
+            sectionid: sectionId  // Pass userSection as a query parameter
+          }
+        });
+        setEngagements(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+  
+    fetchEngagementData();
+  }, [sectionId]);
 
 
-   const tacticToRow = (tactics: Tactics[]) => (
+  const tactics: Tactics[] = [
+    { ID: 'Aware of OPFOR?', friendlyScore: 20, enemyScore: 0 },
+    { ID: 'Within Logistics Support Range?', friendlyScore: 0, enemyScore: 25 },
+    { ID: 'Within RPA/ISR Coverage?', friendlyScore: 10, enemyScore: 0 },
+    { ID: 'Working GPS?', friendlyScore: 10, enemyScore: 0 },
+    { ID: 'Within Fire Support Range?', friendlyScore: 10, enemyScore: 0 },
+    { ID: 'Within Range of a Pattern Force?', friendlyScore: 0, enemyScore: 15 }
+  ]
+
+
+  const tacticToRow = (tactics: Tactics[]) => (
     tactics.map((tactic) => (
       <Table.Tr key={tactic.ID}>
         <Table.Td>{tactic.ID}</Table.Td>
-        <Table.Td>{tactic.blueScore}</Table.Td>
-        <Table.Td>{tactic.redScore}</Table.Td>
+        <Table.Td>{tactic.friendlyScore}</Table.Td>
+        <Table.Td>{tactic.enemyScore}</Table.Td>
       </Table.Tr>
     ))
   );
 
   const engagementData: engagementData[] = [
-    { timeStamp: '2024-06-21', engagementID: '1', friendlyUnitName: 'Unit A', enemyUnitName: 'Enemy A' },
+    { timeStamp: '2024-06-21', engagementID: '3', friendlyUnitName: 'Unit A', enemyUnitName: 'Enemy A' },
     { timeStamp: '2024-06-22', engagementID: '2', friendlyUnitName: 'Unit B', enemyUnitName: 'Enemy B' },
     // Add more objects as needed
   ];
@@ -201,7 +241,7 @@ const tactics: Tactics[] = [
                     <h2>Most Recent Engagement</h2>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    Engagement ID:
+                    Engagement ID: 
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
                     <Progress.Root style={{ width: '200px', height: '25px' }}>
@@ -210,8 +250,6 @@ const tactics: Tactics[] = [
                         value={30 * .15}
                         color="#4e87c1">
                       </Progress.Section>
-
-
                     </Progress.Root>
                     <Progress.Root style={{ width: '200px', height: '25px' }}>
                       <Progress.Section
@@ -225,8 +263,8 @@ const tactics: Tactics[] = [
                     <Table.Thead>
                       <Table.Tr>
                         <Table.Th>Tactic</Table.Th>
-                        <Table.Th>Blue Score</Table.Th>
-                        <Table.Th>Red Score</Table.Th>
+                        <Table.Th>Friendly Score</Table.Th>
+                        <Table.Th>Enemy Score</Table.Th>
                       </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
@@ -287,8 +325,8 @@ const tactics: Tactics[] = [
                           <Table.Thead>
                             <Table.Tr>
                               <Table.Th style={{ width: '1000px' }}>Tactic</Table.Th>
-                              <Table.Th style={{ width: '250px', marginLeft: '100px' }}>Blue Score</Table.Th>
-                              <Table.Th style={{ width: '150px', marginLeft: '100px' }}>Red Score</Table.Th>
+                              <Table.Th style={{ width: '250px', marginLeft: '100px' }}>Friendly Score</Table.Th>
+                              <Table.Th style={{ width: '150px', marginLeft: '100px' }}>Enemy Score</Table.Th>
                             </Table.Tr>
                           </Table.Thead>
                           <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
@@ -304,5 +342,9 @@ const tactics: Tactics[] = [
       </AppShell>
     </MantineProvider>
   );
+}
+
+function setEngagementOnline(isonline: any) {
+  throw new Error('Function not implemented.');
 }
 

@@ -67,7 +67,7 @@ function BattlePage() {
       },
       body: JSON.stringify({ id, newHealth }), // Send both id and newHealth in the body
     };
-  
+
     try {
       const response = await fetch(url, options);
       if (!response.ok) {
@@ -171,8 +171,8 @@ function BattlePage() {
     const enemyTotalScore = 15;
     const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
     const isWin = friendlyTotalScore > enemyTotalScore;
-    console.log('ID: ',id);
-    updateUnitHealth(Number(id),0);
+    console.log('ID: ', id);
+    updateUnitHealth(Number(id), 0);
 
     // Process all phase answers here
     console.log('Phase 1 Answers:', question1, question2);
@@ -215,7 +215,7 @@ function BattlePage() {
       EnemyFire: question6 === "Yes" ? 1 : 0,
       FriendlyPattern: question7 === "Yes" ? 1 : 0,
       EnemyPattern: question7 === "Yes" ? 1 : 0,
-    };    
+    };
 
     // Submit answers to backend
     try {
@@ -236,20 +236,20 @@ function BattlePage() {
       console.log('Engagement created:', engagementResult);
 
       // Submit tactics data
-    const tacticsResponse = await fetch('http://localhost:5000/api/tactics', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(tacticsData),
-    });
+      const tacticsResponse = await fetch('http://localhost:5000/api/tactics', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tacticsData),
+      });
 
-    if (!tacticsResponse.ok) {
-      throw new Error('Failed to record tactics');
-    }
+      if (!tacticsResponse.ok) {
+        throw new Error('Failed to record tactics');
+      }
 
-    const tacticsResult = await tacticsResponse.json();
-    console.log('Tactics recorded:', tacticsResult);
+      const tacticsResult = await tacticsResponse.json();
+      console.log('Tactics recorded:', tacticsResult);
 
     } catch (error) {
       console.error('Error submitting data:', error);
@@ -268,7 +268,7 @@ function BattlePage() {
     patternForceRange: { yes: 10, no: 0 }
   };
 
-  let tooltipContent = 'Total Calculated Value (Friendly): ' + ((Number(realTimeScore) * .30) + (baseValue * .70)) + '%';
+  let tooltipContentFriendly = 'Total Calculated Value (Friendly): ' + ((Number(realTimeScore) * .30) + (baseValue * .70)).toFixed(2) + '%';
 
   type WeightKeys = 'awareOfPresence' | 'logisticsSupportRange' | 'isrCoverage' | 'gpsWorking' | 'communicationsWorking' | 'fireSupportRange' | 'patternForceRange';
 
@@ -300,13 +300,13 @@ function BattlePage() {
 
   //printing scores into the Engagement Data card in AAR
   const tactics: Tactics[] = [
-    { ID: 'Aware of OPFOR?', blueScore: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], redScore: 0 },
-    { ID: 'Within Logistics Support Range?', blueScore: weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], redScore: 25 },
-    { ID: 'Within RPA/ISR Coverage?', blueScore: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], redScore: 0 },
-    { ID: 'Working GPS?', blueScore: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], redScore: 0 },
-    { ID: 'Working Communications?', blueScore: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], redScore: 15 },
-    { ID: 'Within Fire Support Range?', blueScore: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], redScore: 0 },
-    { ID: 'Within Range of a Pattern Force?', blueScore: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], redScore: 15 }
+    { ID: 'Aware of OPFOR?', friendlyScore: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
+    { ID: 'Within Logistics Support Range?', friendlyScore: weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], enemyScore: 25 },
+    { ID: 'Within RPA/ISR Coverage?', friendlyScore: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
+    { ID: 'Working GPS?', friendlyScore: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
+    { ID: 'Working Communications?', friendlyScore: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], enemyScore: 15 },
+    { ID: 'Within Fire Support Range?', friendlyScore: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
+    { ID: 'Within Range of a Pattern Force?', friendlyScore: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], enemyScore: 15 }
   ]
 
   //maps each tactic and its corresponding blue/red score to a row
@@ -314,8 +314,8 @@ function BattlePage() {
     tactics.map((tactic) => (
       <Table.Tr key={tactic.ID}>
         <Table.Td>{tactic.ID}</Table.Td>
-        <Table.Td>{tactic.blueScore}</Table.Td>
-        <Table.Td>{tactic.redScore}</Table.Td>
+        <Table.Td>{tactic.friendlyScore}</Table.Td>
+        <Table.Td>{tactic.enemyScore}</Table.Td>
       </Table.Tr>
     ))
   );
@@ -428,7 +428,7 @@ function BattlePage() {
     }
   }
 
-  if(unitNull()){
+  if (unitNull()) {
     return (
       <MantineProvider defaultColorScheme='dark'>
         <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
@@ -610,25 +610,40 @@ function BattlePage() {
           </Stepper.Step>
           <Stepper.Step allowStepSelect={false} icon={<IconHeartbeat stroke={1.5} style={{ width: rem(35), height: rem(35) }} />}>
             <div>
-              <h1>After-Action Review</h1>
-              <Text size="xl">Baseline Score: {baseValue.toFixed(2)}</Text>
-              <Text size="xl">Tactics Score: {calculateRealTimeScore()}</Text>
-              <Text size="xl"></Text>
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
-                <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px' }} display={'flex'}>
+              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>After-Action Review</h1>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '150px', marginTop: '200px', textAlign: 'center' }} display={'flex'}>
                   <Card.Section >
                     <div style={{ textAlign: 'center' }}>
                       <h2>Engagement Data</h2>
                     </div>
-                    <div style={{ textAlign: 'center' }}>
-                      Engagement ID:
-                    </div>
+                    {/* <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}> */}
+                      <Grid style={{justifyContent: 'center', alignItems: 'center'}}>
+                        <Group style={{ flex: 1, textAlign: 'center' }}>
+                          <Grid.Col>
+                            <Text size="lg">Friendly Baseline Score: </Text>
+                            <Text>{baseValue.toFixed(2)}</Text>
+                            <Text size="lg">Friendly Tactics Score:</Text>
+                            <Text> {calculateRealTimeScore()}</Text>
+                          </Grid.Col>
+                        </Group>
+                        <Group style={{ flex: 1, textAlign: 'center' }}>
+                          <Grid.Col>
+                            <Text size="lg">Enemy Baseline Score: </Text>
+                            <Text >
+                              {baseValue.toFixed(2)}
+                            </Text>
+                            <Text size="lg">Enemy Tactics Score:</Text>
+                            <Text> {calculateRealTimeScore()}</Text>
+                          </Grid.Col>
+                        </Group>
+                      </Grid>
                     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
-                        <Tooltip label={tooltipContent}>
+                        <Tooltip label={tooltipContentFriendly}>
                           <Progress.Section
                             className={classes.progressSection}
-                            value={(baseValue * .70) + (Number(realTimeScore) * .30)}
+                            value={Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
                             color="#4e87c1">
                           </Progress.Section>
                         </Tooltip>
@@ -636,7 +651,7 @@ function BattlePage() {
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
                         <Progress.Section
                           className={classes.progressSection}
-                          value={30 * .15}
+                          value={58}
                           color="#bd3058">
                         </Progress.Section>
                       </Progress.Root>
@@ -645,8 +660,8 @@ function BattlePage() {
                       <Table.Thead>
                         <Table.Tr>
                           <Table.Th>Tactic</Table.Th>
-                          <Table.Th>Blue Score</Table.Th>
-                          <Table.Th>Red Score</Table.Th>
+                          <Table.Th>Friendly Score</Table.Th>
+                          <Table.Th>Enemy Score</Table.Th>
                         </Table.Tr>
                       </Table.Thead>
                       <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
@@ -654,7 +669,7 @@ function BattlePage() {
                   </Card.Section>
                 </Card>
               </div>
-              <Group justify="center" mt="xl">
+              <Group justify="center" mt="xl" display={'flex'}>
                 <Button onClick={() => { navigate(closeLocation); setSelectedUnit(null) }}>Done</Button>
               </Group>
             </div>
@@ -663,10 +678,10 @@ function BattlePage() {
       </MantineProvider>
     );
   }
-  
-  else{
+
+  else {
     navigate('/')
-    return(
+    return (
       <Text> Error. Rerouting. </Text>
     );
   }
