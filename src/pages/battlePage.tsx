@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
-import { Table, Progress, Text, AppShell, Group, Skeleton, Image, Stepper, Button, SegmentedControl, rem, Modal, useMantineColorScheme, useComputedColorScheme, MantineProvider, Grid, Card, Center } from '@mantine/core';
+import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconSwords, IconHeartbeat, IconNumber1Small, IconNumber2Small, IconNumber3Small, IconNumber4Small } from '@tabler/icons-react';
@@ -267,6 +267,8 @@ function BattlePage() {
     fireSupportRange: { yes: 15, no: 0 },
     patternForceRange: { yes: 10, no: 0 }
   };
+
+  let tooltipContent = 'Total Calculated Value (Friendly): ' + ((Number(realTimeScore) * .30) + (baseValue * .70)) + '%';
 
   type WeightKeys = 'awareOfPresence' | 'logisticsSupportRange' | 'isrCoverage' | 'gpsWorking' | 'communicationsWorking' | 'fireSupportRange' | 'patternForceRange';
 
@@ -621,16 +623,15 @@ function BattlePage() {
                     <div style={{ textAlign: 'center' }}>
                       Engagement ID:
                     </div>
-
                     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={30 * .15}
-                          color="#4e87c1">
-                        </Progress.Section>
-
-
+                        <Tooltip label={tooltipContent}>
+                          <Progress.Section
+                            className={classes.progressSection}
+                            value={(baseValue * .70) + (Number(realTimeScore) * .30)}
+                            color="#4e87c1">
+                          </Progress.Section>
+                        </Tooltip>
                       </Progress.Root>
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
                         <Progress.Section
