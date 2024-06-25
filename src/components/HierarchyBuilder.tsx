@@ -131,7 +131,7 @@ function Hierarchy() {
     forceReadiness: '',
     forceSkill: ''
   });
-  const [selectedNode, setSelectedNode] = useState('');
+  const [selectedNode, setSelectedNode] = useState<string>('');
  
  
  
@@ -169,6 +169,7 @@ function Hierarchy() {
  
  
   const handleNodeClick = (nodeData: RawNodeDatum) => {
+    console.log(nodeData.name);
     setSelectedNode(nodeData.name);
     if (userRole === "Administrator") {
       open();
@@ -182,8 +183,6 @@ function Hierarchy() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     
-
-
     try {
       const response = await axios.put(`http://10.0.1.226:5000/api/units/update`, {
         parent_id: selectedNode,

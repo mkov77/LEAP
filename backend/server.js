@@ -28,10 +28,12 @@ app.get('/api/sections', async (req, res) => {
 });
 
 // End point to get engagements
-app.get('/api/engagements', async (req, res) => {
+app.get('/api/engagements/:id', async (req, res) => {
+  
   console.log('Attempting to engagements')
+  const { id } = req.params;
   try {
-    const result = await pool.query('SELECT * FROM engagements');
+    const result = await pool.query('SELECT * FROM engagements WHERE sectionid = $1', [id]);
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);
@@ -40,10 +42,12 @@ app.get('/api/engagements', async (req, res) => {
 });
 
 // Endpoint to get tactics
-app.get('/api/tactics', async (req, res) => {
+app.get('/api/tactics/:id', async (req, res) => {
   console.log('Attempting to retrieve tactics')
+  const { id } = req.params;
   try {
-    const result = await pool.query('SELECT * FROM tactics');
+    const result = await pool.query('SELECT * FROM engagements WHERE engagementid = $1', [id]);
+
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);
@@ -229,41 +233,53 @@ app.put('/api/units/update', async (req, res) => {
     force_posture,
     force_readiness,
     force_skill,
-  } = req.body; // Use req.body instead of req.params
+  } = req.body;
 
   try {
-    const result = await pool.query(
-      `UPDATE units
-       SET unit_type = $1,
-           unit_health = $2,
-           role_type = $3,
-           unit_size = $4,
-           force_posture = $5,
-           force_readiness = $6,
-           force_skill = $7
-       WHERE unit_id = $8;
-
+    // Update unit details
+    const updateQuery = `
       UPDATE units
-      SET children = array_append(children, $8)
-      WHERE unit_id = $9;`,
-      [
-        unit_type,
-        unit_health,
-        role_type,
-        unit_size,
-        force_posture,
-        force_readiness,
-        force_skill,
-        unit_id,
-        parent_id
-      ]
-    );
+      SET unit_type = $1,
+          unit_health = $2,
+          role_type = $3,
+          unit_size = $4,
+          force_posture = $5,
+          force_readiness = $6,
+          force_skill = $7
+      WHERE unit_id = $8
+      RETURNING *;
+    `;
+    const updateValues = [
+      unit_type,
+      unit_health,
+      role_type,
+      unit_size,
+      force_posture,
+      force_readiness,
+      force_skill,
+      unit_id,
+    ];
 
-    if (result.rows.length === 0) {
-      res.status(404).json({ error: 'Unit not found' });
-    } else {
-      res.json(result.rows[0]);
+    const updateResult = await pool.query(updateQuery, updateValues);
+
+    if (updateResult.rowCount === 0) {
+      return res.status(404).json({ error: 'Unit not found' });
     }
+
+    // Append child to parent's children array
+    const appendQuery = `
+      UPDATE units
+      SET children = array_append(children, $1)
+      WHERE unit_id = $2;
+    `;
+    const appendValues = [
+      unit_id, // Child unit_id to append
+      parent_id, // Parent unit_id
+    ];
+
+    await pool.query(appendQuery, appendValues);
+
+    res.json(updateResult.rows[0]); // Return the updated unit details
   } catch (error) {
     console.error('Error updating unit:', error);
     res.status(500).json({ error: 'Internal Server Error' });
