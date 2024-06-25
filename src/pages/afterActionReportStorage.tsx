@@ -39,23 +39,30 @@ export interface recentEngagementData {
 }
 
 export interface Tactics {
-  ID: string;
-  friendlyScore: number;
-  enemyScore: number;
+  question: string;
+  //engagementid: string;
+  friendlytacticsscore: number;
+  enemytacticsscore: number;
 }
 
-export interface engagementData {
-  timeStamp: string;
-  engagementID: string;
-  friendlyUnitName: string;
-  enemyUnitName: string;
+// export interface engagementData {
+//   timeStamp: string;
+//   engagementID: string;
+//   friendlyUnitName: string;
+//   enemyUnitName: string;
 
-}
+// }
 
 export interface Engagement {
   friendlyid: string;
   enemyid: string;
   engagementid: string;
+  friendlybasescore: string;
+  enemybasescore: string;
+  friendlytacticsscore: string;
+  enemytacticsscore: string;
+  friendlytotalscore: number;
+  enemytotalscore: number;
 }
 
 
@@ -70,7 +77,7 @@ export default function AAR() {
   const [scrolled, setScrolled] = useState(false);
   // const [isOpen, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [engagementsData, setEngagementsData] = useState<engagementData[]>([]);
+ // const [engagementsData, setEngagementsData] = useState<engagementData[]>([]);
   const [engagements, setEngagements] = useState<Engagement[]>([]);
 
 
@@ -81,24 +88,6 @@ export default function AAR() {
   const handleArrowClick = () => {
     navigate(`/studentPage/${sectionId}`);
   };
-
-
-  // useEffect(() => {
-  //   const fetchEngagementData = async () => {
-  //     try {
-  //       const response = await fetch(`http://10.0.1.226:5000/api/engagements`);
-  //       if (response.ok) {
-  //         const engagementData = await response.json();
-  //         setEngagementsData(engagementsData);
-  //       } else {
-  //         console.error('Failed to fetch engagement data');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching engagement data:', error);
-  //     }
-  //   };
-  //   fetchEngagementData();
-  // }, []);
 
   
   useEffect(() => {
@@ -121,34 +110,36 @@ export default function AAR() {
 
 
   const tactics: Tactics[] = [
-    { ID: 'Aware of OPFOR?', friendlyScore: 20, enemyScore: 0 },
-    { ID: 'Within Logistics Support Range?', friendlyScore: 0, enemyScore: 25 },
-    { ID: 'Within RPA/ISR Coverage?', friendlyScore: 10, enemyScore: 0 },
-    { ID: 'Working GPS?', friendlyScore: 10, enemyScore: 0 },
-    { ID: 'Within Fire Support Range?', friendlyScore: 10, enemyScore: 0 },
-    { ID: 'Within Range of a Pattern Force?', friendlyScore: 0, enemyScore: 15 }
+    { question: 'Aware of OPFOR?', friendlytacticsscore: 20, enemytacticsscore: 0 },
+    { question: 'Within Logistics Support Range?', friendlytacticsscore: 0, enemytacticsscore: 25 },
+    { question: 'Within RPA/ISR Coverage?', friendlytacticsscore: 10, enemytacticsscore: 0 },
+    { question: 'Working GPS?', friendlytacticsscore: 10, enemytacticsscore: 0 },
+    { question: 'Within Fire Support Range?', friendlytacticsscore: 10, enemytacticsscore: 0 },
+    { question: 'Within Range of a Pattern Force?', friendlytacticsscore: 0, enemytacticsscore: 15 }
   ]
 
 
   const tacticToRow = (tactics: Tactics[]) => (
     tactics.map((tactic) => (
-      <Table.Tr key={tactic.ID}>
-        <Table.Td>{tactic.ID}</Table.Td>
-        <Table.Td>{tactic.friendlyScore}</Table.Td>
-        <Table.Td>{tactic.enemyScore}</Table.Td>
+      <Table.Tr key={tactic.question}>
+        <Table.Td>{tactic.question}</Table.Td>
+        <Table.Td>{tactic.friendlytacticsscore}</Table.Td>
+        <Table.Td>{tactic.enemytacticsscore}</Table.Td>
       </Table.Tr>
     ))
   );
 
-  const engagementData: engagementData[] = [
-    { timeStamp: '2024-06-21', engagementID: '3', friendlyUnitName: 'Unit A', enemyUnitName: 'Enemy A' },
-    { timeStamp: '2024-06-22', engagementID: '2', friendlyUnitName: 'Unit B', enemyUnitName: 'Enemy B' },
-    // Add more objects as needed
-  ];
+  // const engagementData: engagementData[] = [
+  //   { timeStamp: '2024-06-21', engagementID: '1', friendlyUnitName: 'Unit A', enemyUnitName: 'Enemy A' },
+  //   { timeStamp: '2024-06-22', engagementID: '2', friendlyUnitName: 'Unit B', enemyUnitName: 'Enemy B' },
+  //   // Add more objects as needed
+  // ];
+
+  
 
   let index: number = 0;
 
-  const [isOpen, setIsOpen] = useState<boolean[]>(Array(engagementData.length).fill(false));
+  const [isOpen, setIsOpen] = useState<boolean[]>(Array(engagements.length).fill(false));
 
   const handleToggle = (index: number) => {
     setIsOpen(prev => {
@@ -158,11 +149,11 @@ export default function AAR() {
     });
   };
 
-  const row = engagementData.map((rowData) => (
-    <Table.Tr key={rowData.friendlyUnitName}>
-      <Table.Td>{rowData.timeStamp}</Table.Td>
-      <Table.Td>{rowData.engagementID}</Table.Td>
-      <Table.Td>{rowData.friendlyUnitName}</Table.Td>
+  const row = engagements.map((rowData) => (
+    <Table.Tr key={rowData.engagementid}>
+      <Table.Td>{rowData.friendlyid}</Table.Td>
+      <Table.Td>{rowData.engagementid}</Table.Td>
+      <Table.Td>{rowData.friendlyid}</Table.Td>
       <Table.Td>
         <Progress.Root style={{ width: '600px', height: '50px' }}>
           <Progress.Section
@@ -172,7 +163,7 @@ export default function AAR() {
           </Progress.Section>
         </Progress.Root>
       </Table.Td>
-      <Table.Td>{rowData.enemyUnitName}</Table.Td>
+      <Table.Td>{rowData.enemyid}</Table.Td>
       <Table.Td>
         <Progress.Root style={{ width: '600px', height: '50px' }}>
           <Progress.Section
@@ -240,14 +231,14 @@ export default function AAR() {
                   <div style={{ textAlign: 'center' }}>
                     <h2>Most Recent Engagement</h2>
                   </div>
-                  <div style={{ textAlign: 'center' }}>
-                    Engagement ID: 
-                  </div>
+                  {/* <div style={{ textAlign: 'center' }}>
+                    Engagement engagementid:
+                  </div> */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
                     <Progress.Root style={{ width: '200px', height: '25px' }}>
                       <Progress.Section
                         className={classes.progressSection}
-                        value={30 * .15}
+                        value={30}
                         color="#4e87c1">
                       </Progress.Section>
                     </Progress.Root>
@@ -273,6 +264,14 @@ export default function AAR() {
               </Card>
             </div>
 
+            {/* {engagements.map((engagement, index) => (
+            <li key={index}>
+              <strong>Engagement engagementid:</strong> {engagement.engagementid}, 
+              <strong> Timestamp:</strong> {engagement.friendlyid}, 
+              <strong> Friendly Unit:</strong> {engagement.enemyid}, 
+            </li>
+          ))} */}
+
             <Table verticalSpacing={'xs'} style={{ width: '100%', tableLayout: 'fixed', justifyContent: 'space-between' }}>
               <Table.Thead>
                 <Table.Tr>
@@ -284,30 +283,30 @@ export default function AAR() {
                   <Table.Th>Enemy Bar</Table.Th>
                 </Table.Tr>
               </Table.Thead>
-              {engagementData.map((row, index) => (
+              {engagements.map((row, index) => (
                 <Table.Tbody>
                   <Table.Tr key={index} >
-                    <Table.Td>{row.timeStamp}</Table.Td>
-                    <Table.Td>{row.engagementID}</Table.Td>
-                    <Table.Td>{row.friendlyUnitName}</Table.Td>
+                    <Table.Td>{row.engagementid}</Table.Td>
+                    <Table.Td>{row.engagementid}</Table.Td>
+                    <Table.Td>{row.friendlyid}</Table.Td>
                     <Table.Td>
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
                         <Progress.Section
                           className={classes.progressSection}
-                          value={40}
+                          value={row.friendlytotalscore}
                           color="#4e87c1">
-                          40%
+                          {Number(row.friendlytotalscore).toFixed(0)}%
                         </Progress.Section>
                       </Progress.Root>
                     </Table.Td>
-                    <Table.Td>{row.enemyUnitName}</Table.Td>
+                    <Table.Td>{row.enemyid}</Table.Td>
                     <Table.Td>
                       <Progress.Root style={{ width: '200px', height: '25px', display: 'flex' }}>
                         <Progress.Section
                           className={classes.progressSection}
-                          value={60}
+                          value={row.enemytotalscore}
                           color="#bd3058">
-                          60%
+                          {Number(row.enemytotalscore).toFixed(0)}%
                         </Progress.Section>
                       </Progress.Root>
                     </Table.Td>

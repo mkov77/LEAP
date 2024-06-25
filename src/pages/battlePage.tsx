@@ -300,22 +300,22 @@ function BattlePage() {
 
   //printing scores into the Engagement Data card in AAR
   const tactics: Tactics[] = [
-    { ID: 'Aware of OPFOR?', friendlyScore: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
-    { ID: 'Within Logistics Support Range?', friendlyScore: weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], enemyScore: 25 },
-    { ID: 'Within RPA/ISR Coverage?', friendlyScore: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
-    { ID: 'Working GPS?', friendlyScore: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
-    { ID: 'Working Communications?', friendlyScore: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], enemyScore: 15 },
-    { ID: 'Within Fire Support Range?', friendlyScore: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
-    { ID: 'Within Range of a Pattern Force?', friendlyScore: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], enemyScore: 15 }
+    { question: 'Aware of OPFOR?', friendlytacticsscore: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 0 },
+    { question: 'Within Logistics Support Range?', friendlytacticsscore: weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 25 },
+    { question: 'Within RPA/ISR Coverage?', friendlytacticsscore: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 0 },
+    { question: 'Working GPS?', friendlytacticsscore: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 0 },
+    { question: 'Working Communications?', friendlytacticsscore: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 15 },
+    { question: 'Within Fire Support Range?', friendlytacticsscore: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 0 },
+    { question: 'Within Range of a Pattern Force?', friendlytacticsscore: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], enemytacticsscore: 15 }
   ]
 
   //maps each tactic and its corresponding blue/red score to a row
   const tacticToRow = (tactics: Tactics[]) => (
     tactics.map((tactic) => (
-      <Table.Tr key={tactic.ID}>
-        <Table.Td>{tactic.ID}</Table.Td>
-        <Table.Td>{tactic.friendlyScore}</Table.Td>
-        <Table.Td>{tactic.enemyScore}</Table.Td>
+      <Table.Tr key={tactic.question}>
+        <Table.Td>{tactic.question}</Table.Td>
+        <Table.Td>{tactic.friendlytacticsscore}</Table.Td>
+        <Table.Td>{tactic.enemytacticsscore}</Table.Td>
       </Table.Tr>
     ))
   );
