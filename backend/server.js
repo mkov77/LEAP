@@ -29,14 +29,17 @@ app.get('/api/sections', async (req, res) => {
 
 // Endpoint to fetch data from 'units' table
 app.get('/api/units', async (req, res) => {
+  const sectionid = req.query.sectionid;
   try {
-    const result = await pool.query('SELECT * FROM units');
+    const result = await pool.query('SELECT * FROM units WHERE section = $1', [sectionid]);
     res.json(result.rows);
   } catch (err) {
+    console.error('sectionid: ', [sectionid]);
     console.error(err.message);
     res.status(500).send('Server Error');
   }
 });
+
 
 // GET request to fetch a specific section by ID
 app.get('/api/sections/:id', async (req, res) => {
@@ -106,6 +109,102 @@ app.put('/api/sections/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+// Endpoint to create an engagement
+app.post('/api/engagements', async (req, res) => {
+  const {
+    SectionID,
+    FriendlyID,
+    EnemyID,
+    FriendlyBaseScore,
+    EnemyBaseScore,
+    FriendlyTacticsScore,
+    EnemyTacticsScore,
+    FriendlyTotalScore,
+    EnemyTotalScore,
+    isWin
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO engagements 
+      (sectionid, friendlyid, enemyid, friendlybasescore, enemybasescore, 
+       friendlytacticsscore, enemytacticsscore, friendlytotalscore, enemytotalscore, iswin) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+       RETURNING *`,
+      [
+        SectionID,
+        FriendlyID,
+        EnemyID,
+        FriendlyBaseScore,
+        EnemyBaseScore,
+        FriendlyTacticsScore,
+        EnemyTacticsScore,
+        FriendlyTotalScore,
+        EnemyTotalScore,
+        isWin
+      ]
+    );
+
+    res.json(result.rows[0]); // Respond with the newly created engagement data
+  } catch (error) {
+    console.error('Error creating new engagement:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Endpoint to make record tactics
+app.post('/api/tactics', async (req, res) => {
+
+  console.log("Attempting to store tactics record")
+  const {
+    FriendlyAwareness, EnemyAwareness,
+    FriendlyLogistics, EnemyLogistics, FriendlyCoverage, EnemyCoverage,
+    FriendlyGPS, EnemyGPS, FriendlyComms, EnemyComms, FriendlyFire,
+    EnemyFire, FriendlyPattern, EnemyPattern
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO Tactics (FriendlyAwareness, EnemyAwareness, FriendlyLogistics, EnemyLogistics, FriendlyCoverage, EnemyCoverage,
+       FriendlyGPS, EnemyGPS, FriendlyComms, EnemyComms, FriendlyFire, EnemyFire, FriendlyPattern, EnemyPattern)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`,
+      [
+        FriendlyAwareness, EnemyAwareness, FriendlyLogistics,
+        EnemyLogistics, FriendlyCoverage, EnemyCoverage, FriendlyGPS, EnemyGPS,
+        FriendlyComms, EnemyComms, FriendlyFire, EnemyFire, FriendlyPattern, EnemyPattern
+      ]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error recording tactics:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Endpoint to update the health of a unit
+app.put('/api/units/:id/updateHealth', async (req, res) => {
+  console.log("Attempting to update the health of Unit ",id)
+  const { id } = req.params;
+  const { health } = req.body;
+
+  try {
+    const result = await pool.query('UPDATE units SET health = $1 WHERE id = $2 RETURNING *', [
+      health,
+      id,
+    ]);
+
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]); // Respond with updated unit data
+    } else {
+      res.status(404).json({ message: 'Unit not found' });
+    }
+  } catch (error) {
+    console.error('Error updating unit health:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

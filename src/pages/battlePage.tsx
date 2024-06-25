@@ -32,7 +32,11 @@ function BattlePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units');
+        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units', {
+          params: {
+            sectionid: userSection  // Pass userSection as a query parameter
+          }
+        });
         setUnits(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -47,15 +51,35 @@ function BattlePage() {
     unit_id,
     unit_type,
     unit_health,
-    unit_symbol,
-    is_friendly,
-    role_type,
     unit_size,
-    force_posture,
     force_mobility,
     force_readiness,
-    force_skill
+    force_skill,
+    id
   } = unit || {};
+
+  const updateUnitHealth = async (id: number, newHealth: number) => {
+    const url = `/api/units/${id}/updateHealth`;
+    const options = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ health: newHealth }),
+    };
+  
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error(`Failed to update unit health: ${response.statusText}`);
+      }
+      const updatedUnit = await response.json();
+      console.log('Updated unit:', updatedUnit);
+      return updatedUnit;
+    } catch (error) {
+      console.error('Error updating unit health:', error);
+    }
+  };
 
   const calculateBaseValue = (unit: Unit) => {
     const unitTypeValues: Record<string, number> = {
@@ -140,20 +164,99 @@ function BattlePage() {
   const [question7, setQuestion7] = useState('Yes')
   // const [question8, setQuestion8] = useState('Yes')
 
-  const finalizeTactics = () => {
+  // This function handles the engagement tactics form submission
+  const finalizeTactics = async () => {
+
+    // Dummy data for enemyscore
+    const enemyTotalScore = 50;
+    const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
+    const isWin = friendlyTotalScore > enemyTotalScore;
+    updateUnitHealth(Number(id),0);
+    
+
     // Process all phase answers here
     console.log('Phase 1 Answers:', question1, question2);
     console.log('Phase 2 Answers:', question3, question4);
     console.log('Phase 3 Answers:', question5, question6);
     console.log('Phase 4 Answers:', question7);
 
+
     const score = calculateRealTimeScore();
     setRealTimeScore(score);
     setScoreFinalized(true); // Mark the score as finalized
     nextStep();
 
-    // Example of further actions:
-    // Submit answers to backend, navigate to next step, etc.
+    
+
+    // Prepare data for engagement and tactics
+    const engagementData = {
+      SectionID: userSection, // Replace with actual SectionID
+      FriendlyID: 1, // Replace with actual FriendlyID
+      EnemyID: 1, // Replace with actual EnemyID
+      FriendlyBaseScore: baseValue,
+      EnemyBaseScore: baseValue,
+      FriendlyTacticsScore: realTimeScore,
+      EnemyTacticsScore: realTimeScore,
+      FriendlyTotalScore: friendlyTotalScore,
+      EnemyTotalScore: enemyTotalScore,
+      isWin: isWin,
+    };
+
+    const tacticsData = {
+      FriendlyAwareness: question1 === "Yes" ? 1 : 0,
+      EnemyAwareness: question1 === "Yes" ? 1 : 0,
+      FriendlyLogistics: question2 === "Yes" ? 1 : 0,
+      EnemyLogistics: question2 === "Yes" ? 1 : 0,
+      FriendlyCoverage: question3 === "Yes" ? 1 : 0,
+      EnemyCoverage: question3 === "Yes" ? 1 : 0,
+      FriendlyGPS: question4 === "Yes" ? 1 : 0,
+      EnemyGPS: question4 === "Yes" ? 1 : 0,
+      FriendlyComms: question5 === "Yes" ? 1 : 0,
+      EnemyComms: question5 === "Yes" ? 1 : 0,
+      FriendlyFire: question6 === "Yes" ? 1 : 0,
+      EnemyFire: question6 === "Yes" ? 1 : 0,
+      FriendlyPattern: question7 === "Yes" ? 1 : 0,
+      EnemyPattern: question7 === "Yes" ? 1 : 0,
+    };    
+
+    // Submit answers to backend
+    try {
+      // Submit engagement data
+      const engagementResponse = await fetch('http://localhost:5000/api/engagements', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(engagementData),
+      });
+
+      if (!engagementResponse.ok) {
+        throw new Error('Failed to create engagement');
+      }
+
+      const engagementResult = await engagementResponse.json();
+      console.log('Engagement created:', engagementResult);
+
+      // Submit tactics data
+    const tacticsResponse = await fetch('http://localhost:5000/api/tactics', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(tacticsData),
+    });
+
+    if (!tacticsResponse.ok) {
+      throw new Error('Failed to record tactics');
+    }
+
+    const tacticsResult = await tacticsResponse.json();
+    console.log('Tactics recorded:', tacticsResult);
+
+    } catch (error) {
+      console.error('Error submitting data:', error);
+    }
+
   };
 
   // Variable Conditions and corresponding weights
@@ -320,14 +423,13 @@ function BattlePage() {
 
 
   const unitNull = () => {
-    console.log("Testing", unit_id)
+    console.log("Checking for unit: ", unit_id)
     if (unit_id !== undefined) {
-      // navigate(closeLocation);
+      console.log("Unit found: ", unit_id)
       return true;
     }
   }
 
-  if (unitNull()) {
     return (
       <MantineProvider defaultColorScheme='dark'>
         <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
@@ -534,7 +636,7 @@ function BattlePage() {
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
                         <Progress.Section
                           className={classes.progressSection}
-                          value={55}
+                          value={30 * .15}
                           color="#bd3058">
                         </Progress.Section>
                       </Progress.Root>
@@ -560,13 +662,6 @@ function BattlePage() {
         </Stepper>
       </MantineProvider>
     );
-  }
-  else {
-    navigate(`/`);
-    return (
-      <h1>Error.</h1>
-    )
-  }
 }
 
 export default BattlePage;
