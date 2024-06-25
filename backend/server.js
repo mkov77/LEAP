@@ -28,10 +28,21 @@ app.get('/api/sections', async (req, res) => {
 });
 
 // Endpoint to fetch data from 'units' table
-app.get('/api/units', async (req, res) => {
+app.get('/api/units/sectionSort', async (req, res) => {
   const sectionid = req.query.sectionid;
   try {
     const result = await pool.query('SELECT * FROM units WHERE section = $1', [sectionid]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('sectionid: ', [sectionid]);
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+app.get('/api/units', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM units');
     res.json(result.rows);
   } catch (err) {
     console.error('sectionid: ', [sectionid]);
@@ -183,7 +194,7 @@ app.post('/api/tactics', async (req, res) => {
 });
 
 
-app.put('/api/units/', async (req, res) => {
+app.put('/api/units/update', async (req, res) => {
   const {
     unit_id,
     unit_type,
@@ -251,6 +262,7 @@ app.put('/api/units/', async (req, res) => {
 //     res.status(500).json({ message: 'Internal server error' });
 //   }
 // });
+
 
 app.put('/api/units/health', async (req, res) => {
   const { id, newHealth } = req.body; // Ensure request body contains id and newHealth

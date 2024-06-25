@@ -32,7 +32,7 @@ function BattlePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units', {
+        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units/sectionSort', {
           params: {
             sectionid: userSection  // Pass userSection as a query parameter
           }
@@ -611,8 +611,8 @@ function BattlePage() {
           <Stepper.Step allowStepSelect={false} icon={<IconHeartbeat stroke={1.5} style={{ width: rem(35), height: rem(35) }} />}>
             <div>
               <h1>After-Action Review</h1>
-              <Text size="xl">Calculated Base Value: {baseValue.toFixed(2)}</Text>
-              <Text size="xl">Real-Time Input Score: {calculateRealTimeScore()}</Text>
+              <Text size="xl">Baseline Score: {baseValue.toFixed(2)}</Text>
+              <Text size="xl">Tactics Score: {calculateRealTimeScore()}</Text>
               <Text size="xl"></Text>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
                 <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px' }} display={'flex'}>
