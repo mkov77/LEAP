@@ -45,7 +45,7 @@ app.get('/api/engagements/:id', async (req, res) => {
 app.get('/api/engagements', async (req, res) => {
   
   try {
-    const result = await pool.query('SELECT * FROM engagement');
+    const result = await pool.query('SELECT * FROM engagements');
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);
