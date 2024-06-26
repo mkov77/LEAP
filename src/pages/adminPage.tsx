@@ -141,6 +141,7 @@ function AdminPage() {
   };
 
   const handleRowDoubleClick = (sectionid: string) => {
+    setUserSection(sectionid);
     navigate(`/sectionControls/${sectionid}`);
   };
 

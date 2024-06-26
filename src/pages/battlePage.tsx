@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
-import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Tooltip } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Tooltip, useMantineTheme, rgba } from '@mantine/core';
+import { useDisclosure, useInterval } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconSwords, IconHeartbeat, IconNumber1Small, IconNumber2Small, IconNumber3Small, IconNumber4Small } from '@tabler/icons-react';
 import { FaSun, FaMoon } from "react-icons/fa";
@@ -13,6 +13,13 @@ import { read } from 'fs';
 import axios from 'axios';
 import { Tactics } from './afterActionReportStorage';
 import { text } from 'node:stream/consumers';
+
+
+export interface Form {
+  ID: string;
+  friendlyScore: number;
+  enemyScore: number;
+}
 
 function BattlePage() {
   const [mobileOpened] = useDisclosure(false);
@@ -28,6 +35,11 @@ function BattlePage() {
   const [scoreFinalized, setScoreFinalized] = useState(false); // State to track if score has been finalized
 
   const [units, setUnits] = useState<Unit[]>([]);
+  const [progress, setProgress] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  const theme = useMantineTheme();
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -257,6 +269,23 @@ function BattlePage() {
 
   }; // End of finalize tactics
 
+
+  const interval = useInterval(
+    () =>
+      setProgress((current) => {
+        if (current < 100) {
+          return current + 1;
+        }
+        
+        finalizeTactics();
+
+        interval.stop();
+        setLoaded(true);
+        return 0;
+      }),
+    20
+  );
+
   // Variable Conditions and corresponding weights
   const weights: Record<WeightKeys, { yes: number; no: number }> = {
     awareOfPresence: { yes: 20, no: 0 },
@@ -298,25 +327,27 @@ function BattlePage() {
     return score;
   };
 
+
   //printing scores into the Engagement Data card in AAR
-  const tactics: Tactics[] = [
-    { question: 'Aware of OPFOR?', friendlyawareness: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], enemyawareness: 0 },
-    { question: 'Within Logistics Support Range?', friendlylogistics: weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], enemylogistics: 25 },
-    { question: 'Within RPA/ISR Coverage?', friendlycoverage: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], enemycoverage: 0 },
-    { question: 'Working GPS?', friendlygps: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], enemygps: 0 },
-    { question: 'Working Communications?', friendlycomms: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], enemycomms: 15 },
-    { question: 'Within Fire Support Range?', friendlyfire: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], enemyfire: 0 },
-    { question: 'Within Range of a Pattern Force?', friendlypattern: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], enemypattern: 15 }
+  const answers: Form[] = [
+    { ID: 'Aware of OPFOR?', friendlyScore: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
+    { ID: 'Within Logistics Support Range?', friendlyScore: weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], enemyScore: 25 },
+    { ID: 'Within RPA/ISR Coverage?', friendlyScore: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
+    { ID: 'Working GPS?', friendlyScore: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
+    { ID: 'Working Communications?', friendlyScore: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], enemyScore: 15 },
+    { ID: 'Within Fire Support Range?', friendlyScore: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
+    { ID: 'Within Range of a Pattern Force?', friendlyScore: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], enemyScore: 15 }
   ]
 
+
   //maps each tactic and its corresponding blue/red score to a row
-  const tacticToRow = (tactics: Tactics[]) => (
-    tactics.map((tactic) => (
-        <Table.Tr key={tactic.question}>
-          <Table.Td>{tactic.question}</Table.Td>
-          <Table.Td>{tactic.friendlyawareness}</Table.Td>
-          <Table.Td>{tactic.enemyawareness}</Table.Td>
-        </Table.Tr>
+  const tacticToRow = (answers: Form[]) => (
+    answers.map((tactic) => (
+      <Table.Tr key={tactic.ID}>
+        <Table.Td>{tactic.ID}</Table.Td>
+        <Table.Td>{tactic.friendlyScore}</Table.Td>
+        <Table.Td>{tactic.enemyScore}</Table.Td>
+      </Table.Tr>
     ))
   );
 
@@ -604,7 +635,25 @@ function BattlePage() {
               </Grid>
               <Group justify="center" mt="xl">
                 <Button onClick={prevStep}>Go Back</Button>
-                <Button onClick={finalizeTactics}>Finalize Tactics</Button>
+
+                <Button
+
+                  className={classes.button}
+                  onClick={() => (loaded ? setLoaded(false) : !interval.active && interval.start())}
+                  color={loaded ? 'teal' : theme.primaryColor}
+                >
+                  <div className={classes.label}>
+                    {progress !== 0 ? 'Calculating Scores...' : loaded ? 'Complete' : 'Finalize Tactics'}
+                  </div>
+                  {progress !== 0 && (
+                    <Progress
+                      value={progress}
+                      className={classes.progress}
+                      color={rgba(theme.colors.blue[2], 0.35)}
+                      radius="sm"
+                    />
+                  )}
+                </Button>
               </Group>
             </div>
           </Stepper.Step>
@@ -664,7 +713,7 @@ function BattlePage() {
                           <Table.Th>Enemy Score</Table.Th>
                         </Table.Tr>
                       </Table.Thead>
-                      <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
+                      <Table.Tbody>{tacticToRow(answers)}</Table.Tbody>
                     </Table>
                   </Card.Section>
                 </Card>
