@@ -276,7 +276,7 @@ export default function AAR() {
         <Progress.Root style={{ width: '600px', height: '50px' }}>
           <Progress.Section
             className={classes.progressSection}
-            value={30 * .15}
+            value={rowData.friendlytotalscore}
             color="#4e87c1">
           </Progress.Section>
         </Progress.Root>
@@ -286,7 +286,7 @@ export default function AAR() {
         <Progress.Root style={{ width: '600px', height: '50px' }}>
           <Progress.Section
             className={classes.progressSection}
-            value={30 * .15}
+            value={rowData.enemytotalscore}
             color="#bd3058">
           </Progress.Section>
         </Progress.Root>
@@ -347,7 +347,7 @@ export default function AAR() {
           <h2 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>Section: {sectionId}</h2>
           <AppShell>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
-              <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px' }} display={'flex'}>
+              <Card shadow="sm" padding="xl" radius="md" withBorder style={{ display: 'grid', justifyContent: 'center', alignItems: 'center', height: '40vh', width: '600px', placeItems: 'center', marginBottom: '100px', marginTop: '100px', textAlign: 'center'}}>
                 <Card.Section >
                   <div style={{ textAlign: 'center' }}>
                     <h2>Most Recent Engagement</h2>
@@ -438,10 +438,11 @@ export default function AAR() {
                         {isOpen[index] ? 'Collapse' : 'Expand'}
                       </Button>
                     </Table.Td>
-                  </Table.Tr>
-                  <Table.Tr style={{ display: 'flex', justifyContent: 'center' }}>
+              </Table.Tr>
+
+                  <Table.Tr style={{ display: 'flex', justifyContent: 'center', width: '100%', marginLeft: '300%'}}>
                     <Collapse in={isOpen[index]} style={{ width: '100%' }}>
-                      <div style={{ justifyContent: 'center', width: '100%', display: 'flex', marginLeft: '300%' }}>
+                     
                         <Table verticalSpacing={'xs'} style={{ maxWidth: '100%', width: '1000px' }} display={'fixed'}>
                           <Table.Thead>
                             <Table.Tr>
@@ -452,7 +453,7 @@ export default function AAR() {
                           </Table.Thead>
                           <Table.Tbody>{renderTacticsRows(tacticsMap.get(row.engagementid))}</Table.Tbody>
                         </Table>
-                      </div>
+                      
                     </Collapse>
                   </Table.Tr>
                 </Table.Tbody>
