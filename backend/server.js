@@ -41,6 +41,18 @@ app.get('/api/engagements/:id', async (req, res) => {
   }
 });
 
+// General Engagement Endpoint 
+app.get('/api/engagements', async (req, res) => {
+  
+  try {
+    const result = await pool.query('SELECT * FROM engagement');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
 // Endpoint to get tactics
 app.get('/api/tactics/:id', async (req, res) => {
   console.log('Attempting to retrieve tactics')
