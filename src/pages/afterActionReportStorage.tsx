@@ -89,11 +89,11 @@ export default function AAR() {
   const [scrolled, setScrolled] = useState(false);
   // const [isOpen, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
- // const [engagementsData, setEngagementsData] = useState<engagementData[]>([]);
+  // const [engagementsData, setEngagementsData] = useState<engagementData[]>([]);
   const [engagements, setEngagements] = useState<Engagement[]>([]);
   const [tacticsMap, setTacticsMap] = useState<Map<string, Tactics[]>>(new Map()); // Changed: Added `tacticsMap` state for storing tactics data
 
-  
+
 
 
   const handleLogoClick = () => {
@@ -104,7 +104,7 @@ export default function AAR() {
     navigate(`/studentPage/${sectionId}`);
   };
 
-  
+
   useEffect(() => {
     const fetchEngagementData = async () => {
       try {
@@ -137,7 +137,7 @@ export default function AAR() {
         console.error('Error fetching data:', error);
       }
     };
-  
+
     fetchEngagementData();
   }, [sectionId]);
 
@@ -151,7 +151,7 @@ export default function AAR() {
     { question: 'Within Fire Support Range?', friendlyfire: 10, enemyfire: 0 },
     { question: 'Within Range of a Pattern Force?', friendlypattern: 0, enemypattern: 15 }
   ]
-  
+
 
 
   // const tacticToRow = (tactics: Tactics[]) => (
@@ -201,62 +201,54 @@ export default function AAR() {
 
 
     if (!tactics || tactics.length === 0) {
-    return (
-      <Table.Tr>
-        <Table.Td colSpan={3} align="center">No tactics data available</Table.Td>
-      </Table.Tr>
-    );
-  }
+      return (
+        <Table.Tr>
+          <Table.Td colSpan={3} align="center">No tactics data available</Table.Td>
+        </Table.Tr>
+      );
+    }
     return tactics.map((tactic, index) => (
       <React.Fragment key={index}>
-      <Table.Tr key={`tactic-${index}-awareness`}>
-        <Table.Td>{tactic.question}</Table.Td>
-        <Table.Td>{tactic.friendlyawareness}</Table.Td>
-        <Table.Td>{tactic.enemyawareness}</Table.Td>
-      </Table.Tr>
-      <Table.Tr  key={`tactic-${index}-logistics`}>
-        <Table.Td>{tactic.question}</Table.Td>
-        <Table.Td>{tactic.friendlylogistics}</Table.Td>
-        <Table.Td>{tactic.enemylogistics}</Table.Td>
-      </Table.Tr>
-      <Table.Tr key={`tactic-${index}-coverage`}>
-        <Table.Td>{tactic.question}</Table.Td>
-        <Table.Td>{tactic.friendlycoverage}</Table.Td>
-        <Table.Td>{tactic.enemycoverage}</Table.Td>
-      </Table.Tr>
-      <Table.Tr key={`tactic-${index}-gps`}>
-        <Table.Td>{tactic.question}</Table.Td>
-        <Table.Td>{tactic.friendlygps}</Table.Td>
-        <Table.Td>{tactic.enemygps}</Table.Td>
-      </Table.Tr>
-      <Table.Tr key={`tactic-${index}-comms`}>
-        <Table.Td>{tactic.question}</Table.Td>
-        <Table.Td>{tactic.friendlycomms}</Table.Td>
-        <Table.Td>{tactic.enemycomms}</Table.Td>
-      </Table.Tr>
-      <Table.Tr key={`tactic-${index}-fire`}>
-        <Table.Td>{tactic.question}</Table.Td>
-        <Table.Td>{tactic.friendlyfire}</Table.Td>
-        <Table.Td>{tactic.enemyfire}</Table.Td>
-      </Table.Tr>
-      <Table.Tr  key={`tactic-${index}-pattern`}>
-        <Table.Td>{tactic.question}</Table.Td>
-        <Table.Td>{tactic.friendlypattern}</Table.Td>
-        <Table.Td>{tactic.enemypattern}</Table.Td>
-      </Table.Tr>
-      
+        <Table.Tr key={`tactic-${index}-awareness`}>
+          <Table.Td>Aware of OPFOR?</Table.Td>
+          <Table.Td>{Number(tactic.friendlyawareness) * 20}</Table.Td>
+          <Table.Td>{Number(tactic.enemyawareness) * 20}</Table.Td>
+        </Table.Tr>
+        <Table.Tr key={`tactic-${index}-logistics`}>
+          <Table.Td>Within Logistics Support Range?</Table.Td>
+          <Table.Td>{Number(tactic.friendlylogistics) * 25}</Table.Td>
+          <Table.Td>{Number(tactic.enemylogistics) * 25}</Table.Td>
+        </Table.Tr>
+        <Table.Tr key={`tactic-${index}-coverage`}>
+          <Table.Td>Within RPA/ISR Coverage?</Table.Td>
+          <Table.Td>{Number(tactic.friendlycoverage) * 10}</Table.Td>
+          <Table.Td>{Number(tactic.enemycoverage) * 10}</Table.Td>
+        </Table.Tr>
+        <Table.Tr key={`tactic-${index}-gps`}>
+          <Table.Td>Working GPS?</Table.Td>
+          <Table.Td>{Number(tactic.friendlygps) * 10}</Table.Td>
+          <Table.Td>{Number(tactic.enemygps) * 10}</Table.Td>
+        </Table.Tr>
+        <Table.Tr key={`tactic-${index}-comms`}>
+          <Table.Td>Within Communications Range?</Table.Td>
+          <Table.Td>{Number(tactic.friendlycomms) * 10}</Table.Td>
+          <Table.Td>{Number(tactic.enemycomms) * 10}</Table.Td>
+        </Table.Tr>
+        <Table.Tr key={`tactic-${index}-fire`}>
+          <Table.Td>Within Fire Support Range?</Table.Td>
+          <Table.Td>{Number(tactic.friendlyfire) * 15}</Table.Td>
+          <Table.Td>{Number(tactic.enemyfire) * 15}</Table.Td>
+        </Table.Tr>
+        <Table.Tr key={`tactic-${index}-pattern`}>
+          <Table.Td>Within Range of a Pattern Force?</Table.Td>
+          <Table.Td>{Number(tactic.friendlypattern) * 10}</Table.Td>
+          <Table.Td>{Number(tactic.enemypattern) * 10}</Table.Td>
+        </Table.Tr>
+
       </React.Fragment>
-      
+
     ));
   };
-
-  // const engagementData: engagementData[] = [
-  //   { timeStamp: '2024-06-21', engagementID: '1', friendlyUnitName: 'Unit A', enemyUnitName: 'Enemy A' },
-  //   { timeStamp: '2024-06-22', engagementID: '2', friendlyUnitName: 'Unit B', enemyUnitName: 'Enemy B' },
-  //   // Add more objects as needed
-  // ];
-
-  
 
   let index: number = 0;
 
@@ -352,23 +344,23 @@ export default function AAR() {
                   <div style={{ textAlign: 'center' }}>
                     <h2>Most Recent Engagement</h2>
                   </div>
-                  {/* <div style={{ textAlign: 'center' }}>
-                    Engagement engagementid:
-                  </div> */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
                     <Progress.Root style={{ width: '200px', height: '25px' }}>
                       <Progress.Section
                         className={classes.progressSection}
-                        value={30}
+                        value={Number(engagements[engagements.length - 1]?.friendlytotalscore)}
                         color="#4e87c1">
+                          {Number(engagements[engagements.length - 1]?.friendlytotalscore).toFixed(0)}
                       </Progress.Section>
                     </Progress.Root>
                     <Progress.Root style={{ width: '200px', height: '25px' }}>
                       <Progress.Section
                         className={classes.progressSection}
-                        value={30 * .15}
+                        value={Number(engagements[engagements.length - 1]?.enemytotalscore)}
                         color="#bd3058">
+                           {Number(engagements[engagements.length - 1]?.enemytotalscore).toFixed(0)}
                       </Progress.Section>
+                     
                     </Progress.Root>
                   </div>
                   <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center' }}>
@@ -379,7 +371,8 @@ export default function AAR() {
                         <Table.Th>Enemy Score</Table.Th>
                       </Table.Tr>
                     </Table.Thead>
-                    <Table.Tbody>{renderTacticsRows(tacticsMap.get(engagements[engagements.length - 1].engagementid))}</Table.Tbody>
+                    <Table.Tbody>{(engagements.length > 0) && renderTacticsRows(tacticsMap.get(engagements[engagements.length - 1].engagementid))}
+                    </Table.Tbody>
                   </Table>
                 </Card.Section>
               </Card>
@@ -399,9 +392,9 @@ export default function AAR() {
                   <Table.Th>Time Stamp</Table.Th>
                   <Table.Th>Engagement ID</Table.Th>
                   <Table.Th>Friendly Unit Name</Table.Th>
-                  <Table.Th>Friendly Bar</Table.Th>
+                  <Table.Th>Friendly Total Score</Table.Th>
                   <Table.Th>Enemy Unit Name</Table.Th>
-                  <Table.Th>Enemy Bar</Table.Th>
+                  <Table.Th>Enemy Total Score</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               {engagements.map((row, index) => (
@@ -416,7 +409,7 @@ export default function AAR() {
                           className={classes.progressSection}
                           value={row.friendlytotalscore}
                           color="#4e87c1">
-                          {Number(row.friendlytotalscore).toFixed(0)}%
+                          {Number(row.friendlytotalscore).toFixed(0)}
                         </Progress.Section>
                       </Progress.Root>
                     </Table.Td>
@@ -427,7 +420,7 @@ export default function AAR() {
                           className={classes.progressSection}
                           value={row.enemytotalscore}
                           color="#bd3058">
-                          {Number(row.enemytotalscore).toFixed(0)}%
+                          {Number(row.enemytotalscore).toFixed(0)}
                         </Progress.Section>
                       </Progress.Root>
                     </Table.Td>
