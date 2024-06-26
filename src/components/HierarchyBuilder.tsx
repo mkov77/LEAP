@@ -541,7 +541,7 @@ function Hierarchy({ is_friendly }: HierarchyProps) {
           color='red'
            mt="md" 
            disabled={tree === null} 
-           >Delete</Button>
+          >Delete</Button>
           </Group>
         </form>
           
