@@ -4,7 +4,7 @@ import Tree from 'react-d3-tree';
 import { RawNodeDatum, CustomNodeElementProps } from 'react-d3-tree';
 import CardC, { Unit } from './Cards';
 import classes from './Cards.module.css';
-import { SegmentedControl, Modal, Tabs, Select, TextInput, Button, Text, HoverCard } from '@mantine/core';
+import { SegmentedControl, Modal, Tabs, Select, TextInput, Button, Text, HoverCard, Group } from '@mantine/core';
 import axios from 'axios';
 import { useUserRole } from '../context/UserContext';
 
@@ -19,6 +19,10 @@ type UnitAttributes = {
   force_mobility: string;
   force_readiness: string;
   force_skill: string;
+};
+
+type HierarchyProps = {
+  is_friendly: boolean;
 };
 
 const buildHierarchy = (units: Unit[]): RawNodeDatum[] | null => {
@@ -136,11 +140,11 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
 
 
 
-function Hierarchy() {
+function Hierarchy({ is_friendly }: HierarchyProps) {
   const [units, setUnits] = useState<Unit[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [tree, setTree] = useState<RawNodeDatum[] | null>();
-  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
+  const { userRole, setUserRole, userSection, setUserSection } = useUserRole()
   const [formValues, setFormValues] = useState({
     ID: 0,
     unitType: '',
@@ -164,19 +168,26 @@ function Hierarchy() {
     pattern: 1
   });
 
+  useEffect(() => {
+    setTree(null); // Reset tree state to null when is_friendly changes
+  }, [is_friendly]);
+
   const fetchData = async () => {
     try {
       console.log('Fetching data for section:', userSection);
-      const response = await axios.get<Unit[]>(`http://10.0.1.226:5000/api/units/sectionOrNullSort`, {
+
+      const response = await axios.get<Unit[]>(`http://10.0.1.226:5000/api/units/sectionNullandAllianceSort`, {
         params: {
           sectionid: userSection,
+          is_friendly: is_friendly
         }
       });
       const normalizedData = response.data.map(unit => ({
         ...unit,
         children: unit.children || [] // Ensure children is an array
       }));
-      setUnits(response.data);
+      setUnits(normalizedData);
+      console.log(response.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -185,7 +196,7 @@ function Hierarchy() {
 
   useEffect(() => {
     fetchData();
-  }, [userSection]);
+  }, [userSection, is_friendly]);
 
   useEffect(() => {
     // Convert the data to the RawNodeDatum format
@@ -197,7 +208,7 @@ function Hierarchy() {
       setTree(formattedData);
     }
   }, [units]);
-
+  console.log('is friendly', is_friendly);
 
   const handleNodeClick = (nodeData: RawNodeDatum) => {
     const attributes = nodeData.attributes as any;
@@ -214,7 +225,7 @@ function Hierarchy() {
     setIsRoot(true);
     open();
   }
-
+  console.log({ selectedNode });
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     console.log({ selectedNode });
@@ -310,6 +321,10 @@ function Hierarchy() {
     }));
 
   };
+  const filteredUnits = units.filter(unit => {
+    const isChild = units.some(parent => parent.children.includes(unit.unit_id));
+    return !unit.root && !isChild;
+  });
 
 
 
@@ -358,7 +373,10 @@ function Hierarchy() {
                 required
                 value={formValues.ID.toString()}
                 onChange={(value) => handleSelectChange(value, 'ID')}
-                data={units.map((unit) => ({ value: unit.id.toString(), label: unit.unit_id }))}
+                data={filteredUnits.map(unit => ({
+                  value: unit.id.toString(),
+                  label: unit.unit_id,
+                }))}
               />
 
               <Select
@@ -517,8 +535,16 @@ function Hierarchy() {
 
             </Tabs.Panel>
           </Tabs>
+          <Group grow>
           <Button type="submit" mt="md">Submit</Button>
+          <Button 
+          color='red'
+           mt="md" 
+           disabled={tree === null} 
+           >Delete</Button>
+          </Group>
         </form>
+          
       </Modal>
     </div>
   );

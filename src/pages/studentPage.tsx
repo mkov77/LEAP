@@ -124,7 +124,7 @@ function App() {
                 </Group>
               </>
             ) : (
-              <Hierarchy />
+              <Hierarchy is_friendly={true} />
             )}
           </div>
         </AppShell.Main>

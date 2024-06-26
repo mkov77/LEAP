@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AppShell, Burger, Group, Table, useMantineTheme, Image, Button, Box, Switch, rem, Divider, Alert, useMantineColorScheme, useComputedColorScheme, MantineProvider, } from '@mantine/core';
+import { AppShell, Burger, Group, Table, useMantineTheme, Image, Button, Box, Switch, rem, Divider, Alert, useMantineColorScheme, useComputedColorScheme, MantineProvider, SegmentedControl, } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { engagements } from '../data/engagements';
 import { IconCheck, IconX, IconInfoCircle } from '@tabler/icons-react';
@@ -31,6 +31,7 @@ function SectionControls() {
   const [engagementsData, setEngagementsData] = useState<Engagement[]>([]);
   const [sectionOnline, setSectionOnline] = useState(false);
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
+  const [isFriendlyHierarchy, setIsFriendlyHierarchy] = useState('Friendly');
 
   setUserSection(sectionId);
   
@@ -137,6 +138,10 @@ function SectionControls() {
             <h1><strong>{sectionId}</strong> Controls </h1>
             <Button onClick={() => setHierarchyToggle(!hierarchyToggle)}>{!hierarchyToggle ? 'Hierarchy Builder' : 'Section Controls'}</Button>
           </div>
+          <div>
+
+          </div>
+ 
 
           {!hierarchyToggle ? (
           <>  
@@ -232,7 +237,21 @@ function SectionControls() {
             Restore state
           </Button>
           </>
-          ) : (<Hierarchy />)}
+          ) : (
+            <>
+            <SegmentedControl 
+            value={isFriendlyHierarchy}
+            onChange={setIsFriendlyHierarchy}
+            size='xl'
+            data={[
+              { label: 'Friendly Hierarchy', value: 'Friendly'},
+              { label: 'Enemy Hierarchy', value: 'Enemy' }
+            ]}
+          />
+          <Hierarchy is_friendly={isFriendlyHierarchy === 'Friendly'} />
+          </>
+          )
+          }
 
 
 
