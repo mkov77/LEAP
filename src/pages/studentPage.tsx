@@ -56,26 +56,29 @@ function App() {
         padding="md"
       >
         <AppShell.Header>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}>
-              <FaArrowAltCircleLeft />
-            </Button>
-            <Image
-              src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
-              radius="md"
-              h={50}
-              fallbackSrc="https://placehold.co/600x400?text=Placeholder"
-              onClick={handleLogoClick}
-              style={{ cursor: 'pointer', scale: '1', padding: '8px' }}
-            />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}>
+                <FaArrowAltCircleLeft />
+              </Button>
+              <Image
+                src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
+                radius="md"
+                h={50}
+                fallbackSrc="https://placehold.co/600x400?text=Placeholder"
+                onClick={handleLogoClick}
+                style={{ cursor: 'pointer', scale: '1', padding: '8px' }}
+              />
+            </div>
+
           </div>
-          <Button size='sm' variant='link' onClick={handleAARClick} style={{margin: '10px '}}>After Action Reports</Button>
-          </div>
-          
+
         </AppShell.Header>
 
         <AppShell.Main>
+          <div style={{justifyContent:'right', display:'flex'}}>
+            <Button size='sm' variant='link' onClick={handleAARClick} style={{ margin: '10px ' }}>After Action Reports</Button>
+          </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
               <h1>Welcome to the Student Page</h1>
@@ -85,12 +88,12 @@ function App() {
                 </p>
               )}
               {!hierarchyToggle && (
-              <TextInput
-              placeholder='Search'
-              style={{ width: '100%' }}
-              value={search}
-              onChange={handleChange}
-            />
+                <TextInput
+                  placeholder='Search'
+                  style={{ width: '100%' }}
+                  value={search}
+                  onChange={handleChange}
+                />
               )}
 
             </div>
@@ -101,31 +104,31 @@ function App() {
             </div>
           </div>
           <div className="App">
-      {!hierarchyToggle ? (
-        <>
-          {search && (
-            <SearchResultList search={search} />
-          )}
-          {!search && (
-            <CarouselC />
-          )}
-          <Group justify='center'>
-            <Button
-              disabled={!selectedUnit}
-              size='compact-xl'
-              onClick={() => navigate(`/battlePage`)}
-              style={{ margin: '30px' }}
-            >
-              Select For Battle!
-            </Button>
-          </Group>
-        </>
-      ) : (
-        <Hierarchy />
-      )}
-    </div>
-      </AppShell.Main>
-    </AppShell>
+            {!hierarchyToggle ? (
+              <>
+                {search && (
+                  <SearchResultList search={search} />
+                )}
+                {!search && (
+                  <CarouselC />
+                )}
+                <Group justify='center'>
+                  <Button
+                    disabled={!selectedUnit}
+                    size='compact-xl'
+                    onClick={() => navigate(`/battlePage`)}
+                    style={{ margin: '30px' }}
+                  >
+                    Select for Engagement
+                  </Button>
+                </Group>
+              </>
+            ) : (
+              <Hierarchy />
+            )}
+          </div>
+        </AppShell.Main>
+      </AppShell>
     </MantineProvider >
   );
 }

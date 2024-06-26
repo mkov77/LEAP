@@ -21,11 +21,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
 import { useUserRole } from '../context/UserContext';
 import { useUnitProvider } from '../context/UnitContext';
-
 import classes from './TableReviews.module.css'
 import { timeStamp } from 'console';
 import BattlePage from './battlePage';
 import axios from 'axios';
+import { sections } from '../data/sections';
+
 
 export interface recentEngagementData {
   unit_type: string;
@@ -103,6 +104,10 @@ export default function AAR() {
   const handleArrowClick = () => {
     navigate(`/studentPage/${sectionId}`);
   };
+
+  const handleAARClick = () => {
+    navigate(`/studentPage/${sectionId}`)
+  }
 
 
   useEffect(() => {
@@ -335,6 +340,9 @@ export default function AAR() {
         </AppShell.Header>
 
         <AppShell.Main>
+        <div style={{justifyContent:'right', display:'flex'}}>
+            <Button size='sm' variant='link' onClick={handleAARClick} style={{ margin: '10px ' }}>Return</Button>
+          </div>
           <h1 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>Log of After Action Reviews</h1>
           <h2 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>Section: {sectionId}</h2>
           <AppShell>
