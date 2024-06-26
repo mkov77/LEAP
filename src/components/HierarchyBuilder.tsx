@@ -8,6 +8,19 @@ import { SegmentedControl, Modal, Tabs, Select, TextInput, Button, Text, HoverCa
 import axios from 'axios';
 import { useUserRole } from '../context/UserContext';
 
+type UnitAttributes = {
+  id: number;
+  unit_type: string;
+  is_friendly: boolean;
+  unit_health: number;
+  role_type: string;
+  unit_size: string;
+  force_posture: string;
+  force_mobility: string;
+  force_readiness: string;
+  force_skill: string;
+};
+
 const buildHierarchy = (units: Unit[]): RawNodeDatum[] | null => {
   const unitMap = new Map<string, RawNodeDatum>();
 
@@ -25,6 +38,7 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] | null => {
         force_mobility: unit.force_mobility,
         force_readiness: unit.force_readiness,
         force_skill: unit.force_skill,
+        id: unit.id
       },
       children: []
     });
@@ -72,7 +86,7 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
     force_mobility,
     force_readiness,
     force_skill,
-  } = nodeDatum.attributes as any;
+  } = nodeDatum.attributes as UnitAttributes;
 
   return (
     <HoverCard width={280} shadow="md" openDelay={750}>
@@ -128,7 +142,7 @@ function Hierarchy() {
   const [tree, setTree] = useState<RawNodeDatum[] | null>();
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
   const [formValues, setFormValues] = useState({
-    unitName: '',
+    ID: 0,
     unitType: '',
     unitHealth: 100,
     unitRole: '',
@@ -138,9 +152,17 @@ function Hierarchy() {
     forceSkill: '',
     root: false
   });
-  const [selectedNode, setSelectedNode] = useState<string>('');
+  const [selectedNode, setSelectedNode] = useState<number>();
   const [isRoot, setIsRoot] = useState(false);
-
+  const [segmentValues, setSegmentValues] = useState({
+    awareness: 1,
+    logistics: 1,
+    coverage: 1,
+    gps: 1,
+    comms: 1,
+    fire: 1,
+    pattern: 1
+  });
 
   const fetchData = async () => {
     try {
@@ -178,13 +200,12 @@ function Hierarchy() {
 
 
   const handleNodeClick = (nodeData: RawNodeDatum) => {
-    console.log(nodeData.name);
-    setSelectedNode(nodeData.name);
+    const attributes = nodeData.attributes as any;
+    console.log(attributes);
+    setSelectedNode(attributes.id);
+
     if (userRole === "Administrator") {
       open();
-    }
-    else {
-
     }
 
   };
@@ -193,13 +214,14 @@ function Hierarchy() {
     setIsRoot(true);
     open();
   }
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
+    console.log({ selectedNode });
     try {
       const response = await axios.put(`http://10.0.1.226:5000/api/units/update`, {
         parent_id: selectedNode,
-        unit_id: formValues.unitName,
+        unit_id: Number(formValues.ID),
         unit_type: formValues.unitType,
         unit_health: formValues.unitHealth,
         role_type: formValues.unitRole,
@@ -208,12 +230,12 @@ function Hierarchy() {
         force_readiness: formValues.forceReadiness,
         force_skill: formValues.forceSkill,
         section_id: userSection,
-        root: isRoot
+        root: isRoot,
       });
 
-      if (response.status === 200) {
+      if (response.status === 200 || response.status === 201) {
         // Successfully updated the unit, update the state to reflect the changes
-        setUnits(prevUnits => prevUnits.map(unit => unit.unit_id === formValues.unitName ? response.data : unit));
+        setUnits(prevUnits => prevUnits.map(unit => unit.id === Number(formValues.ID) ? response.data : unit));
         fetchData();
       } else {
         console.error('Failed to update unit:', response);
@@ -222,11 +244,27 @@ function Hierarchy() {
       console.error('Error updating unit:', error);
     }
 
+    try {
+      const response = await axios.put(`http://10.0.1.226:5000/api/unitTactics/update`, {
+        awareness: segmentValues.awareness,
+        logistics: segmentValues.logistics,
+        coverage: segmentValues.coverage,
+        gps: segmentValues.gps,
+        comms: segmentValues.comms,
+        fire: segmentValues.fire,
+        pattern: segmentValues.pattern,
+        ID: Number(formValues.ID)
+      });
+
+    } catch (error) {
+      console.error('Error updating unit:', error);
+    }
+
     // Close the modal
     close();
     setIsRoot(false);
     setFormValues({
-      unitName: '',
+      ID: 0,
       unitType: '',
       unitHealth: 100,
       unitRole: '',
@@ -236,6 +274,25 @@ function Hierarchy() {
       forceSkill: '',
       root: false
     });
+    setSegmentValues({
+      awareness: 1,
+      logistics: 1,
+      coverage: 1,
+      gps: 1,
+      comms: 1,
+      fire: 1,
+      pattern: 1
+    });
+    console.log(formValues);
+  };
+
+  const handleSegmentChange = (value: string, segmentName: keyof typeof segmentValues) => {
+    const updatedSegments = { ...segmentValues };
+
+    // Map 'Yes' to 1 and 'No' to 0
+    updatedSegments[segmentName] = value === 'Yes' ? 1 : 0;
+
+    setSegmentValues(updatedSegments);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
@@ -251,39 +308,10 @@ function Hierarchy() {
       ...prevValues,
       [name]: value ?? ''
     }));
+
   };
 
-  const isChildOf = (node: RawNodeDatum | null, unitId: string): boolean => {
-    if (!node) {
-      return false; // Base case: if node is null or undefined, return false
-    }
 
-    if (node.name === unitId) {
-      return true; // Found the unit as a direct child of this node
-    }
-
-    // Recursively check all children of the current node
-    for (const child of node.children || []) {
-      if (isChildOf(child, unitId)) {
-        return true; // Found the unit in one of the children
-      }
-    }
-
-    return false; // Unit not found in the current node or its children
-  };
-
-  const filteredUnits = units.filter(unit => {
-    if (unit.unit_id === selectedNode) {
-      return true; // Include selected node
-    }
-    // Check if the unit is a child of any node
-    for (const rootNode of tree || []) {
-      if (isChildOf(rootNode, unit.unit_id)) {
-        return false; // Exclude children
-      }
-    }
-    return true; // Include non-children
-  });
 
   return (
     <div style={{ width: '100%', height: '100vh' }}>
@@ -309,186 +337,187 @@ function Hierarchy() {
       }
 
       <Modal opened={opened} onClose={close} title="Add unit">
-      <form onSubmit={handleSubmit}>
-        <Tabs defaultValue="unit">
-          <Tabs.List>
-            <Tabs.Tab value="unit" >
-              Unit selection
-            </Tabs.Tab>
-            <Tabs.Tab value="tactics" >
-              Unit Tactics
-            </Tabs.Tab>
+        <form onSubmit={handleSubmit}>
+          <Tabs defaultValue="unit">
+            <Tabs.List>
+              <Tabs.Tab value="unit" >
+                Unit selection
+              </Tabs.Tab>
+              <Tabs.Tab value="tactics" >
+                Unit Tactics
+              </Tabs.Tab>
 
-          </Tabs.List>
+            </Tabs.List>
 
-          <Tabs.Panel value="unit">
-         
-          <Select
-            label="Unit"
-            placeholder="Pick one"
-            name='unitName'
-            value={formValues.unitName}
-            onChange={(value) => handleSelectChange(value, 'unitName')}
-            data={filteredUnits.map((unit) => ({ value: unit.unit_id, label: unit.unit_id }))}
-          />
+            <Tabs.Panel value="unit">
 
-          <Select
-            label="Unit Type"
-            placeholder="Enter unit type"
-            required
-            name='unitType'
-            mt="md"
-            value={formValues.unitType}
-            onChange={(value) => handleSelectChange(value, 'unitType')}
-            data={[
-              'Command and Control',
-              'Infantry',
-              'Reconnaissance',
-              'Armored Mechanized',
-              'Combined Arms',
-              'Armored Mechanized Tracked',
-              'Field Artillery',
-              'Self-propelled',
-              'Electronic Warfare',
-              'Signal',
-              'Special Operations Forces',
-              'Ammunition',
-              'Air Defense',
-              'Engineer',
-              'Air Assault',
-              'Medical Treatment Facility',
-              'Aviation Rotary Wing',
-              'Combat Support',
-              'Sustainment',
-              'Unmanned Aerial Systems',
-              'Combat Service Support',
-              'Petroleum, Oil and Lubricants',
-              'Sea Port',
-              'Railhead'
-            ]}
-          />
+              <Select
+                label="Unit"
+                placeholder="Pick one"
+                name='unit'
+                required
+                value={formValues.ID.toString()}
+                onChange={(value) => handleSelectChange(value, 'ID')}
+                data={units.map((unit) => ({ value: unit.id.toString(), label: unit.unit_id }))}
+              />
 
-          <TextInput
-            label="Unit Health"
-            placeholder="Enter unit health"
-            required
-            name='unitHealth'
-            mt="md"
-            type='number'
-            value={formValues.unitHealth}
-            onChange={handleChange}
-          />
+              <Select
+                label="Unit Type"
+                placeholder="Enter unit type"
+                required
+                name='unitType'
+                mt="md"
+                value={formValues.unitType}
+                onChange={(value) => handleSelectChange(value, 'unitType')}
+                data={[
+                  'Command and Control',
+                  'Infantry',
+                  'Reconnaissance',
+                  'Armored Mechanized',
+                  'Combined Arms',
+                  'Armored Mechanized Tracked',
+                  'Field Artillery',
+                  'Self-propelled',
+                  'Electronic Warfare',
+                  'Signal',
+                  'Special Operations Forces',
+                  'Ammunition',
+                  'Air Defense',
+                  'Engineer',
+                  'Air Assault',
+                  'Medical Treatment Facility',
+                  'Aviation Rotary Wing',
+                  'Combat Support',
+                  'Sustainment',
+                  'Unmanned Aerial Systems',
+                  'Combat Service Support',
+                  'Petroleum, Oil and Lubricants',
+                  'Sea Port',
+                  'Railhead'
+                ]}
+              />
 
-          <Select
-            label="Unit Role"
-            placeholder="Enter unit role"
-            required
-            name='unitRole'
-            mt="md"
-            value={formValues.unitRole}
-            onChange={(value) => handleSelectChange(value, 'unitRole')}
-            data={[
-              'Combat',
-              'Headquarters',
-              'Support',
-              'Supply Materials',
-              'Facility'
-            ]}
-          />
+              <TextInput
+                label="Unit Health"
+                placeholder="Enter unit health"
+                required
+                name='unitHealth'
+                mt="md"
+                type='number'
+                value={formValues.unitHealth}
+                onChange={handleChange}
+              />
 
-          <Select
-            label="Unit size"
-            placeholder="Enter unit size"
-            required
-            name='unitSize'
-            mt="md"
-            value={formValues.unitSize}
-            onChange={(value) => handleSelectChange(value, 'unitSize')}
-            data={[
-              'Squad/Team',
-              'Platoon',
-              'Company/Battery',
-              'Battalion',
-              'Brigade/Regiment',
-              'Division',
-              'Corps',
-              'UAS (1)',
-              'Aviation Section (2)',
-              'Aviation Flight (4)'
-            ]}
-          />
+              <Select
+                label="Unit Role"
+                placeholder="Enter unit role"
+                required
+                name='unitRole'
+                mt="md"
+                value={formValues.unitRole}
+                onChange={(value) => handleSelectChange(value, 'unitRole')}
+                data={[
+                  'Combat',
+                  'Headquarters',
+                  'Support',
+                  'Supply Materials',
+                  'Facility'
+                ]}
+              />
 
-          <Select
-            label="Force Posture"
-            placeholder="Enter force posture"
-            required
-            name='forcePosture'
-            mt="md"
-            value={formValues.forcePosture}
-            onChange={(value) => handleSelectChange(value, 'forcePosture')}
-            data={[
-              'Offensive Only',
-              'Defensive Only',
-              'Offense and Defense'
-            ]}
-          />
+              <Select
+                label="Unit size"
+                placeholder="Enter unit size"
+                required
+                name='unitSize'
+                mt="md"
+                value={formValues.unitSize}
+                onChange={(value) => handleSelectChange(value, 'unitSize')}
+                data={[
+                  'Squad/Team',
+                  'Platoon',
+                  'Company/Battery',
+                  'Battalion',
+                  'Brigade/Regiment',
+                  'Division',
+                  'Corps',
+                  'UAS (1)',
+                  'Aviation Section (2)',
+                  'Aviation Flight (4)'
+                ]}
+              />
 
-          <Select
-            label="Force Readiness"
-            placeholder="Enter force readiness"
-            required
-            name='forceReadiness'
-            mt="md"
-            value={formValues.forceReadiness}
-            onChange={(value) => handleSelectChange(value, 'forceReadiness')}
-            data={[
-              'Low',
-              'Medium',
-              'High'
-            ]}
-          />
+              <Select
+                label="Force Posture"
+                placeholder="Enter force posture"
+                required
+                name='forcePosture'
+                mt="md"
+                value={formValues.forcePosture}
+                onChange={(value) => handleSelectChange(value, 'forcePosture')}
+                data={[
+                  'Offensive Only',
+                  'Defensive Only',
+                  'Offense and Defense'
+                ]}
+              />
 
-          <Select
-            label="Force Skill"
-            placeholder="Enter force skill"
-            required
-            name='forceSkill'
-            mt="md"
-            value={formValues.forceSkill}
-            onChange={(value) => handleSelectChange(value, 'forceSkill')}
-            data={[
-              'Untrained',
-              'Basic',
-              'Advanced',
-              'Elite'
-            ]}
-          />
+              <Select
+                label="Force Readiness"
+                placeholder="Enter force readiness"
+                required
+                name='forceReadiness'
+                mt="md"
+                value={formValues.forceReadiness}
+                onChange={(value) => handleSelectChange(value, 'forceReadiness')}
+                data={[
+                  'Low',
+                  'Medium',
+                  'High'
+                ]}
+              />
 
-          
-        
-          </Tabs.Panel>
+              <Select
+                label="Force Skill"
+                placeholder="Enter force skill"
+                required
+                name='forceSkill'
+                mt="md"
+                value={formValues.forceSkill}
+                onChange={(value) => handleSelectChange(value, 'forceSkill')}
+                data={[
+                  'Untrained',
+                  'Basic',
+                  'Advanced',
+                  'Elite'
+                ]}
+              />
 
-          <Tabs.Panel value="tactics">
-            
-            <p>Aware of OPFOR presence?</p>
-                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
-                  <p>Within logistics support range?</p>
-                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
-                  <p>Under ISR coverage?</p>
-                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
-                  <p>Working GPS?</p>
-                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
-                  <p>Working communications?</p>
-                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
-                  <p>Within fire support range?</p>
-                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
-                  <p>Accessible by pattern force?</p>
-                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
-                
-            
-          </Tabs.Panel>
-        </Tabs>
-        <Button type="submit" mt="md">Submit</Button>
+
+
+            </Tabs.Panel>
+
+            <Tabs.Panel value="tactics">
+
+              <p>Aware of OPFOR presence?</p>
+              <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} onChange={(value) => handleSegmentChange(value, 'awareness')} />
+              <p>Within logistics support range?</p>
+              <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} onChange={(value) => handleSegmentChange(value, 'logistics')} />
+              <p>Under ISR coverage?</p>
+              <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} onChange={(value) => handleSegmentChange(value, 'coverage')} />
+              <p>Working GPS?</p>
+              <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} onChange={(value) => handleSegmentChange(value, 'gps')} />
+              <p>Working communications?</p>
+              <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} onChange={(value) => handleSegmentChange(value, 'comms')} />
+              <p>Within fire support range?</p>
+              <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} onChange={(value) => handleSegmentChange(value, 'fire')} />
+              <p>Accessible by pattern force?</p>
+              <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} onChange={(value) => handleSegmentChange(value, 'pattern')} />
+
+
+            </Tabs.Panel>
+          </Tabs>
+          <Button type="submit" mt="md">Submit</Button>
         </form>
       </Modal>
     </div>
