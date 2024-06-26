@@ -71,7 +71,7 @@ function BattlePage() {
   } = unit || {};
 
   const updateUnitHealth = async (id: number, newHealth: number) => {
-    const url = `http://localhost:5000/api/units/health`; // Corrected URL to point to the server running on port 5000
+    const url = `http://10.0.1.226:5000/api/units/health`; // Corrected URL to point to the server running on port 5000
     const options = {
       method: 'PUT',
       headers: {
@@ -174,7 +174,6 @@ function BattlePage() {
   const [question5, setQuestion5] = useState('Yes')
   const [question6, setQuestion6] = useState('Yes')
   const [question7, setQuestion7] = useState('Yes')
-  // const [question8, setQuestion8] = useState('Yes')
 
   // This function handles the engagement tactics form submission
   const finalizeTactics = async () => {
@@ -232,7 +231,7 @@ function BattlePage() {
     // Submit answers to backend
     try {
       // Submit engagement data
-      const engagementResponse = await fetch('http://localhost:5000/api/engagements', {
+      const engagementResponse = await fetch('http://10.0.1.226:5000/api/engagements', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -248,7 +247,7 @@ function BattlePage() {
       console.log('Engagement created:', engagementResult);
 
       // Submit tactics data
-      const tacticsResponse = await fetch('http://localhost:5000/api/tactics', {
+      const tacticsResponse = await fetch('http://10.0.1.226:5000/api/tactics', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -276,7 +275,7 @@ function BattlePage() {
         if (current < 100) {
           return current + 1;
         }
-        
+
         finalizeTactics();
 
         interval.stop();
@@ -666,7 +665,6 @@ function BattlePage() {
                     <div style={{ textAlign: 'center' }}>
                       <h2>Engagement Data</h2>
                     </div>
-                    {/* <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}> */}
                     <Grid style={{ justifyContent: 'center', alignItems: 'center' }}>
                       <Group style={{ flex: 1, textAlign: 'center' }}>
                         <Grid.Col>
@@ -689,19 +687,19 @@ function BattlePage() {
                     </Grid>
                     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
-                        <Tooltip label={tooltipContentFriendly}>
-                          <Progress.Section
-                            className={classes.progressSection}
-                            value={Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
-                            color="#4e87c1">
-                          </Progress.Section>
-                        </Tooltip>
+                        <Progress.Section
+                          className={classes.progressSection}
+                          value={Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
+                          color="#4e87c1">
+                          {Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
+                        </Progress.Section>
                       </Progress.Root>
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
                         <Progress.Section
                           className={classes.progressSection}
-                          value={58}
+                          value={Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
                           color="#bd3058">
+                          {Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
                         </Progress.Section>
                       </Progress.Root>
                     </div>
