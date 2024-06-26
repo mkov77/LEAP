@@ -234,6 +234,81 @@ app.post('/api/tactics', async (req, res) => {
   }
 });
 
+app.put('/api/unitTactics/update', async (req, res) => {
+  const {
+    awareness,
+    logistics,
+    coverage,
+    gps,
+    comms,
+    fire,
+    pattern,
+    ID
+  } = req.body;
+
+  try {
+    // Check if the record exists
+    const checkQuery = `
+      SELECT * FROM unit_tactics WHERE "ID" = $1;
+    `;
+    const checkValues = [ID];
+    const checkResult = await pool.query(checkQuery, checkValues);
+
+    if (checkResult.rows.length === 0) {
+      // Insert a new record if it doesn't exist
+      const insertQuery = `
+        INSERT INTO unit_tactics ("ID", awareness, logistics, coverage, gps, comms, fire, pattern)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING *;
+      `;
+      const insertValues = [
+        ID,
+        awareness,
+        logistics,
+        coverage,
+        gps,
+        comms,
+        fire,
+        pattern
+      ];
+
+      const insertResult = await pool.query(insertQuery, insertValues);
+      res.status(201).json(insertResult.rows[0]); // Return the newly inserted record
+    } else {
+      // Update the existing record
+      const updateQuery = `
+        UPDATE unit_tactics
+        SET awareness = $1,
+            logistics = $2,
+            coverage = $3,
+            gps = $4,
+            comms = $5,
+            fire = $6,
+            pattern = $7
+        WHERE "ID" = $8
+        RETURNING *;
+      `;
+      const updateValues = [
+        awareness,
+        logistics,
+        coverage,
+        gps,
+        comms,
+        fire,
+        pattern,
+        ID
+      ];
+
+      const updateResult = await pool.query(updateQuery, updateValues);
+      res.status(200).json(updateResult.rows[0]); // Return the updated record
+    }
+
+  } catch (error) {
+    console.error('Error updating unit tactics:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 app.put('/api/units/update', async (req, res) => {
   const {
@@ -250,6 +325,7 @@ app.put('/api/units/update', async (req, res) => {
     root
   } = req.body;
 
+  console.log(parent_id, unit_id);
   try {
     // Update unit details
     const updateQuery = `
@@ -263,7 +339,7 @@ app.put('/api/units/update', async (req, res) => {
           force_skill = $7,
           section = $8,
           root = $9
-      WHERE unit_id = $10
+      WHERE id = $10
       RETURNING *;
     `;
     const updateValues = [
@@ -287,14 +363,19 @@ app.put('/api/units/update', async (req, res) => {
 
     // Append child to parent's children array
     const appendQuery = `
-      UPDATE units
-      SET children = array_append(children, $1)
-      WHERE unit_id = $2;
-    `;
-    const appendValues = [
-      unit_id, // Child unit_id to append
-      parent_id, // Parent unit_id
-    ];
+    UPDATE units
+    SET children = array_append(children, (
+      SELECT unit_id
+      FROM units
+      WHERE id = $1
+    ))
+    WHERE id = $2;
+  `;
+  
+  const appendValues = [
+    unit_id,  // Child unit_id to find the name
+    parent_id // Parent unit_id
+  ];
 
     await pool.query(appendQuery, appendValues);
 
