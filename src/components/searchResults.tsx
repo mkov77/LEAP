@@ -14,7 +14,7 @@ const SearchResultList: React.FC<Props> = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units');
+        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units/sectionSort');
         setUnits(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);

@@ -30,8 +30,10 @@ function SectionControls() {
   const theme = useMantineTheme();
   const [engagementsData, setEngagementsData] = useState<Engagement[]>([]);
   const [sectionOnline, setSectionOnline] = useState(false);
-  const { userRole, setUserRole } = useUserRole();
+  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
 
+  setUserSection(sectionId);
+  
   useEffect(() => {
     if (userRole !== 'Administrator') {
       navigate('/');

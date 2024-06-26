@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
-import { Table, Progress, Text, AppShell, Group, Skeleton, Image, Stepper, Button, SegmentedControl, rem, Modal, useMantineColorScheme, useComputedColorScheme, MantineProvider, Grid, Card, Center } from '@mantine/core';
+import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconSwords, IconHeartbeat, IconNumber1Small, IconNumber2Small, IconNumber3Small, IconNumber4Small } from '@tabler/icons-react';
@@ -12,6 +12,7 @@ import classes from './battlePage.module.css';
 import { read } from 'fs';
 import axios from 'axios';
 import { Tactics } from './afterActionReportStorage';
+import { text } from 'node:stream/consumers';
 
 function BattlePage() {
   const [mobileOpened] = useDisclosure(false);
@@ -31,7 +32,11 @@ function BattlePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units');
+        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units/sectionSort', {
+          params: {
+            sectionid: userSection  // Pass userSection as a query parameter
+          }
+        });
         setUnits(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -40,20 +45,41 @@ function BattlePage() {
     fetchData();
   }, []);
 
+
   const unit = units.find((u) => u.unit_id === selectedUnit);
   const {
     unit_id,
     unit_type,
     unit_health,
-    unit_symbol,
-    is_friendly,
-    role_type,
     unit_size,
-    force_posture,
     force_mobility,
     force_readiness,
-    force_skill
+    force_skill,
+    id
   } = unit || {};
+
+  const updateUnitHealth = async (id: number, newHealth: number) => {
+    const url = `http://localhost:5000/api/units/health`; // Corrected URL to point to the server running on port 5000
+    const options = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id, newHealth }), // Send both id and newHealth in the body
+    };
+
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error(`Failed to update unit health: ${response.statusText}`);
+      }
+      const updatedUnit = await response.json();
+      console.log('Updated unit:', updatedUnit);
+      return updatedUnit;
+    } catch (error) {
+      console.error('Error updating unit health:', error);
+    }
+  };
 
   const calculateBaseValue = (unit: Unit) => {
     const unitTypeValues: Record<string, number> = {
@@ -136,23 +162,100 @@ function BattlePage() {
   const [question5, setQuestion5] = useState('Yes')
   const [question6, setQuestion6] = useState('Yes')
   const [question7, setQuestion7] = useState('Yes')
-  const [question8, setQuestion8] = useState('Yes')
+  // const [question8, setQuestion8] = useState('Yes')
 
-  const finalizeTactics = () => {
+  // This function handles the engagement tactics form submission
+  const finalizeTactics = async () => {
+
+    // Dummy data for enemyscore
+    const enemyTotalScore = 15;
+    const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
+    const isWin = friendlyTotalScore > enemyTotalScore;
+    console.log('ID: ', id);
+    updateUnitHealth(Number(id), 0);
+
     // Process all phase answers here
     console.log('Phase 1 Answers:', question1, question2);
     console.log('Phase 2 Answers:', question3, question4);
     console.log('Phase 3 Answers:', question5, question6);
-    console.log('Phase 4 Answers:', question7, question8);
+    console.log('Phase 4 Answers:', question7);
+    console.log('RESULTS -> Enemy:', enemyTotalScore, 'Friendly:', friendlyTotalScore, 'Win?:', isWin)
 
     const score = calculateRealTimeScore();
     setRealTimeScore(score);
     setScoreFinalized(true); // Mark the score as finalized
     nextStep();
 
-    // Example of further actions:
-    // Submit answers to backend, navigate to next step, etc.
-  };
+    // Prepare data for engagement and tactics
+    const engagementData = {
+      SectionID: userSection, // Replace with actual SectionID
+      FriendlyID: 1, // Replace with actual FriendlyID
+      EnemyID: 1, // Replace with actual EnemyID
+      FriendlyBaseScore: baseValue,
+      EnemyBaseScore: baseValue,
+      FriendlyTacticsScore: realTimeScore,
+      EnemyTacticsScore: realTimeScore,
+      FriendlyTotalScore: friendlyTotalScore,
+      EnemyTotalScore: enemyTotalScore,
+      isWin: isWin,
+    };
+
+    const tacticsData = {
+      FriendlyAwareness: question1 === "Yes" ? 1 : 0,
+      EnemyAwareness: question1 === "Yes" ? 1 : 0,
+      FriendlyLogistics: question2 === "Yes" ? 1 : 0,
+      EnemyLogistics: question2 === "Yes" ? 1 : 0,
+      FriendlyCoverage: question3 === "Yes" ? 1 : 0,
+      EnemyCoverage: question3 === "Yes" ? 1 : 0,
+      FriendlyGPS: question4 === "Yes" ? 1 : 0,
+      EnemyGPS: question4 === "Yes" ? 1 : 0,
+      FriendlyComms: question5 === "Yes" ? 1 : 0,
+      EnemyComms: question5 === "Yes" ? 1 : 0,
+      FriendlyFire: question6 === "Yes" ? 1 : 0,
+      EnemyFire: question6 === "Yes" ? 1 : 0,
+      FriendlyPattern: question7 === "Yes" ? 1 : 0,
+      EnemyPattern: question7 === "Yes" ? 1 : 0,
+    };
+
+    // Submit answers to backend
+    try {
+      // Submit engagement data
+      const engagementResponse = await fetch('http://localhost:5000/api/engagements', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(engagementData),
+      });
+
+      if (!engagementResponse.ok) {
+        throw new Error('Failed to create engagement');
+      }
+
+      const engagementResult = await engagementResponse.json();
+      console.log('Engagement created:', engagementResult);
+
+      // Submit tactics data
+      const tacticsResponse = await fetch('http://localhost:5000/api/tactics', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tacticsData),
+      });
+
+      if (!tacticsResponse.ok) {
+        throw new Error('Failed to record tactics');
+      }
+
+      const tacticsResult = await tacticsResponse.json();
+      console.log('Tactics recorded:', tacticsResult);
+
+    } catch (error) {
+      console.error('Error submitting data:', error);
+    }
+
+  }; // End of finalize tactics
 
   // Variable Conditions and corresponding weights
   const weights: Record<WeightKeys, { yes: number; no: number }> = {
@@ -164,6 +267,8 @@ function BattlePage() {
     fireSupportRange: { yes: 15, no: 0 },
     patternForceRange: { yes: 10, no: 0 }
   };
+
+  let tooltipContentFriendly = 'Total Calculated Value (Friendly): ' + ((Number(realTimeScore) * .30) + (baseValue * .70)).toFixed(2) + '%';
 
   type WeightKeys = 'awareOfPresence' | 'logisticsSupportRange' | 'isrCoverage' | 'gpsWorking' | 'communicationsWorking' | 'fireSupportRange' | 'patternForceRange';
 
@@ -195,27 +300,27 @@ function BattlePage() {
 
   //printing scores into the Engagement Data card in AAR
   const tactics: Tactics[] = [
-    { ID: 'Aware of OPFOR?', blueScore: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], redScore: 0 },
-    { ID: 'Within Logistics Support Range?', blueScore:  weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], redScore: 25 },
-    { ID: 'Within RPA/ISR Coverage?', blueScore: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], redScore: 0 },
-    { ID: 'Working GPS?', blueScore: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], redScore: 0 },
-    { ID: 'Working Communications?', blueScore: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], redScore: 15},
-    { ID: 'Within Fire Support Range?', blueScore: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], redScore: 0 },
-    { ID: 'Within Range of a Pattern Force?', blueScore: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], redScore: 15 }
+    { question: 'Aware of OPFOR?', friendlyawareness: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], enemyawareness: 0 },
+    { question: 'Within Logistics Support Range?', friendlylogistics: weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], enemylogistics: 25 },
+    { question: 'Within RPA/ISR Coverage?', friendlycoverage: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], enemycoverage: 0 },
+    { question: 'Working GPS?', friendlygps: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], enemygps: 0 },
+    { question: 'Working Communications?', friendlycomms: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], enemycomms: 15 },
+    { question: 'Within Fire Support Range?', friendlyfire: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], enemyfire: 0 },
+    { question: 'Within Range of a Pattern Force?', friendlypattern: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], enemypattern: 15 }
   ]
 
   //maps each tactic and its corresponding blue/red score to a row
   const tacticToRow = (tactics: Tactics[]) => (
     tactics.map((tactic) => (
-      <Table.Tr key={tactic.ID}>
-        <Table.Td>{tactic.ID}</Table.Td>
-        <Table.Td>{tactic.blueScore}</Table.Td>
-        <Table.Td>{tactic.redScore}</Table.Td>
-      </Table.Tr>
+        <Table.Tr key={tactic.question}>
+          <Table.Td>{tactic.question}</Table.Td>
+          <Table.Td>{tactic.friendlyawareness}</Table.Td>
+          <Table.Td>{tactic.enemyawareness}</Table.Td>
+        </Table.Tr>
     ))
   );
 
-  //sets color of readiness bar in inital display based on readiness value
+  //sets color of readiness bar in inital display based on readiness
   let readinessColor = 'green';
   const getReadinessProgress = (force_readiness: string | undefined) => {
     switch (force_readiness) {
@@ -315,239 +420,271 @@ function BattlePage() {
   };
 
 
-  return (
-    <MantineProvider defaultColorScheme='dark'>
+  const unitNull = () => {
+    console.log("Checking for unit: ", unit_id)
+    if (unit_id !== undefined) {
+      console.log("Unit found: ", unit_id)
+      return true;
+    }
+  }
 
-      <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
-        <Stepper.Step allowStepSelect={false} icon={<IconSwords stroke={1.5} style={{ width: rem(27), height: rem(27) }} />}>
-          <div>
-            <Grid justify='center' align='flex-start' gutter={100}>
-              <Grid.Col span={4}>
-                <Card withBorder radius="md" className={classes.card} >
-                  <Card.Section className={classes.imageSection} mt="md" >
-                    <Group>
-                      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-                        <Image
-                          src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
-                          height={160}
-                          style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
-                        />
-                      </div>
-                    </Group>
-                  </Card.Section>
-                  <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
-                  {unit ? (
-                    <Text size="xl" style={{ whiteSpace: 'pre-line' }}>
-                      <strong>Type:</strong> {unit_type}<br />
-                      <strong>Unit Size:</strong> {unit_size}<br />
-                      <strong>Force Mobility:</strong> {force_mobility}<br />
-                      <strong>Health:</strong> {unit_health}<br />
-                      <CustomProgressBarHealth value={Number(unit_health)} />
+  if (unitNull()) {
+    return (
+      <MantineProvider defaultColorScheme='dark'>
+        <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
+          <Stepper.Step allowStepSelect={false} icon={<IconSwords stroke={1.5} style={{ width: rem(27), height: rem(27) }} />}>
+            <div>
+              <Grid justify='center' align='flex-start' gutter={100}>
+                <Grid.Col span={4}>
+                  <Card withBorder radius="md" className={classes.card} >
+                    <Card.Section className={classes.imageSection} mt="md" >
+                      <Group>
+                        <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                          <Image
+                            src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
+                            height={160}
+                            style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
+                          />
+                        </div>
+                      </Group>
+                    </Card.Section>
+                    <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
+                    {unit ? (
+                      <Text size="xl" style={{ whiteSpace: 'pre-line' }}>
+                        <strong>Type:</strong> {unit_type}<br />
+                        <strong>Unit Size:</strong> {unit_size}<br />
+                        <strong>Force Mobility:</strong> {force_mobility}<br />
+                        <strong>Health:</strong> {unit_health}<br />
+                        <CustomProgressBarHealth value={Number(unit_health)} />
 
-                      <strong>Force Readiness:</strong> {force_readiness}<br />
-                      <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
+                        <strong>Force Readiness:</strong> {force_readiness}<br />
+                        <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
 
-                      <strong>Force Skill:</strong> {force_skill}<br />
-                      <CustomProgressBarReadiness value={Number(getForceSkill((force_skill)))} />
-                    </Text>
-                  ) : (
-                    <Text size="sm">Unit not found</Text>
-                  )}
-                </Card>
-              </Grid.Col>
-              <Grid.Col span={4}>
-                <Card withBorder radius="md" className={classes.card} >
-                  <Card.Section className={classes.imageSection} mt="md" >
-                    <Group>
-                      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-                        <Image
-                          src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
-                          height={160}
-                          style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
-                        />
-                      </div>
-                    </Group>
-                  </Card.Section>
-                  <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
-                  {unit ? (
-                    <Text size="xl">
-                      <strong>Type:</strong> {unit_type}<br />
-                      <strong>Unit Size:</strong> {unit_size}<br />
-                      <strong>Force Mobility:</strong> {force_mobility}<br />
-                      <strong>Health:</strong> {unit_health}<br />
-                      <CustomProgressBarHealth value={Number(unit_health)} />
+                        <strong>Force Skill:</strong> {force_skill}<br />
+                        <CustomProgressBarReadiness value={Number(getForceSkill((force_skill)))} />
+                      </Text>
+                    ) : (
+                      <Text size="sm">Unit not found</Text>
+                    )}
+                  </Card>
+                </Grid.Col>
+                <Grid.Col span={4}>
+                  <Card withBorder radius="md" className={classes.card} >
+                    <Card.Section className={classes.imageSection} mt="md" >
+                      <Group>
+                        <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                          <Image
+                            src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
+                            height={160}
+                            style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
+                          />
+                        </div>
+                      </Group>
+                    </Card.Section>
+                    <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
+                    {unit ? (
+                      <Text size="xl">
+                        <strong>Type:</strong> {unit_type}<br />
+                        <strong>Unit Size:</strong> {unit_size}<br />
+                        <strong>Force Mobility:</strong> {force_mobility}<br />
+                        <strong>Health:</strong> {unit_health}<br />
+                        <CustomProgressBarHealth value={Number(unit_health)} />
 
-                      <strong>Force Readiness:</strong> {force_readiness}<br />
-                      <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
+                        <strong>Force Readiness:</strong> {force_readiness}<br />
+                        <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
 
-                      <strong>Force Skill:</strong> {force_skill}<br />
-                      <CustomProgressBarSkill value={Number(getForceSkill((force_skill)))} />
+                        <strong>Force Skill:</strong> {force_skill}<br />
+                        <CustomProgressBarSkill value={Number(getForceSkill((force_skill)))} />
 
-                    </Text>
-                  ) : (
-                    <Text size="sm">Unit not found</Text>
-                  )}
-                </Card>
-              </Grid.Col>
-            </Grid>
-            <Group justify="center" mt="xl">
-              <Button onClick={nextStep}>Start Engagement</Button>
-            </Group>
-          </div>
-        </Stepper.Step>
-        <Stepper.Step allowStepSelect={false} label="Force Strength" icon={<IconNumber1Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />}>
-          <div>
-            <p>Phase 1: Force Strength</p>
-            <Grid>
-              <Grid.Col span={4}>
-                <h1>Friendly {selectedUnit}</h1>
-                <p>Aware of OPFOR presence?</p>
-                <SegmentedControl onChange={setQuestion1} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-                <p>Within logistics support range?</p>
-                <SegmentedControl onChange={setQuestion2} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <h1>Enemy INF-BRIG-C</h1>
-                <p>Aware of OPFOR presence?</p>
-                <SegmentedControl onChange={setQuestion3} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-                <p>Within logistics support range?</p>
-                <SegmentedControl onChange={setQuestion4} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-              </Grid.Col>
-            </Grid>
-            <Group justify="center" mt="xl">
-              <Button onClick={nextStep}>Continue</Button>
-            </Group>
-
-          </div>
-        </Stepper.Step>
-        <Stepper.Step allowStepSelect={false} label="Tactical Advantage" icon={<IconNumber2Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />}>
-          <div>
-            <p>Phase 2: Tactical Advantage</p>
-            <Grid>
-              <Grid.Col span={6}>
-                <h1>Friendly {selectedUnit}</h1>
-                <p>Under ISR coverage?</p>
-                <SegmentedControl onChange={setQuestion5} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-                <p>Working GPS?</p>
-                <SegmentedControl onChange={setQuestion6} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <h1>Enemy INF-BRIG-C</h1>
-                <p>Under ISR coverage?</p>
-                <SegmentedControl onChange={setQuestion7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-                <p>Working GPS?</p>
-                <SegmentedControl onChange={setQuestion8} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-              </Grid.Col>
-            </Grid>
-            <Group justify="center" mt="xl">
-              <Button onClick={prevStep}>Go Back</Button>
-              <Button onClick={nextStep}>Next Phase</Button>
-            </Group>
-          </div>
-        </Stepper.Step>
-        <Stepper.Step allowStepSelect={false} label="Fire Support" icon={<IconNumber3Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />} >
-          <div>
-            <p>Phase 3: Fire Support</p>
-            <Grid>
-              <Grid.Col span={6}>
-                <h1>Friendly {selectedUnit}</h1>
-                <p>Working communications?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-                <p>Within fire support range?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <h1>Enemy INF-BRIG-C</h1>
-                <p>Working communications?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-                <p>Within fire support range?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-              </Grid.Col>
-            </Grid>
-            <Group justify="center" mt="xl">
-              <Button onClick={prevStep}>Go Back</Button>
-              <Button onClick={nextStep}>Next Phase</Button>
-            </Group>
-          </div>
-        </Stepper.Step>
-        <Stepper.Step allowStepSelect={false} label="Terrain" icon={<IconNumber4Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />}>
-          <div>
-            <p>Phase 4: Terrain</p>
-            <Grid>
-              <Grid.Col span={6}>
-                <h1>Friendly {selectedUnit}</h1>
-                <p>Higher ground?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-                <p>Accessible by pattern force?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <h1>Enemy INF-BRIG-C</h1>
-                <p>Higher ground?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-                <p>Accessible by pattern force?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
-              </Grid.Col>
-            </Grid>
-            <Group justify="center" mt="xl">
-              <Button onClick={prevStep}>Go Back</Button>
-              <Button onClick={finalizeTactics}>Finalize Tactics</Button>
-            </Group>
-          </div>
-        </Stepper.Step>
-        <Stepper.Step allowStepSelect={false} icon={<IconHeartbeat stroke={1.5} style={{ width: rem(35), height: rem(35) }} />}>
-          <div>
-            <h1>After-Action Review</h1>
-            <Text size="xl">Calculated Base Value: {baseValue.toFixed(2)}</Text>
-            <Text size="xl">Real-Time Input Score: {calculateRealTimeScore()}</Text>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
-              <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px' }} display={'flex'}>
-                <Card.Section >
-                  <div style={{ textAlign: 'center' }}>
-                    <h2>Engagement Data</h2>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    Engagement ID:
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
-                    <Progress.Root style={{ width: '200px', height: '25px' }}>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={30 * .15}
-                        color="#4e87c1">
-                      </Progress.Section>
-
-
-                    </Progress.Root>
-                    <Progress.Root style={{ width: '200px', height: '25px' }}>
-                      <Progress.Section
-                        className={classes.progressSection}
-                        value={30 * .15}
-                        color="#bd3058">
-                      </Progress.Section>
-                    </Progress.Root>
-                  </div>
-                  <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center' }}>
-                    <Table.Thead>
-                      <Table.Tr>
-                        <Table.Th>Tactic</Table.Th>
-                        <Table.Th>Blue Score</Table.Th>
-                        <Table.Th>Red Score</Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
-                  </Table>
-                </Card.Section>
-              </Card>
+                      </Text>
+                    ) : (
+                      <Text size="sm">Unit not found</Text>
+                    )}
+                  </Card>
+                </Grid.Col>
+              </Grid>
+              <Group justify="center" mt="xl">
+                <Button onClick={nextStep}>Start Engagement</Button>
+              </Group>
             </div>
-            <Group justify="center" mt="xl">
-              <Button onClick={() => { navigate(closeLocation); setSelectedUnit(null) }}>Done</Button>
-            </Group>
-          </div>
-        </Stepper.Step>
-      </Stepper>
-    </MantineProvider>
-  );
+          </Stepper.Step>
+          <Stepper.Step allowStepSelect={false} label="Force Strength" icon={<IconNumber1Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />}>
+            <div>
+              <p>Phase 1: Force Strength</p>
+              <Grid>
+                <Grid.Col span={4}>
+                  <h1>Friendly {selectedUnit}</h1>
+                  <p>Aware of OPFOR presence?</p>
+                  <SegmentedControl value={question1} onChange={setQuestion1} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <p>Within logistics support range?</p>
+                  <SegmentedControl value={question2} onChange={setQuestion2} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <h1>Enemy INF-BRIG-C</h1>
+                  <p>Aware of OPFOR presence?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <p>Within logistics support range?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                </Grid.Col>
+              </Grid>
+              <Group justify="center" mt="xl">
+                <Button onClick={nextStep}>Continue</Button>
+              </Group>
+
+            </div>
+          </Stepper.Step>
+          <Stepper.Step allowStepSelect={false} label="Tactical Advantage" icon={<IconNumber2Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />}>
+            <div>
+              <p>Phase 2: Tactical Advantage</p>
+              <Grid>
+                <Grid.Col span={6}>
+                  <h1>Friendly {selectedUnit}</h1>
+                  <p>Under ISR coverage?</p>
+                  <SegmentedControl value={question3} onChange={setQuestion3} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <p>Working GPS?</p>
+                  <SegmentedControl value={question4} onChange={setQuestion4} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <h1>Enemy INF-BRIG-C</h1>
+                  <p>Under ISR coverage?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <p>Working GPS?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                </Grid.Col>
+              </Grid>
+              <Group justify="center" mt="xl">
+                <Button onClick={prevStep}>Go Back</Button>
+                <Button onClick={nextStep}>Next Phase</Button>
+              </Group>
+            </div>
+          </Stepper.Step>
+          <Stepper.Step allowStepSelect={false} label="Fire Support" icon={<IconNumber3Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />} >
+            <div>
+              <p>Phase 3: Fire Support</p>
+              <Grid>
+                <Grid.Col span={6}>
+                  <h1>Friendly {selectedUnit}</h1>
+                  <p>Working communications?</p>
+                  <SegmentedControl value={question5} onChange={setQuestion5} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <p>Within fire support range?</p>
+                  <SegmentedControl value={question6} onChange={setQuestion6} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <h1>Enemy INF-BRIG-C</h1>
+                  <p>Working communications?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <p>Within fire support range?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                </Grid.Col>
+              </Grid>
+              <Group justify="center" mt="xl">
+                <Button onClick={prevStep}>Go Back</Button>
+                <Button onClick={nextStep}>Next Phase</Button>
+              </Group>
+            </div>
+          </Stepper.Step>
+          <Stepper.Step allowStepSelect={false} label="Terrain" icon={<IconNumber4Small stroke={1.5} style={{ width: rem(80), height: rem(80) }} />}>
+            <div>
+              <p>Phase 4: Terrain</p>
+              <Grid>
+                <Grid.Col span={6}>
+                  <h1>Friendly {selectedUnit}</h1>
+                  {/* <p>Higher ground?</p>
+                <SegmentedControl value={question7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} /> */}
+                  <p>Accessible by pattern force?</p>
+                  <SegmentedControl value={question7} onChange={setQuestion7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <h1>Enemy INF-BRIG-C</h1>
+                  {/* <p>Higher ground?</p>
+                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled /> */}
+                  <p>Accessible by pattern force?</p>
+                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                </Grid.Col>
+              </Grid>
+              <Group justify="center" mt="xl">
+                <Button onClick={prevStep}>Go Back</Button>
+                <Button onClick={finalizeTactics}>Finalize Tactics</Button>
+              </Group>
+            </div>
+          </Stepper.Step>
+          <Stepper.Step allowStepSelect={false} icon={<IconHeartbeat stroke={1.5} style={{ width: rem(35), height: rem(35) }} />}>
+            <div>
+              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>After-Action Review</h1>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '150px', marginTop: '200px', textAlign: 'center' }} display={'flex'}>
+                  <Card.Section >
+                    <div style={{ textAlign: 'center' }}>
+                      <h2>Engagement Data</h2>
+                    </div>
+                    {/* <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}> */}
+                    <Grid style={{ justifyContent: 'center', alignItems: 'center' }}>
+                      <Group style={{ flex: 1, textAlign: 'center' }}>
+                        <Grid.Col>
+                          <Text size="lg">Friendly Baseline Score: </Text>
+                          <Text>{baseValue.toFixed(2)}</Text>
+                          <Text size="lg">Friendly Tactics Score:</Text>
+                          <Text> {calculateRealTimeScore()}</Text>
+                        </Grid.Col>
+                      </Group>
+                      <Group style={{ flex: 1, textAlign: 'center' }}>
+                        <Grid.Col>
+                          <Text size="lg">Enemy Baseline Score: </Text>
+                          <Text >
+                            {baseValue.toFixed(2)}
+                          </Text>
+                          <Text size="lg">Enemy Tactics Score:</Text>
+                          <Text> {calculateRealTimeScore()}</Text>
+                        </Grid.Col>
+                      </Group>
+                    </Grid>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
+                      <Progress.Root style={{ width: '200px', height: '25px' }}>
+                        <Tooltip label={tooltipContentFriendly}>
+                          <Progress.Section
+                            className={classes.progressSection}
+                            value={Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
+                            color="#4e87c1">
+                          </Progress.Section>
+                        </Tooltip>
+                      </Progress.Root>
+                      <Progress.Root style={{ width: '200px', height: '25px' }}>
+                        <Progress.Section
+                          className={classes.progressSection}
+                          value={58}
+                          color="#bd3058">
+                        </Progress.Section>
+                      </Progress.Root>
+                    </div>
+                    <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center' }}>
+                      <Table.Thead>
+                        <Table.Tr>
+                          <Table.Th>Tactic</Table.Th>
+                          <Table.Th>Friendly Score</Table.Th>
+                          <Table.Th>Enemy Score</Table.Th>
+                        </Table.Tr>
+                      </Table.Thead>
+                      <Table.Tbody>{tacticToRow(tactics)}</Table.Tbody>
+                    </Table>
+                  </Card.Section>
+                </Card>
+              </div>
+              <Group justify="center" mt="xl" display={'flex'}>
+                <Button onClick={() => { navigate(closeLocation); setSelectedUnit(null) }}>Done</Button>
+              </Group>
+            </div>
+          </Stepper.Step>
+        </Stepper>
+      </MantineProvider>
+    );
+  }
+
+  else {
+    navigate('/')
+    return (
+      <Text> Error. Rerouting. </Text>
+    );
+  }
 }
 
 export default BattlePage;

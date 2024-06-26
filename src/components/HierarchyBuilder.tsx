@@ -4,11 +4,11 @@ import Tree from 'react-d3-tree';
 import { RawNodeDatum, CustomNodeElementProps } from 'react-d3-tree';
 import CardC, { Unit } from './Cards';
 import classes from './Cards.module.css';
-import { Modal, Select, TextInput, Button, Text, HoverCard } from '@mantine/core';
+import { SegmentedControl, Modal, Tabs, Select, TextInput, Button, Text, HoverCard } from '@mantine/core';
 import axios from 'axios';
 import { useUserRole } from '../context/UserContext';
 
-const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
+const buildHierarchy = (units: Unit[]): RawNodeDatum[] | null => {
   const unitMap = new Map<string, RawNodeDatum>();
 
   // First pass: Add all units to a map
@@ -17,7 +17,6 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
       name: unit.unit_id,
       attributes: {
         unit_type: unit.unit_type,
-        unit_symbol: unit.unit_symbol,
         is_friendly: unit.is_friendly,
         unit_health: unit.unit_health,
         role_type: unit.role_type,
@@ -47,7 +46,14 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] => {
   });
 
   // Return the roots (units without a parent)
-  const rootNodes = units.filter(unit => !units.some(u => u.children.includes(unit.unit_id)));
+  const rootNodes = units.filter(unit => unit.root); // Filter units with root attribute true
+  if (rootNodes.length === 0) {
+    return null; // If no root nodes, return null
+  }
+
+  // Sort root nodes to appear at the top
+  rootNodes.sort((a, b) => (a.root && !b.root ? -1 : 0));
+
   return rootNodes.map(unit => unitMap.get(unit.unit_id)!);
 };
 
@@ -119,7 +125,7 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
 function Hierarchy() {
   const [units, setUnits] = useState<Unit[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
-  const [tree, setTree] = useState<RawNodeDatum[]>();
+  const [tree, setTree] = useState<RawNodeDatum[] | null>();
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
   const [formValues, setFormValues] = useState({
     unitName: '',
@@ -129,29 +135,33 @@ function Hierarchy() {
     unitSize: '',
     forcePosture: '',
     forceReadiness: '',
-    forceSkill: ''
+    forceSkill: '',
+    root: false
   });
+  const [selectedNode, setSelectedNode] = useState<string>('');
+  const [isRoot, setIsRoot] = useState(false);
 
+
+  const fetchData = async () => {
+    try {
+      console.log('Fetching data for section:', userSection);
+      const response = await axios.get<Unit[]>(`http://10.0.1.226:5000/api/units/sectionOrNullSort`, {
+        params: {
+          sectionid: userSection,
+        }
+      });
+      const normalizedData = response.data.map(unit => ({
+        ...unit,
+        children: unit.children || [] // Ensure children is an array
+      }));
+      setUnits(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log('Fetching data for section:', userSection);
-        const response = await axios.get<Unit[]>(`http://10.0.1.226:5000/api/units/`, {
-          params: {
-            sectionid: userSection,
-          }
-        });
-        const normalizedData = response.data.map(unit => ({
-          ...unit,
-          children: unit.children || [] // Ensure children is an array
-        }));
-        setUnits(response.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
     fetchData();
   }, [userSection]);
 
@@ -166,13 +176,10 @@ function Hierarchy() {
     }
   }, [units]);
 
-  const handleFormSubmit = () => {
-    close();
 
-  }
-
-  const handleNodeClick = () => {
-
+  const handleNodeClick = (nodeData: RawNodeDatum) => {
+    console.log(nodeData.name);
+    setSelectedNode(nodeData.name);
     if (userRole === "Administrator") {
       open();
     }
@@ -182,28 +189,32 @@ function Hierarchy() {
 
   };
 
+  const handleParentClick = () => {
+    setIsRoot(true);
+    open();
+  }
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-
-
     try {
-      const response = await axios.put(`http://10.0.1.226:5000/api/units`, {
-        params: {
-          unit_id: formValues.unitName,
-          unit_type: formValues.unitType,
-          unit_health: formValues.unitHealth,
-          role_type: formValues.unitRole,
-          unit_size: formValues.unitSize,
-          force_posture: formValues.forcePosture,
-          force_readiness: formValues.forceReadiness,
-          force_skill: formValues.forceSkill,
-        }
+      const response = await axios.put(`http://10.0.1.226:5000/api/units/update`, {
+        parent_id: selectedNode,
+        unit_id: formValues.unitName,
+        unit_type: formValues.unitType,
+        unit_health: formValues.unitHealth,
+        role_type: formValues.unitRole,
+        unit_size: formValues.unitSize,
+        force_posture: formValues.forcePosture,
+        force_readiness: formValues.forceReadiness,
+        force_skill: formValues.forceSkill,
+        section_id: userSection,
+        root: isRoot
       });
 
       if (response.status === 200) {
         // Successfully updated the unit, update the state to reflect the changes
         setUnits(prevUnits => prevUnits.map(unit => unit.unit_id === formValues.unitName ? response.data : unit));
+        fetchData();
       } else {
         console.error('Failed to update unit:', response);
       }
@@ -213,6 +224,18 @@ function Hierarchy() {
 
     // Close the modal
     close();
+    setIsRoot(false);
+    setFormValues({
+      unitName: '',
+      unitType: '',
+      unitHealth: 100,
+      unitRole: '',
+      unitSize: '',
+      forcePosture: '',
+      forceReadiness: '',
+      forceSkill: '',
+      root: false
+    });
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
@@ -223,12 +246,44 @@ function Hierarchy() {
     }));
   };
 
-  const handleSelectChange = (value: string | null) => {
-    setFormValues((prevValues) => ({
+  const handleSelectChange = (value: string | null, name: string) => {
+    setFormValues(prevValues => ({
       ...prevValues,
-      unitName: value ?? ''
+      [name]: value ?? ''
     }));
   };
+
+  const isChildOf = (node: RawNodeDatum | null, unitId: string): boolean => {
+    if (!node) {
+      return false; // Base case: if node is null or undefined, return false
+    }
+
+    if (node.name === unitId) {
+      return true; // Found the unit as a direct child of this node
+    }
+
+    // Recursively check all children of the current node
+    for (const child of node.children || []) {
+      if (isChildOf(child, unitId)) {
+        return true; // Found the unit in one of the children
+      }
+    }
+
+    return false; // Unit not found in the current node or its children
+  };
+
+  const filteredUnits = units.filter(unit => {
+    if (unit.unit_id === selectedNode) {
+      return true; // Include selected node
+    }
+    // Check if the unit is a child of any node
+    for (const rootNode of tree || []) {
+      if (isChildOf(rootNode, unit.unit_id)) {
+        return false; // Exclude children
+      }
+    }
+    return true; // Include non-children
+  });
 
   return (
     <div style={{ width: '100%', height: '100vh' }}>
@@ -243,35 +298,74 @@ function Hierarchy() {
           pathFunc={'step'}
           zoom={1.2}
           scaleExtent={{ min: 0.5, max: 3 }}
-          renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} toggleModal={handleNodeClick} />}
-          onNodeClick={handleNodeClick}
+          renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} toggleModal={() => handleNodeClick(rd3tProps.nodeDatum)} />}
+          onNodeClick={() => handleNodeClick}
 
 
         />) : (
-        <Button onClick={handleNodeClick}>Add Parent</Button>
+        <Button onClick={() => handleParentClick()}>Add Parent</Button>
       )
 
       }
 
       <Modal opened={opened} onClose={close} title="Add unit">
-        <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
+        <Tabs defaultValue="unit">
+          <Tabs.List>
+            <Tabs.Tab value="unit" >
+              Unit selection
+            </Tabs.Tab>
+            <Tabs.Tab value="tactics" >
+              Unit Tactics
+            </Tabs.Tab>
+
+          </Tabs.List>
+
+          <Tabs.Panel value="unit">
+         
           <Select
             label="Unit"
             placeholder="Pick one"
             name='unitName'
             value={formValues.unitName}
-            onChange={handleSelectChange}
-            data={units.map((unit) => ({ value: unit.unit_id, label: unit.unit_id }))}
+            onChange={(value) => handleSelectChange(value, 'unitName')}
+            data={filteredUnits.map((unit) => ({ value: unit.unit_id, label: unit.unit_id }))}
           />
 
-          <TextInput
+          <Select
             label="Unit Type"
             placeholder="Enter unit type"
             required
             name='unitType'
             mt="md"
             value={formValues.unitType}
-            onChange={handleChange}
+            onChange={(value) => handleSelectChange(value, 'unitType')}
+            data={[
+              'Command and Control',
+              'Infantry',
+              'Reconnaissance',
+              'Armored Mechanized',
+              'Combined Arms',
+              'Armored Mechanized Tracked',
+              'Field Artillery',
+              'Self-propelled',
+              'Electronic Warfare',
+              'Signal',
+              'Special Operations Forces',
+              'Ammunition',
+              'Air Defense',
+              'Engineer',
+              'Air Assault',
+              'Medical Treatment Facility',
+              'Aviation Rotary Wing',
+              'Combat Support',
+              'Sustainment',
+              'Unmanned Aerial Systems',
+              'Combat Service Support',
+              'Petroleum, Oil and Lubricants',
+              'Sea Port',
+              'Railhead'
+            ]}
           />
 
           <TextInput
@@ -285,57 +379,116 @@ function Hierarchy() {
             onChange={handleChange}
           />
 
-          <TextInput
+          <Select
             label="Unit Role"
             placeholder="Enter unit role"
             required
             name='unitRole'
             mt="md"
             value={formValues.unitRole}
-            onChange={handleChange}
+            onChange={(value) => handleSelectChange(value, 'unitRole')}
+            data={[
+              'Combat',
+              'Headquarters',
+              'Support',
+              'Supply Materials',
+              'Facility'
+            ]}
           />
 
-          <TextInput
+          <Select
             label="Unit size"
             placeholder="Enter unit size"
             required
             name='unitSize'
             mt="md"
             value={formValues.unitSize}
-            onChange={handleChange}
+            onChange={(value) => handleSelectChange(value, 'unitSize')}
+            data={[
+              'Squad/Team',
+              'Platoon',
+              'Company/Battery',
+              'Battalion',
+              'Brigade/Regiment',
+              'Division',
+              'Corps',
+              'UAS (1)',
+              'Aviation Section (2)',
+              'Aviation Flight (4)'
+            ]}
           />
 
-          <TextInput
+          <Select
             label="Force Posture"
             placeholder="Enter force posture"
             required
             name='forcePosture'
             mt="md"
             value={formValues.forcePosture}
-            onChange={handleChange}
+            onChange={(value) => handleSelectChange(value, 'forcePosture')}
+            data={[
+              'Offensive Only',
+              'Defensive Only',
+              'Offense and Defense'
+            ]}
           />
 
-          <TextInput
+          <Select
             label="Force Readiness"
             placeholder="Enter force readiness"
             required
             name='forceReadiness'
             mt="md"
             value={formValues.forceReadiness}
-            onChange={handleChange}
+            onChange={(value) => handleSelectChange(value, 'forceReadiness')}
+            data={[
+              'Low',
+              'Medium',
+              'High'
+            ]}
           />
 
-          <TextInput
+          <Select
             label="Force Skill"
             placeholder="Enter force skill"
             required
             name='forceSkill'
             mt="md"
             value={formValues.forceSkill}
-            onChange={handleChange}
+            onChange={(value) => handleSelectChange(value, 'forceSkill')}
+            data={[
+              'Untrained',
+              'Basic',
+              'Advanced',
+              'Elite'
+            ]}
           />
 
-          <Button type="submit" mt="md">Submit</Button>
+          
+        
+          </Tabs.Panel>
+
+          <Tabs.Panel value="tactics">
+            
+            <p>Aware of OPFOR presence?</p>
+                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <p>Within logistics support range?</p>
+                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <p>Under ISR coverage?</p>
+                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <p>Working GPS?</p>
+                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <p>Working communications?</p>
+                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <p>Within fire support range?</p>
+                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <p>Accessible by pattern force?</p>
+                  <SegmentedControl size='md' radius='xs' color="gray" data={['Yes', 'No']} />
+                
+            
+          </Tabs.Panel>
+        </Tabs>
+        <Button type="submit" mt="md">Submit</Button>
         </form>
       </Modal>
     </div>

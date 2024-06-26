@@ -34,9 +34,9 @@ function CarouselC() {
     const fetchData = async () => {
       try {
         console.log('Fetching data for section:', userSection);
-        const response = await axios.get<Unit[]>(`http://10.0.1.226:5000/api/units/`, {
+        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units/sectionSort', {
           params: {
-            sectionid: userSection,
+            sectionid: userSection  // Pass userSection as a query parameter
           }
         });
         setUnits(response.data);
@@ -44,6 +44,7 @@ function CarouselC() {
         console.error('Error fetching data:', error);
       }
     };
+  
     fetchData();
   }, [userSection]);
 
