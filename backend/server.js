@@ -38,6 +38,54 @@ app.get('/api/units', async (req, res) => {
   }
 });
 
+app.put('/api/units/update', async (req, res) => {
+  const {
+    unit_id,
+    unit_type,
+    unit_health,
+    role_type,
+    unit_size,
+    force_posture,
+    force_readiness,
+    force_skill,
+  } = req.params;
+
+
+  try {
+    const result = await pool.query(
+      `UPDATE units
+           SET unit_type = $1,
+               unit_health = $2,
+               role_type = $3,
+               unit_size = $4,
+               force_posture = $5,
+               force_readiness = $6,
+               forces_skill = $7
+           WHERE unit_id = $8
+           RETURNING *`,
+      [
+        unit_type,
+        unit_health,
+        role_type,
+        unit_size,
+        force_posture,
+        force_readiness,
+        force_skill,
+        unit_id
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Unit not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
+  } catch (error) {
+    console.error('Error updating unit:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // GET request to fetch a specific section by ID
 app.get('/api/sections/:id', async (req, res) => {
   const { id } = req.params;

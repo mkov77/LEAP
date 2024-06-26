@@ -4,7 +4,7 @@ import Tree from 'react-d3-tree';
 import { RawNodeDatum, CustomNodeElementProps } from 'react-d3-tree';
 import CardC, { Unit } from './Cards';
 import classes from './Cards.module.css';
-import { Modal, Text, HoverCard } from '@mantine/core';
+import { Modal, Select, TextInput, Button, Text, HoverCard } from '@mantine/core';
 import axios from 'axios';
 import { useUserRole } from '../context/UserContext';
 
@@ -115,55 +115,125 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
 };
 
 
-  
-  function Hierarchy() {
-    const [units, setUnits] = useState<Unit[]>([]);
-    const [opened, { open, close }] = useDisclosure(false);
-    const [tree, setTree] = useState<RawNodeDatum[]>();
-    const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units');
-          const normalizedData = response.data.map(unit => ({
-            ...unit,
-            children: unit.children || [] // Ensure children is an array
-          }));
-          console.log('Normalized Data:', normalizedData);
-          setUnits(normalizedData);
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
-      fetchData();
-    }, []);
 
-    useEffect(() => {
-      // Convert the data to the RawNodeDatum format
-      if(units.length <= 0){
-        console.log("waiting");
+function Hierarchy() {
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [opened, { open, close }] = useDisclosure(false);
+  const [tree, setTree] = useState<RawNodeDatum[]>();
+  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
+  const [formValues, setFormValues] = useState({
+    unitName: '',
+    unitType: '',
+    unitHealth: 100,
+    unitRole: '',
+    unitSize: '',
+    forcePosture: '',
+    forceReadiness: '',
+    forceSkill: ''
+  });
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log('Fetching data for section:', userSection);
+        const response = await axios.get<Unit[]>(`http://10.0.1.226:5000/api/units/`, {
+          params: {
+            sectionid: userSection,
+          }
+        });
+        const normalizedData = response.data.map(unit => ({
+          ...unit,
+          children: unit.children || [] // Ensure children is an array
+        }));
+        setUnits(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-      else{
+    };
+    fetchData();
+  }, [userSection]);
+
+  useEffect(() => {
+    // Convert the data to the RawNodeDatum format
+    if (units.length <= 0) {
+      console.log("waiting");
+    }
+    else {
       const formattedData = buildHierarchy(units);
       setTree(formattedData);
+    }
+  }, [units]);
+
+  const handleFormSubmit = () => {
+    close();
+
+  }
+
+  const handleNodeClick = () => {
+
+    if (userRole === "Administrator") {
+      open();
+    }
+    else {
+
+    }
+
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+
+
+    try {
+      const response = await axios.put(`http://10.0.1.226:5000/api/units`, {
+        params: {
+          unit_id: formValues.unitName,
+          unit_type: formValues.unitType,
+          unit_health: formValues.unitHealth,
+          role_type: formValues.unitRole,
+          unit_size: formValues.unitSize,
+          force_posture: formValues.forcePosture,
+          force_readiness: formValues.forceReadiness,
+          force_skill: formValues.forceSkill,
+        }
+      });
+
+      if (response.status === 200) {
+        // Successfully updated the unit, update the state to reflect the changes
+        setUnits(prevUnits => prevUnits.map(unit => unit.unit_id === formValues.unitName ? response.data : unit));
+      } else {
+        console.error('Failed to update unit:', response);
       }
-    }, [units]);
+    } catch (error) {
+      console.error('Error updating unit:', error);
+    }
 
+    // Close the modal
+    close();
+  };
 
-    const handleNodeClick = () => {
-      
-      if(userRole === "Administrator"){
-        open();
-      }
-      else{
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = event.currentTarget;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value
+    }));
+  };
 
-      }
-
-    };
+  const handleSelectChange = (value: string | null) => {
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      unitName: value ?? ''
+    }));
+  };
 
   return (
     <div style={{ width: '100%', height: '100vh' }}>
-      {tree &&
+
+      {tree ? (
         <Tree
           data={tree}
           orientation='vertical'
@@ -173,14 +243,100 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
           pathFunc={'step'}
           zoom={1.2}
           scaleExtent={{ min: 0.5, max: 3 }}
-          renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} toggleModal={handleNodeClick}/>}
+          renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} toggleModal={handleNodeClick} />}
           onNodeClick={handleNodeClick}
 
-        
-        />}
+
+        />) : (
+        <Button onClick={handleNodeClick}>Add Parent</Button>
+      )
+
+      }
 
       <Modal opened={opened} onClose={close} title="Add unit">
+        <form onSubmit={handleSubmit}>
+          <Select
+            label="Unit"
+            placeholder="Pick one"
+            name='unitName'
+            value={formValues.unitName}
+            onChange={handleSelectChange}
+            data={units.map((unit) => ({ value: unit.unit_id, label: unit.unit_id }))}
+          />
 
+          <TextInput
+            label="Unit Type"
+            placeholder="Enter unit type"
+            required
+            name='unitType'
+            mt="md"
+            value={formValues.unitType}
+            onChange={handleChange}
+          />
+
+          <TextInput
+            label="Unit Health"
+            placeholder="Enter unit health"
+            required
+            name='unitHealth'
+            mt="md"
+            type='number'
+            value={formValues.unitHealth}
+            onChange={handleChange}
+          />
+
+          <TextInput
+            label="Unit Role"
+            placeholder="Enter unit role"
+            required
+            name='unitRole'
+            mt="md"
+            value={formValues.unitRole}
+            onChange={handleChange}
+          />
+
+          <TextInput
+            label="Unit size"
+            placeholder="Enter unit size"
+            required
+            name='unitSize'
+            mt="md"
+            value={formValues.unitSize}
+            onChange={handleChange}
+          />
+
+          <TextInput
+            label="Force Posture"
+            placeholder="Enter force posture"
+            required
+            name='forcePosture'
+            mt="md"
+            value={formValues.forcePosture}
+            onChange={handleChange}
+          />
+
+          <TextInput
+            label="Force Readiness"
+            placeholder="Enter force readiness"
+            required
+            name='forceReadiness'
+            mt="md"
+            value={formValues.forceReadiness}
+            onChange={handleChange}
+          />
+
+          <TextInput
+            label="Force Skill"
+            placeholder="Enter force skill"
+            required
+            name='forceSkill'
+            mt="md"
+            value={formValues.forceSkill}
+            onChange={handleChange}
+          />
+
+          <Button type="submit" mt="md">Submit</Button>
+        </form>
       </Modal>
     </div>
   );

@@ -8,6 +8,7 @@ import { useUnitProvider } from '../context/UnitContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import classes from './carousel.module.css';
 import axios from 'axios';
+import { useUserRole } from '../context/UserContext';
 
 const unitTypes = [
   {
@@ -26,20 +27,25 @@ const unitTypes = [
 
 function CarouselC() {
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
-
+  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
   const [units, setUnits] = useState<Unit[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units');
+        console.log('Fetching data for section:', userSection);
+        const response = await axios.get<Unit[]>(`http://10.0.1.226:5000/api/units/`, {
+          params: {
+            sectionid: userSection,
+          }
+        });
         setUnits(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
     fetchData();
-  }, []);
+  }, [userSection]);
 
   const navigate = useNavigate();
   const { sectionId } = useParams();
