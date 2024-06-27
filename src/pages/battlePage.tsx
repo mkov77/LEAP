@@ -721,8 +721,9 @@ function BattlePage() {
               </div>
               <Group justify="center" mt="xl" display={'flex'}>
                 <Button
-                  onClick={() => { navigate(closeLocation); setSelectedUnit(null) }}>Done
-                  </Button>
+                   onClick={() => { navigate(closeLocation); setSelectedUnit(null) }}>Done
+                  {/* {progress !== 0 ? 'Loading...' : loaded ? 'Done' : 'Next Round'} */}
+                </Button>
               </Group>
             </div>
           </Stepper.Step>
