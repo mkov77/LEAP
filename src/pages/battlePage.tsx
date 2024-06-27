@@ -185,7 +185,7 @@ function BattlePage() {
     const isWin = friendlyTotalScore > enemyTotalScore;
     console.log('ID: ', id);
     console.log("Current unit health:", unit_health)
-    updateUnitHealth(Number(id), Number(unit_health) - 10);
+    updateUnitHealth(Number(id), Number(unit_health) - 5);
     console.log("Current unit health:", unit_health)
 
     // Process all phase answers here
@@ -197,7 +197,7 @@ function BattlePage() {
 
     const score = calculateRealTimeScore();
     setRealTimeScore(score);
-    setScoreFinalized(true); // Mark the score as finalized
+    setScoreFinalized(true); // Mark the score as finalized\
     nextStep();
 
     console.log(unit_id);
@@ -287,7 +287,7 @@ function BattlePage() {
         setLoaded(true);
         return 0;
       }),
-    20
+    40
   );
 
   // Variable Conditions and corresponding weights
@@ -625,7 +625,7 @@ function BattlePage() {
                 <Grid.Col span={6}>
                   <h1>Friendly {selectedUnit}</h1>
                   <p>Accessible by pattern force?</p>
-                  <SegmentedControl value={question7} onChange={setQuestion7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
+                  <SegmentedControl value={question7} onChange={setQuestion7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled={progress !== 0} />
                 </Grid.Col>
                 <Grid.Col span={6}>
                   <h1>Enemy INF-BRIG-C</h1>
@@ -634,7 +634,7 @@ function BattlePage() {
                 </Grid.Col>
               </Grid>
               <Group justify="center" mt="xl">
-                <Button onClick={prevStep}>Go Back</Button>
+                <Button onClick={prevStep} disabled={progress !== 0}>Go Back</Button>
                   {/* I don't like this button */}
                   <Button
 
