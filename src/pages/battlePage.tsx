@@ -184,7 +184,9 @@ function BattlePage() {
     const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
     const isWin = friendlyTotalScore > enemyTotalScore;
     console.log('ID: ', id);
+    console.log("Current unit health:", unit_health)
     updateUnitHealth(Number(id), Number(unit_health) - 10);
+    console.log("Current unit health:", unit_health)
 
     // Process all phase answers here
     console.log('Phase 1 Answers:', question1, question2);
@@ -196,8 +198,7 @@ function BattlePage() {
     const score = calculateRealTimeScore();
     setRealTimeScore(score);
     setScoreFinalized(true); // Mark the score as finalized
-    // BRING THIS BACK
-    // nextStep();
+    nextStep();
 
     console.log(unit_id);
 
@@ -634,8 +635,9 @@ function BattlePage() {
               </Grid>
               <Group justify="center" mt="xl">
                 <Button onClick={prevStep}>Go Back</Button>
-
+                  {/* I don't like this button */}
                   <Button
+
                   
                   className={classes.button}
                   onClick={() => (loaded ? setLoaded(false) : !interval.active && interval.start())}
@@ -643,14 +645,14 @@ function BattlePage() {
                 >
                   <div className={classes.label}>    {progress !== 0 ? 'Calculating Scores...' : loaded ? '    Complete    ' : '    Finalize Tactics    '}
                     </div>
-
+ 
                   {progress !== 0 && (
                       <Progress
-                        style={{height: '100px', width: '130px'}}
+                        style={{height: '100px', width: '200px'}}
                         value={progress}
                         className={classes.progress}
                         color={rgba(theme.colors.blue[2], 0.35)}
-                        radius="xl"
+                        radius="0px"
                         // animated={true}
                       />
                     )}
