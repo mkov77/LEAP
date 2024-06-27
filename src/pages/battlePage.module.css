@@ -32,20 +32,28 @@
   .button {
     position: relative;
     transition: background-color 150ms ease;
+    padding: 10px 20px; /* Adjust padding as needed */
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    color: white; /* Text color */
+    font-size: 16px; /* Example font size */
+  }
+  .label {
+    position: relative;
+    z-index: 1;
+    display: block; /* Ensure the label takes full width */
+    padding: 10px; /* Adjust padding as needed */
   }
   
   .progress {
     position: absolute;
-    top: rem(-1px);
-    left: rem(-10px);
-    right: rem(-1px);
-    bottom: rem(-1px);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     height: auto;
     background-color: transparent;
     z-index: 0;
-  }
-  
-  .label {
-    position: relative;
-    z-index: 1;
   }
