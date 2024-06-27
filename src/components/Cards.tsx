@@ -2,7 +2,6 @@ import { Box, Card, Container, Flex, Image, Text, Badge, Button, Group, Grid, Pr
 import classes from './Cards.module.css'
 import { useUnitProvider } from '../context/UnitContext';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { useClickOutside } from '@mantine/hooks';
 import { RawNodeDatum } from 'react-d3-tree';
 
 // Define Unit interface
