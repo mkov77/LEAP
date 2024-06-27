@@ -76,7 +76,7 @@ export default function LandingPage() {
           <Table.Thead>
             <Table.Tr>
               <th className='left-oriented'>Section ID</th>
-              <th className='isonlineCentered'>Is Online</th>
+              <th className='isonlineCentered'>Status</th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>

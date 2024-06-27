@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '@mantine/core/styles.css';
 import '../App.css';
-import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Tooltip, useMantineTheme, rgba } from '@mantine/core';
+import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Select, useMantineTheme, rgba } from '@mantine/core';
 import { useDisclosure, useInterval } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconSwords, IconHeartbeat, IconNumber1Small, IconNumber2Small, IconNumber3Small, IconNumber4Small } from '@tabler/icons-react';
@@ -10,10 +10,8 @@ import { useUserRole } from '../context/UserContext';
 import { UnitProvider, useUnitProvider } from '../context/UnitContext';
 import { Unit } from '../components/Cards';
 import classes from './battlePage.module.css';
-import { read } from 'fs';
 import axios from 'axios';
-import { Tactics } from './afterActionReportStorage';
-import { text } from 'node:stream/consumers';
+
 
 
 export interface Form {
@@ -39,6 +37,9 @@ function BattlePage() {
   const [progress, setProgress] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const theme = useMantineTheme();
+  const [friendlyHealth, setFriendlyHealth] = useState<number>(0);
+  const [enemyHealth, setEnemyHealth] = useState<number>(0);
+
 
 
 
@@ -71,6 +72,8 @@ function BattlePage() {
     id
   } = unit || {};
 
+
+
   const updateUnitHealth = async (id: number, newHealth: number) => {
     const url = `http://10.0.1.226:5000/api/units/health`; // Corrected URL to point to the server running on port 5000
     const options = {
@@ -93,6 +96,22 @@ function BattlePage() {
       console.error('Error updating unit health:', error);
     }
   };
+
+  const handleNextRound = (currentFriendlyHealth: number, currentEnemyHealth: number) => {
+    console.log("Handling Next Round");
+    console.log("1-- Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth)
+    if (currentEnemyHealth > 0 && currentFriendlyHealth > 0) {
+      // setFriendlyHealth(friendlyHealth-20);
+      setActive(0);
+      setLoaded(false);
+    } else {
+      updateUnitHealth(Number(id), 0);
+      console.log("Current unit health:", unit_health);
+      console.log("2-- Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth)
+      setSelectedUnit(null);
+      navigate(closeLocation);
+    }
+  }
 
   const calculateBaseValue = (unit: Unit) => {
     const unitTypeValues: Record<string, number> = {
@@ -128,6 +147,11 @@ function BattlePage() {
     if (unit) {
       const calculatedValue = calculateBaseValue(unit);
       setBaseValue(calculatedValue);
+
+      // Set initial friendlyHealth based on unit_health
+      setFriendlyHealth(unit.unit_health ?? 0);
+      // Assuming you want to set enemyHealth as well
+      setEnemyHealth(unit.unit_health ?? 0);
     }
   }, [unit]);
 
@@ -183,17 +207,19 @@ function BattlePage() {
     const enemyTotalScore = 15;
     const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
     const isWin = friendlyTotalScore > enemyTotalScore;
-    console.log('ID: ', id);
-    console.log("Current unit health:", unit_health)
-    updateUnitHealth(Number(id), Number(unit_health) - 5);
-    console.log("Current unit health:", unit_health)
 
-    // Process all phase answers here
-    console.log('Phase 1 Answers:', question1, question2);
-    console.log('Phase 2 Answers:', question3, question4);
-    console.log('Phase 3 Answers:', question5, question6);
-    console.log('Phase 4 Answers:', question7);
-    console.log('RESULTS -> Enemy:', enemyTotalScore, 'Friendly:', friendlyTotalScore, 'Win?:', isWin)
+
+
+    setFriendlyHealth(Number(friendlyHealth) - 30);
+    setEnemyHealth(Number(enemyHealth) - 10);
+    console.log("TESTING HERE! Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth)
+
+    // // Process all phase answers here
+    // console.log('Phase 1 Answers:', question1, question2);
+    // console.log('Phase 2 Answers:', question3, question4);
+    // console.log('Phase 3 Answers:', question5, question6);
+    // console.log('Phase 4 Answers:', question7);
+    // console.log('RESULTS -> Enemy:', enemyTotalScore, 'Friendly:', friendlyTotalScore, 'Win?:', isWin)
 
     const score = calculateRealTimeScore();
     setRealTimeScore(score);
@@ -379,8 +405,10 @@ function BattlePage() {
       case 'Untrained':
         return 0;
       case 'Basic':
-        return 50;
+        return 33;
       case 'Advanced':
+        return 66;
+      case 'Elite':
         return 100;
       default:
         return <div>Error: Invalid Force Skill</div>
@@ -456,7 +484,7 @@ function BattlePage() {
 
 
   const unitNull = () => {
-    console.log("Checking for unit: ", unit_id)
+    console.log("Unit Health", unit_health);
     if (unit_id !== undefined) {
       console.log("Unit found: ", unit_id)
       return true;
@@ -489,20 +517,27 @@ function BattlePage() {
                         <strong>Type:</strong> {unit_type}<br />
                         <strong>Unit Size:</strong> {unit_size}<br />
                         <strong>Force Mobility:</strong> {force_mobility}<br />
-                        <strong>Health:</strong> {unit_health}<br />
-                        <CustomProgressBarHealth value={Number(unit_health)} />
+                        <strong>Health:</strong> {friendlyHealth}<br />
+                        <CustomProgressBarHealth value={Number(friendlyHealth)} />
 
                         <strong>Force Readiness:</strong> {force_readiness}<br />
                         <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
 
                         <strong>Force Skill:</strong> {force_skill}<br />
-                        <CustomProgressBarReadiness value={Number(getForceSkill((force_skill)))} />
+                        <CustomProgressBarSkill value={Number(getForceSkill((force_skill)))} />
                       </Text>
                     ) : (
                       <Text size="sm">Unit not found</Text>
                     )}
                   </Card>
                 </Grid.Col>
+                <Select
+                  label="Select Enemy Unit"
+                  placeholder='Select Enemy Unit'
+                  data={['React', 'Angular', 'Vue', 'Svelte']}
+                  searchable
+                >
+                </Select>
                 <Grid.Col span={4}>
                   <Card withBorder radius="md" className={classes.card} >
                     <Card.Section className={classes.imageSection} mt="md" >
@@ -516,14 +551,15 @@ function BattlePage() {
                         </div>
                       </Group>
                     </Card.Section>
+
                     <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
                     {unit ? (
                       <Text size="xl">
                         <strong>Type:</strong> {unit_type}<br />
                         <strong>Unit Size:</strong> {unit_size}<br />
                         <strong>Force Mobility:</strong> {force_mobility}<br />
-                        <strong>Health:</strong> {unit_health}<br />
-                        <CustomProgressBarHealth value={Number(unit_health)} />
+                        <strong>Health:</strong> {enemyHealth}<br />
+                        <CustomProgressBarHealth value={Number(enemyHealth)} />
 
                         <strong>Force Readiness:</strong> {force_readiness}<br />
                         <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
@@ -635,28 +671,28 @@ function BattlePage() {
               </Grid>
               <Group justify="center" mt="xl">
                 <Button onClick={prevStep} disabled={progress !== 0}>Go Back</Button>
-                  {/* I don't like this button */}
-                  <Button
+                {/* I don't like this button */}
+                <Button
 
-                  
+
                   className={classes.button}
-                  onClick={() => (loaded ? setLoaded(false) : !interval.active && interval.start())}
-                  color={loaded ? 'teal' : theme.primaryColor}
+                  onClick={() => (!interval.active && interval.start())}
+                  color={theme.primaryColor}
                 >
                   <div className={classes.label}>    {progress !== 0 ? 'Calculating Scores...' : loaded ? '    Complete    ' : '    Finalize Tactics    '}
-                    </div>
- 
+                  </div>
+
                   {progress !== 0 && (
-                      <Progress
-                        style={{height: '100px', width: '200px'}}
-                        value={progress}
-                        className={classes.progress}
-                        color={rgba(theme.colors.blue[2], 0.35)}
-                        radius="0px"
-                        // animated={true}
-                      />
-                    )}
-                </Button>               
+                    <Progress
+                      style={{ height: '100px', width: '200px' }}
+                      value={progress}
+                      className={classes.progress}
+                      color={rgba(theme.colors.blue[2], 0.35)}
+                      radius="0px"
+                    // animated={true}
+                    />
+                  )}
+                </Button>
 
               </Group>
             </div>
@@ -722,9 +758,8 @@ function BattlePage() {
                 </Card>
               </div>
               <Group justify="center" mt="xl" display={'flex'}>
-                <Button
-                   onClick={() => { navigate(closeLocation); setSelectedUnit(null) }}>Done
-                  {/* {progress !== 0 ? 'Loading...' : loaded ? 'Done' : 'Next Round'} */}
+                <Button onClick={() => handleNextRound(Number(friendlyHealth), Number(enemyHealth))}>
+                  {((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Done' : 'Next Round'}
                 </Button>
               </Group>
             </div>
