@@ -39,6 +39,8 @@ function BattlePage() {
   const theme = useMantineTheme();
   const [friendlyHealth, setFriendlyHealth] = useState<number>(0);
   const [enemyHealth, setEnemyHealth] = useState<number>(0);
+  const [enemyUnit, setEnemyUnit] = useState<Unit | null>(null);
+  const [inEngagement, setInEngagement] = useState<Boolean>(false);
 
 
 
@@ -113,6 +115,19 @@ function BattlePage() {
     }
   }
 
+  const handleSelectEnemy = () => {
+    if (enemyUnit === null) {
+      setEnemyUnit(selectedUnit);
+    } else {
+      setEnemyUnit(null);
+    }
+  }
+
+  const handleStartEngagement = () => {
+    setInEngagement(true);
+    nextStep();
+  }
+
   const calculateBaseValue = (unit: Unit) => {
     const unitTypeValues: Record<string, number> = {
       "Command and Control": 20, "Infantry": 30, "Reconnaissance": 10, "Armored Mechanized": 40,
@@ -152,6 +167,9 @@ function BattlePage() {
       setFriendlyHealth(unit.unit_health ?? 0);
       // Assuming you want to set enemyHealth as well
       setEnemyHealth(unit.unit_health ?? 0);
+      // Set initial inEngagement to false
+      setInEngagement(false);
+
     }
   }, [unit]);
 
@@ -531,51 +549,63 @@ function BattlePage() {
                     )}
                   </Card>
                 </Grid.Col>
-                <Select
-                  label="Select Enemy Unit"
-                  placeholder='Select Enemy Unit'
-                  data={['React', 'Angular', 'Vue', 'Svelte']}
-                  searchable
-                >
-                </Select>
                 <Grid.Col span={4}>
-                  <Card withBorder radius="md" className={classes.card} >
-                    <Card.Section className={classes.imageSection} mt="md" >
-                      <Group>
-                        <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-                          <Image
-                            src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
-                            height={160}
-                            style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
-                          />
-                        </div>
-                      </Group>
-                    </Card.Section>
+                  {enemyUnit ? (
+                    <Card withBorder radius="md" className={classes.card} >
+                      <Card.Section className={classes.imageSection} mt="md" >
+                        <Group>
+                          <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                            <Image
+                              src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
+                              height={160}
+                              style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
+                            />
+                          </div>
+                        </Group>
+                      </Card.Section>
 
-                    <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
-                    {unit ? (
-                      <Text size="xl">
-                        <strong>Type:</strong> {unit_type}<br />
-                        <strong>Unit Size:</strong> {unit_size}<br />
-                        <strong>Force Mobility:</strong> {force_mobility}<br />
-                        <strong>Health:</strong> {enemyHealth}<br />
-                        <CustomProgressBarHealth value={Number(enemyHealth)} />
+                      <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
+                      {unit ? (
+                        <Text size="xl">
+                          <strong>Type:</strong> {unit_type}<br />
+                          <strong>Unit Size:</strong> {unit_size}<br />
+                          <strong>Force Mobility:</strong> {force_mobility}<br />
+                          <strong>Health:</strong> {enemyHealth}<br />
+                          <CustomProgressBarHealth value={Number(enemyHealth)} />
 
-                        <strong>Force Readiness:</strong> {force_readiness}<br />
-                        <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
+                          <strong>Force Readiness:</strong> {force_readiness}<br />
+                          <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
 
-                        <strong>Force Skill:</strong> {force_skill}<br />
-                        <CustomProgressBarSkill value={Number(getForceSkill((force_skill)))} />
+                          <strong>Force Skill:</strong> {force_skill}<br />
+                          <CustomProgressBarSkill value={Number(getForceSkill((force_skill)))} />
 
-                      </Text>
-                    ) : (
-                      <Text size="sm">Unit not found</Text>
-                    )}
-                  </Card>
+                        </Text>
+                      ) : (
+                        <Text size="sm">Unit not found</Text>
+                      )}
+                    </Card>
+                  )
+                    :
+                    (<Select
+                      label="Select Enemy Unit"
+                      placeholder='Select Enemy Unit'
+                      data={['INF-BRIG-B', 'ARTY-PLT-C', 'INF-PLT-G', 'INF-BRIG-A']}
+                      searchable
+                      onChange={handleSelectEnemy}
+                    >
+
+                    </Select>
+                    )
+                  }
+
                 </Grid.Col>
               </Grid>
               <Group justify="center" mt="xl">
-                <Button onClick={nextStep}>Start Engagement</Button>
+                <Button onClick={handleStartEngagement} disabled={enemyUnit ? false : true}>{inEngagement? 'Continue Enagement': 'Start Engagement'}</Button>
+                {(!inEngagement && enemyUnit)?
+                  (<Button onClick={handleSelectEnemy} disabled={enemyUnit ? false : true}>Deselect Enemy Unit</Button>) :
+                  (<></>)
+                }
               </Group>
             </div>
           </Stepper.Step>
@@ -699,12 +729,12 @@ function BattlePage() {
           </Stepper.Step>
           <Stepper.Step allowStepSelect={false} icon={<IconHeartbeat stroke={1.5} style={{ width: rem(35), height: rem(35) }} />}>
             <div>
-              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>After-Action Review</h1>
+              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Final After-Action Review' : 'Round After-Action Review'}</h1>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
                 <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '150px', marginTop: '200px', textAlign: 'center' }} display={'flex'}>
                   <Card.Section >
                     <div style={{ textAlign: 'center' }}>
-                      <h2>Engagement Data</h2>
+                      <h2>Round Summary</h2>
                     </div>
                     <Grid style={{ justifyContent: 'center', alignItems: 'center' }}>
                       <Group style={{ flex: 1, textAlign: 'center' }}>
