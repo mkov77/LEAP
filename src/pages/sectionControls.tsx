@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AppShell, Burger, Group, Table, useMantineTheme, Image, Button, Box, Switch, rem, Divider, Alert, useMantineColorScheme, useComputedColorScheme, MantineProvider, SegmentedControl, } from '@mantine/core';
+import { AppShell, Burger, Group, Table, useMantineTheme, Image, Button, Text, Box, Switch, rem, Divider, Alert, useMantineColorScheme, useComputedColorScheme, MantineProvider, SegmentedControl, } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { engagements } from '../data/engagements';
 import { IconCheck, IconX, IconInfoCircle } from '@tabler/icons-react';
@@ -8,6 +8,7 @@ import { useUserRole } from '../context/UserContext';
 import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
 import Hierarchy from '../components/HierarchyBuilder';
 import { UserRoleProvider } from '../context/UserContext';
+import axios from 'axios';
 export interface Engagement {
   engagementID: string;
   sectionID: string;
@@ -32,9 +33,10 @@ function SectionControls() {
   const [sectionOnline, setSectionOnline] = useState(false);
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
   const [isFriendlyHierarchy, setIsFriendlyHierarchy] = useState('Friendly');
+  const [refreshHierarchy, setRefreshHierarchy] = useState(0);
 
   setUserSection(sectionId);
-  
+
   useEffect(() => {
     if (userRole !== 'Administrator') {
       navigate('/');
@@ -66,6 +68,23 @@ function SectionControls() {
   const handleArrowClick = () => {
     navigate('/admin');
   };
+
+  const handleClear = async () => {
+    setRefreshHierarchy(prev => prev + 1);
+
+    try {
+      const response = await axios.put(`http://10.0.1.226:5000/api/units/remove`, {
+        section: sectionId,
+        is_friendly: (isFriendlyHierarchy === 'Friendly')
+      });
+
+
+    }
+    catch (error){
+      console.log("error clearing: ", error);
+    }
+    
+  }
 
   const toggleSectionOnline = async () => {
     try {
@@ -141,120 +160,121 @@ function SectionControls() {
           <div>
 
           </div>
- 
+
 
           {!hierarchyToggle ? (
-          <>  
-          <Divider my="md" />
-          <Switch
-            checked={sectionOnline}
-            onChange={toggleSectionOnline} 
-            color={sectionOnline ? 'teal' : 'red'}
-            size="md"
-            label={sectionOnline ? 'Section Online' : 'Section Offline'}
-            thumbIcon={
-              sectionOnline ? (
-                <IconCheck
-                  style={{ width: rem(12), height: rem(12) }}
-                  color={theme.colors.teal[6]}
-                  stroke={3}
-                />
-              ) : (
-                <IconX
-                  style={{ width: rem(12), height: rem(12) }}
-                  color={theme.colors.red[6]}
-                  stroke={3}
-                />
-              )
-            }
-          />
-          <Divider my="md" />
-          <Table style={{ marginTop: 20 }}>
-            <thead>
-              <tr>
-                <th>Engagement ID</th>
-                <th>Section ID</th>
-                <th>Time Stamp</th>
-                <th>Friendly ID</th>
-                <th>Enemy ID</th>
-                <th>Is Win</th>
-                <th>Friendly Health</th>
-                <th>Enemy Health</th>
-                <th>Is Current State</th>
-              </tr>
-            </thead>
-            <tbody>
-              {engagementsData.map((engagement) => (
-                <tr
-                  key={engagement.engagementID}
-                  style={{
-                    cursor: 'pointer',
-                    backgroundColor: selectedEngagement === engagement ? theme.colors.gray[0] : '',
-                  }}
-                  onClick={() => handleRowClick(engagement)}
-                >
-                  <td>{engagement.engagementID}</td>
-                  <td>{engagement.sectionID}</td>
-                  <td>{engagement.timeStamp}</td>
-                  <td>{engagement.friendlyID}</td>
-                  <td>{engagement.enemyID}</td>
-                  <td>
-                    <Box
+            <>
+              <Divider my="md" />
+              <Switch
+                checked={sectionOnline}
+                onChange={toggleSectionOnline}
+                color={sectionOnline ? 'teal' : 'red'}
+                size="md"
+                label={sectionOnline ? 'Section Online' : 'Section Offline'}
+                thumbIcon={
+                  sectionOnline ? (
+                    <IconCheck
+                      style={{ width: rem(12), height: rem(12) }}
+                      color={theme.colors.teal[6]}
+                      stroke={3}
+                    />
+                  ) : (
+                    <IconX
+                      style={{ width: rem(12), height: rem(12) }}
+                      color={theme.colors.red[6]}
+                      stroke={3}
+                    />
+                  )
+                }
+              />
+              <Divider my="md" />
+              <Table style={{ marginTop: 20 }}>
+                <thead>
+                  <tr>
+                    <th>Engagement ID</th>
+                    <th>Section ID</th>
+                    <th>Time Stamp</th>
+                    <th>Friendly ID</th>
+                    <th>Enemy ID</th>
+                    <th>Is Win</th>
+                    <th>Friendly Health</th>
+                    <th>Enemy Health</th>
+                    <th>Is Current State</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {engagementsData.map((engagement) => (
+                    <tr
+                      key={engagement.engagementID}
                       style={{
-                        padding: '4px',
-                        borderRadius: '4px',
-                        backgroundColor: engagement.isWin ? theme.colors.green[0] : theme.colors.red[0],
-                        color: engagement.isWin ? theme.colors.green[9] : theme.colors.red[9],
+                        cursor: 'pointer',
+                        backgroundColor: selectedEngagement === engagement ? theme.colors.gray[0] : '',
                       }}
+                      onClick={() => handleRowClick(engagement)}
                     >
-                      {engagement.isWin.toString()}
-                    </Box>
-                  </td>
-                  <td>{engagement.friendlyHealth}</td>
-                  <td>{engagement.enemyHealth}</td>
-                  <td>
-                    <Box
-                      style={{
-                        padding: '4px',
-                        borderRadius: '4px',
-                        backgroundColor: engagement.isCurrentState ? theme.colors.green[0] : theme.colors.red[0],
-                        color: engagement.isCurrentState ? theme.colors.green[9] : theme.colors.red[9],
-                      }}
-                    >
-                      {engagement.isCurrentState.toString()}
-                    </Box>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-          <Button
-            disabled={!selectedEngagement || selectedEngagement.isCurrentState}
-            onClick={restoreState}
-            color="blue"
-            style={{ marginTop: 20 }}
-          >
-            Restore state
-          </Button>
-          </>
+                      <td>{engagement.engagementID}</td>
+                      <td>{engagement.sectionID}</td>
+                      <td>{engagement.timeStamp}</td>
+                      <td>{engagement.friendlyID}</td>
+                      <td>{engagement.enemyID}</td>
+                      <td>
+                        <Box
+                          style={{
+                            padding: '4px',
+                            borderRadius: '4px',
+                            backgroundColor: engagement.isWin ? theme.colors.green[0] : theme.colors.red[0],
+                            color: engagement.isWin ? theme.colors.green[9] : theme.colors.red[9],
+                          }}
+                        >
+                          {engagement.isWin.toString()}
+                        </Box>
+                      </td>
+                      <td>{engagement.friendlyHealth}</td>
+                      <td>{engagement.enemyHealth}</td>
+                      <td>
+                        <Box
+                          style={{
+                            padding: '4px',
+                            borderRadius: '4px',
+                            backgroundColor: engagement.isCurrentState ? theme.colors.green[0] : theme.colors.red[0],
+                            color: engagement.isCurrentState ? theme.colors.green[9] : theme.colors.red[9],
+                          }}
+                        >
+                          {engagement.isCurrentState.toString()}
+                        </Box>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+              <Button
+                disabled={!selectedEngagement || selectedEngagement.isCurrentState}
+                onClick={restoreState}
+                color="blue"
+                style={{ marginTop: 20 }}
+              >
+                Restore state
+              </Button>
+            </>
           ) : (
             <>
-            <SegmentedControl 
-            value={isFriendlyHierarchy}
-            onChange={setIsFriendlyHierarchy}
-            size='xl'
-            data={[
-              { label: 'Friendly Hierarchy', value: 'Friendly'},
-              { label: 'Enemy Hierarchy', value: 'Enemy' }
-            ]}
-          />
-          <Hierarchy is_friendly={isFriendlyHierarchy === 'Friendly'} />
-          </>
+              <Group>
+                <SegmentedControl
+                  value={isFriendlyHierarchy}
+                  onChange={setIsFriendlyHierarchy}
+                  size='xl'
+                  data={[
+                    { label: 'Friendly Hierarchy', value: 'Friendly' },
+                    { label: 'Enemy Hierarchy', value: 'Enemy' }
+                  ]}
+                />
+                <Button color='red' size="xl" justify='right' onClick={handleClear} >Clear</Button>
+                
+              </Group>
+              <Hierarchy is_friendly={isFriendlyHierarchy === 'Friendly'} hierarchyRefresh={refreshHierarchy} />
+            </>
           )
           }
-
-
-
 
 
         </AppShell.Main>

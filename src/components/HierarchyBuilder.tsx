@@ -23,6 +23,7 @@ type UnitAttributes = {
 
 type HierarchyProps = {
   is_friendly: boolean;
+  hierarchyRefresh: Number;
 };
 
 const buildHierarchy = (units: Unit[]): RawNodeDatum[] | null => {
@@ -140,7 +141,7 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
 
 
 
-function Hierarchy({ is_friendly }: HierarchyProps) {
+function Hierarchy({ is_friendly, hierarchyRefresh }: HierarchyProps) {
   const [units, setUnits] = useState<Unit[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [tree, setTree] = useState<RawNodeDatum[] | null>();
@@ -169,8 +170,9 @@ function Hierarchy({ is_friendly }: HierarchyProps) {
   });
 
   useEffect(() => {
+    console.log('reset');
     setTree(null); // Reset tree state to null when is_friendly changes
-  }, [is_friendly]);
+  }, [is_friendly, hierarchyRefresh]);
 
   const fetchData = async () => {
     try {
@@ -187,7 +189,7 @@ function Hierarchy({ is_friendly }: HierarchyProps) {
         children: unit.children || [] // Ensure children is an array
       }));
       setUnits(normalizedData);
-      console.log(response.data);
+
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -208,11 +210,10 @@ function Hierarchy({ is_friendly }: HierarchyProps) {
       setTree(formattedData);
     }
   }, [units]);
-  console.log('is friendly', is_friendly);
+
 
   const handleNodeClick = (nodeData: RawNodeDatum) => {
     const attributes = nodeData.attributes as any;
-    console.log(attributes);
     setSelectedNode(attributes.id);
 
     if (userRole === "Administrator") {
@@ -225,10 +226,18 @@ function Hierarchy({ is_friendly }: HierarchyProps) {
     setIsRoot(true);
     open();
   }
-  console.log({ selectedNode });
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    console.log({ selectedNode });
+    const requiredFields = ['ID', 'unitType', 'unitHealth', 'unitRole', 'unitSize', 'forcePosture', 'forceReadiness', 'forceSkill'];
+
+    for (const field of requiredFields) {
+      if (!formValues[field as keyof typeof formValues]) {
+        alert(`The field "${field}" is required.`);
+        return; // Stop submission
+      }
+    }
+
     try {
       const response = await axios.put(`http://10.0.1.226:5000/api/units/update`, {
         parent_id: selectedNode,
@@ -332,21 +341,23 @@ function Hierarchy({ is_friendly }: HierarchyProps) {
     <div style={{ width: '100%', height: '100vh' }}>
 
       {tree ? (
-        <Tree
-          data={tree}
-          orientation='vertical'
-          nodeSize={{ x: 160, y: 150 }}
-          translate={{ x: 1250, y: 70 }}
-          collapsible={false}
-          pathFunc={'step'}
-          zoom={1.2}
-          scaleExtent={{ min: 0.5, max: 3 }}
-          renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} toggleModal={() => handleNodeClick(rd3tProps.nodeDatum)} />}
-          onNodeClick={() => handleNodeClick}
-
-
-        />) : (
-        <Button onClick={() => handleParentClick()}>Add Parent</Button>
+        <>
+          <h1>Select a node to add a child to it</h1>
+          <Tree
+            data={tree}
+            orientation='vertical'
+            nodeSize={{ x: 160, y: 150 }}
+            translate={{ x: 1250, y: 70 }}
+            collapsible={false}
+            pathFunc={'step'}
+            zoom={1.2}
+            scaleExtent={{ min: 0.5, max: 3 }}
+            renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} toggleModal={() => handleNodeClick(rd3tProps.nodeDatum)} />}
+            onNodeClick={() => handleNodeClick}
+          />
+        </>
+        ) : (
+        <Button onClick={() => handleParentClick()} size='xl' mt='lg' left={6}>Add Parent</Button>
       )
 
       }
@@ -367,7 +378,7 @@ function Hierarchy({ is_friendly }: HierarchyProps) {
             <Tabs.Panel value="unit">
 
               <Select
-                label="Unit"
+                label="Unit ID"
                 placeholder="Pick one"
                 name='unit'
                 required
@@ -536,15 +547,11 @@ function Hierarchy({ is_friendly }: HierarchyProps) {
             </Tabs.Panel>
           </Tabs>
           <Group grow>
-          <Button type="submit" mt="md">Submit</Button>
-          <Button 
-          color='red'
-           mt="md" 
-           disabled={tree === null} 
-          >Delete</Button>
+            <Button type="submit" mt="md">Submit</Button>
+
           </Group>
         </form>
-          
+
       </Modal>
     </div>
   );

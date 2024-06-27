@@ -29,7 +29,7 @@ app.get('/api/sections', async (req, res) => {
 
 // End point to get engagements
 app.get('/api/engagements/:id', async (req, res) => {
-  
+
   console.log('Attempting to engagements')
   const { id } = req.params;
   try {
@@ -43,7 +43,7 @@ app.get('/api/engagements/:id', async (req, res) => {
 
 // General Engagement Endpoint 
 app.get('/api/engagements', async (req, res) => {
-  
+
   try {
     const result = await pool.query('SELECT * FROM engagements');
     res.json(result.rows);
@@ -384,11 +384,11 @@ app.put('/api/units/update', async (req, res) => {
     ))
     WHERE id = $2;
   `;
-  
-  const appendValues = [
-    unit_id,  // Child unit_id to find the name
-    parent_id // Parent unit_id
-  ];
+
+    const appendValues = [
+      unit_id,  // Child unit_id to find the name
+      parent_id // Parent unit_id
+    ];
 
     await pool.query(appendQuery, appendValues);
 
@@ -399,68 +399,25 @@ app.put('/api/units/update', async (req, res) => {
   }
 });
 
-
-
-app.put('/api/units/removeChild', async (req, res) => {
-  const {
-
-  } = req.body;
-
-  console.log(parent_id, unit_id);
+app.put('/api/units/remove', async (req, res) => {
+  const { section, is_friendly } = req.body;
   try {
     // Update unit details
     const updateQuery = `
-      UPDATE units
-      SET unit_type = $1,
-          unit_health = $2,
-          role_type = $3,
-          unit_size = $4,
-          force_posture = $5,
-          force_readiness = $6,
-          force_skill = $7,
-          section = $8,
-          root = $9
-      WHERE id = $10
-      RETURNING *;
+      update units
+      set children = '{}',
+      unit_health = 100,
+      root = false,
+      section = null
+      WHERE section = $1 AND "isFriendly" = $2
     `;
     const updateValues = [
-      unit_type,
-      unit_health,
-      role_type,
-      unit_size,
-      force_posture,
-      force_readiness,
-      force_skill,
-      section_id,
-      root,
-      unit_id,
+      section,
+      is_friendly
     ];
 
     const updateResult = await pool.query(updateQuery, updateValues);
 
-    if (updateResult.rowCount === 0) {
-      return res.status(404).json({ error: 'Unit not found' });
-    }
-
-    // Append child to parent's children array
-    const appendQuery = `
-    UPDATE units
-    SET children = array_append(children, (
-      SELECT unit_id
-      FROM units
-      WHERE id = $1
-    ))
-    WHERE id = $2;
-  `;
-  
-  const appendValues = [
-    unit_id,  // Child unit_id to find the name
-    parent_id // Parent unit_id
-  ];
-
-    await pool.query(appendQuery, appendValues);
-
-    res.json(updateResult.rows[0]); // Return the updated unit details
   } catch (error) {
     console.error('Error updating unit:', error);
     res.status(500).json({ error: 'Internal Server Error' });
