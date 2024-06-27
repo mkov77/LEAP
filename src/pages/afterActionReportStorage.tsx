@@ -397,7 +397,7 @@ export default function AAR() {
             <Table verticalSpacing={'xs'} style={{ width: '100%', tableLayout: 'fixed', justifyContent: 'space-between' }}>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Time Stamp</Table.Th>
+                  {/* <Table.Th>Time Stamp</Table.Th> */}
                   <Table.Th>Engagement ID</Table.Th>
                   <Table.Th>Friendly Unit Name</Table.Th>
                   <Table.Th>Friendly Total Score</Table.Th>
@@ -408,7 +408,7 @@ export default function AAR() {
               {engagements.map((row, index) => (
                 <Table.Tbody key={index}>
                   <Table.Tr key={row.engagementid} >
-                    <Table.Td>{row.engagementid}</Table.Td>
+                    {/* <Table.Td>{row.engagementid}</Table.Td> */}
                     <Table.Td>{row.engagementid}</Table.Td>
                     <Table.Td>{row.friendlyid}</Table.Td>
                     <Table.Td>
@@ -440,7 +440,7 @@ export default function AAR() {
                     </Table.Td>
               </Table.Tr>
 
-                  <Table.Tr style={{ display: 'flex', justifyContent: 'center', width: '100%', marginLeft: '300%'}}>
+                  <Table.Tr style={{ display: 'flex', justifyContent: 'center', width: '100%', marginLeft: '255%'}}>
                     <Collapse in={isOpen[index]} style={{ width: '100%' }}>
                      
                         <Table verticalSpacing={'xs'} style={{ maxWidth: '100%', width: '1000px' }} display={'fixed'}>
