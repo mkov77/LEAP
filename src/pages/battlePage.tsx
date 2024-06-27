@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import '@mantine/core/styles.css';
 import '../App.css';
 import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Tooltip, useMantineTheme, rgba } from '@mantine/core';
 import { useDisclosure, useInterval } from '@mantine/hooks';
@@ -183,7 +184,7 @@ function BattlePage() {
     const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
     const isWin = friendlyTotalScore > enemyTotalScore;
     console.log('ID: ', id);
-    updateUnitHealth(Number(id), 0);
+    updateUnitHealth(Number(id), Number(unit_health) - 10);
 
     // Process all phase answers here
     console.log('Phase 1 Answers:', question1, question2);
@@ -195,13 +196,16 @@ function BattlePage() {
     const score = calculateRealTimeScore();
     setRealTimeScore(score);
     setScoreFinalized(true); // Mark the score as finalized
-    nextStep();
+    // BRING THIS BACK
+    // nextStep();
+
+    console.log(unit_id);
 
     // Prepare data for engagement and tactics
     const engagementData = {
       SectionID: userSection, // Replace with actual SectionID
-      FriendlyID: 1, // Replace with actual FriendlyID
-      EnemyID: 1, // Replace with actual EnemyID
+      FriendlyID: unit_id, // Replace with actual FriendlyID
+      EnemyID: unit_id, // Replace with actual EnemyID
       FriendlyBaseScore: baseValue,
       EnemyBaseScore: baseValue,
       FriendlyTacticsScore: realTimeScore,
@@ -619,15 +623,11 @@ function BattlePage() {
               <Grid>
                 <Grid.Col span={6}>
                   <h1>Friendly {selectedUnit}</h1>
-                  {/* <p>Higher ground?</p>
-                <SegmentedControl value={question7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} /> */}
                   <p>Accessible by pattern force?</p>
                   <SegmentedControl value={question7} onChange={setQuestion7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 </Grid.Col>
                 <Grid.Col span={6}>
                   <h1>Enemy INF-BRIG-C</h1>
-                  {/* <p>Higher ground?</p>
-                <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled /> */}
                   <p>Accessible by pattern force?</p>
                   <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                 </Grid.Col>
@@ -635,24 +635,27 @@ function BattlePage() {
               <Group justify="center" mt="xl">
                 <Button onClick={prevStep}>Go Back</Button>
 
-                <Button
-
+                  <Button
+                  
                   className={classes.button}
                   onClick={() => (loaded ? setLoaded(false) : !interval.active && interval.start())}
                   color={loaded ? 'teal' : theme.primaryColor}
                 >
-                  <div className={classes.label}>
-                    {progress !== 0 ? 'Calculating Scores...' : loaded ? 'Complete' : 'Finalize Tactics'}
-                  </div>
+                  <div className={classes.label}>    {progress !== 0 ? 'Calculating Scores...' : loaded ? '    Complete    ' : '    Finalize Tactics    '}
+                    </div>
+
                   {progress !== 0 && (
-                    <Progress
-                      value={progress}
-                      className={classes.progress}
-                      color={rgba(theme.colors.blue[2], 0.35)}
-                      radius="sm"
-                    />
-                  )}
-                </Button>
+                      <Progress
+                        style={{height: '100px', width: '130px'}}
+                        value={progress}
+                        className={classes.progress}
+                        color={rgba(theme.colors.blue[2], 0.35)}
+                        radius="xl"
+                        // animated={true}
+                      />
+                    )}
+                </Button>               
+
               </Group>
             </div>
           </Stepper.Step>
@@ -717,7 +720,9 @@ function BattlePage() {
                 </Card>
               </div>
               <Group justify="center" mt="xl" display={'flex'}>
-                <Button onClick={() => { navigate(closeLocation); setSelectedUnit(null) }}>Done</Button>
+                <Button
+                  onClick={() => { navigate(closeLocation); setSelectedUnit(null) }}>Done
+                  </Button>
               </Group>
             </div>
           </Stepper.Step>
