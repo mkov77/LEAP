@@ -357,7 +357,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh }: HierarchyProps) {
           />
         </>
         ) : (
-        <Button onClick={() => handleParentClick()} size='xl' mt='lg' left={6}>Add Parent</Button>
+        (userRole === "Administrator" ? <Button onClick={() => handleParentClick()} size='xl' mt='lg' left={6}>Add Parent</Button> : <></>)
       )
 
       }

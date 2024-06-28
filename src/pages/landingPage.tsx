@@ -1,3 +1,6 @@
+/* LandingPage.tsx is the page that the site automatically opens up to. It is the "home page" of LEAP and serves as a site where 
+administrators, students, and observers can launch other parts of the application from, */
+
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Table, Box, useMantineTheme, FocusTrap, Image, Paper, PasswordInput, Button, Title, SegmentedControl } from '@mantine/core'; // Adjust imports as needed
@@ -7,18 +10,23 @@ import classes from './landingPage.module.css';
 import { useUserRole } from '../context/UserContext';
 import { MantineProvider } from '@mantine/core';
 
+
+// Sets the dynamic interface of the class section
 export interface Section {
   sectionid: string;
   isonline: boolean;
 }
 
 export default function LandingPage() {
-  const navigate = useNavigate();
-  const [role, setRole] = useState('Student');
-  const [force, setForce] = useState('JFLCC');
-  const theme = useMantineTheme();
-  const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const { setUserRole, setUserSection } = useUserRole();
+  const navigate = useNavigate(); // Used to navigate to different pages from the landing page
+  const [role, setRole] = useState('Student'); // Sets the segmented control to student automatically, but is able to be changed
+  const [force, setForce] = useState('JFLCC'); // Sets the segmented control to the JFLCC automatically, but is able to be changed
+  const theme = useMantineTheme(); // Used to set the dark theme for the page
+  const [selectedSection, setSelectedSection] = useState<string | null>(null); // State to track the selected class section throughout the application
+  const { setUserRole, setUserSection } = useUserRole(); // Setters to set the user section and role
+  const [sections, setSections] = useState<Section[]>([]); // Variables to set and get the class sections
+
+  // Validates the password and ensures that an administrator is a user
   const form = useForm({
     initialValues: { password: '' },
     validate: {
@@ -27,6 +35,8 @@ export default function LandingPage() {
     },
   });
 
+
+  // Creates the focus trap that displays as soon as you click into the administrator control
   const trapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -53,8 +63,7 @@ export default function LandingPage() {
     }
   };
 
-  const [sections, setSections] = useState<Section[]>([]);
-
+  // Function to fetch the database data about the sections
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -67,6 +76,7 @@ export default function LandingPage() {
     fetchData();
   }, []);
 
+  // Function to render the table that displays each function and whether or not it is online
   const renderSectionsTable = () => (
     <Box style={{ maxWidth: 600, margin: '0 auto'}}>
         <h1 className='sessionCentered' >
@@ -80,6 +90,7 @@ export default function LandingPage() {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
+            {/* Displays each section ID and whether each section is online or not in the table*/}
             {sections.map((section) => (
               <Table.Tr
                 key={section.sectionid}
@@ -93,6 +104,7 @@ export default function LandingPage() {
                     );
                   }
                 }}
+                // Does not allow a student to click on a section that is not online
                 style={{
                   cursor: section.isonline ? 'pointer' : 'not-allowed',
                   backgroundColor: selectedSection === section.sectionid ? 'rgba(128, 128, 128, 0.5)' : '',
@@ -102,6 +114,7 @@ export default function LandingPage() {
               >
                 <Table.Td>{section.sectionid}</Table.Td>
                 <Table.Td>
+                  {/* Creates the online or offline boxes in the table */}
                   <Box
                     style={{
                       backgroundColor: section.isonline ? theme.colors.green[0] : theme.colors.red[0],
@@ -123,9 +136,11 @@ export default function LandingPage() {
   );
 
   return (
+    // Sets the display to dark mode
     <MantineProvider defaultColorScheme='dark'>
       <div className={classes.wrapper}>
         <Paper className={classes.form} radius={0} p={30}>
+          {/* Displays the LEAP image */}
           <div style={{ display: 'flex', justifyContent: 'center', margin: '40px', scale:'0.75' }}>
             <Image
               radius="md"
@@ -134,6 +149,8 @@ export default function LandingPage() {
               fallbackSrc='https://placehold.co/600x400?text=Placeholder'
             />
           </div>
+
+          {/* Clickable control that allows the switching of roles between student, observer, and administrator */}
           <div style={{ margin: '10px'}} >
             <SegmentedControl
               size="lg"
@@ -142,6 +159,8 @@ export default function LandingPage() {
               onChange={setRole}
             />
           </div>
+
+          {/* Clickable control that allows the switching of components between JFLCC and JFSOCC when their role is a student */}
           {(role === 'Student') && (
             <div style={{ margin: '10px'}} >
               <SegmentedControl
@@ -152,6 +171,8 @@ export default function LandingPage() {
               />
             </div>
           )}
+
+          {/* If a user identifies as an administrator, this handles the password input */}
           {role === 'Administrator' && (
           <FocusTrap>
             <div ref={trapRef} tabIndex={-1}>
@@ -182,6 +203,8 @@ export default function LandingPage() {
             </div>
           </FocusTrap>
           )}
+
+          {/* Displays the table with student sections and their online availability if the user is a student or observer */}
           {(role === 'Student' || role === 'Observer') && renderSectionsTable()}
           {(role === 'Student' || role === 'Observer') && (
             <div style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
