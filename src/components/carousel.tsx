@@ -1,3 +1,7 @@
+/**
+ * carousel.tsx renders the carousel UI component that allows students to navigate 
+ */
+
 import { Carousel } from '@mantine/carousel';
 import { useEffect, useState } from 'react';
 import CardC from './Cards';
@@ -10,26 +14,29 @@ import classes from './carousel.module.css';
 import axios from 'axios';
 import { useUserRole } from '../context/UserContext';
 
+// Define the carousel
+// These are the categories the cards are sorted by
+// The cards are sorted in when their 'unit_type' matches the unitType 'value' field
 const unitTypes = [
   {
     value: 'Infantry',
-    description: '...',
   },
   {
     value: 'Special Operations Forces',
-    description: '...',
   },
   {
     value: 'Other',
-    description: '...',
   },
 ];
 
+
+// CarouselC() renders all of the carousels
 function CarouselC() {
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
   const [units, setUnits] = useState<Unit[]>([]);
 
+  // Fetch unit data from the backend endpoint
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -48,14 +55,15 @@ function CarouselC() {
     fetchData();
   }, [userSection]);
 
-  const navigate = useNavigate();
-  const { sectionId } = useParams();
-
+  // Where rendering happens
   return (
     <div>
+      {/* The map function makes a carousel for each unit type defined above */}
       {unitTypes.map((item) => (
+        // Description for each carousel
         <div key={item.value} style={{ marginBottom: 20 }}>
           <h2>{item.value}</h2>
+          {/* The Carousel is rendered here */}
           <Carousel
             classNames={{ controls: classes.controls, root: classes.root }}
               align="start"
@@ -65,16 +73,19 @@ function CarouselC() {
               controlSize={50}
               containScroll='trimSnaps'
               slidesToScroll={3}>
+              
+              {/* This map function maps renders all the units in it's respective carousel category*/}
+              {/* Uses filterUnitsByType to only render the units whose type matches the categpry of current carousel */}
               {filterUnitsByType(item.value, units).map((unitCard, index) =>
                 <Carousel.Slide key={index}>
                   <CardC unit={unitCard} />
                 </Carousel.Slide>
-              )}
+              )} {/** End of Card Map */}
             </Carousel>
         </div>
-      ))}
+      ))} {/** End of Carousel Map */}
     </div>
-  );
+  ); // End of return statement
 
 }
 
