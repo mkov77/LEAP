@@ -208,7 +208,6 @@ function BattlePage() {
     }
   };
 
-
   // Update user answers
   const [question1, setQuestion1] = useState('Yes')
   const [question2, setQuestion2] = useState('Yes')
@@ -226,10 +225,16 @@ function BattlePage() {
     const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
     const isWin = friendlyTotalScore > enemyTotalScore;
 
+    let r = Math.floor(Math.random() * (5 - 0 + 1)) + 0;
 
+    // let prevFriendlyDamage = Math.exp(-((r^2)/2(b^2)));
+    let maxFriendlyDamage = .5 * Number(unit_health);
 
-    setFriendlyHealth(Number(friendlyHealth) - 30);
-    setEnemyHealth(Number(enemyHealth) - 10);
+    setFriendlyHealth(Number(friendlyHealth));
+
+    let maxEnemyDamage = .5 * Number(unit_health);
+    // let prevEnemyDamage = Math.exp(-((r^2)/2(b^2)));
+    setEnemyHealth(Number(enemyHealth) - maxFriendlyDamage);
     console.log("TESTING HERE! Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth)
 
     // // Process all phase answers here
@@ -241,7 +246,7 @@ function BattlePage() {
 
     const score = calculateRealTimeScore();
     setRealTimeScore(score);
-    setScoreFinalized(true); // Mark the score as finalized\
+    setScoreFinalized(true); // Mark the score as finalized
     nextStep();
 
     console.log(unit_id);
