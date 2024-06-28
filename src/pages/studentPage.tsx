@@ -1,3 +1,6 @@
+/**
+ * studentPage.tsx renders the student page where the students can view and start engagements with their units
+ */
 import '../App.css';
 import CarouselC from '../components/carousel'; // Remove the '.tsx' extension
 import SearchResultList from '../components/searchResults'
@@ -10,6 +13,7 @@ import { useUnitProvider } from '../context/UnitContext';
 import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
 import Hierarchy from '../components/HierarchyBuilder';
 
+// Function where the page renders
 function App() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
@@ -20,6 +24,7 @@ function App() {
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
   const [hierarchyToggle, setHierarchyToggle] = useState(false);
 
+  // Redirects to the home page if the user is not a 'Student' or if their section ID does not match the current section ID.
   useEffect(() => {
     if (userRole !== 'Student' || userSection !== sectionId) {
       console.log(`user Role: ${userRole}`);
@@ -28,22 +33,28 @@ function App() {
     }
   }, [navigate, userRole]);
 
+  // Updates the search state with the value from the input field
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setSearch(value);
   }
+
+  // Navigate to the main login page
   const handleLogoClick = () => {
     navigate('/'); // Navigate to the main login page
   };
 
+  // Navigate to the main login page
   const handleArrowClick = () => {
     navigate('/');
   };
 
+  // Navigate to the After Action Reports page for the current section
   const handleAARClick = () => {
     navigate(`/AAR/${sectionId}`)
   }
 
+  // Where student page renders
   return (
     <MantineProvider defaultColorScheme='dark'>
       <AppShell
@@ -55,12 +66,15 @@ function App() {
         }}
         padding="md"
       >
+        {/* Header / Nav bar  */}
         <AppShell.Header>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
+              {/* Back button */}
               <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}>
                 <FaArrowAltCircleLeft />
               </Button>
+              {/* Clickable logo that takes user back to homepage */}
               <Image
                 src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
                 radius="md"
@@ -70,13 +84,13 @@ function App() {
                 style={{ cursor: 'pointer', scale: '1', padding: '8px' }}
               />
             </div>
-
           </div>
-
         </AppShell.Header>
 
+        {/* Everything that isn't the header / nav bar */}
         <AppShell.Main>
           <div style={{justifyContent:'right', display:'flex'}}>
+            {/* After action report Button where user can switch views */}
             <Button size='sm' variant='link' onClick={handleAARClick} style={{ margin: '10px ' }}>After Action Reports</Button>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -87,6 +101,7 @@ function App() {
                   You are in section: <strong>{sectionId}</strong>
                 </p>
               )}
+              {/* Unit Search Bar */}
               {!hierarchyToggle && (
                 <TextInput
                   placeholder='Search'
@@ -95,8 +110,8 @@ function App() {
                   onChange={handleChange}
                 />
               )}
-
             </div>
+            {/* Toggle between selection and hierarchy view */}
             <div>
               <Button onClick={() => setHierarchyToggle(!hierarchyToggle)}>
                 {hierarchyToggle ? 'Selection Menu' : 'Hierarchy View'}
@@ -104,7 +119,9 @@ function App() {
             </div>
           </div>
           <div className="App">
+            {/* Decides what to render depending on toggle */}
             {!hierarchyToggle ? (
+              // Render carousel view
               <>
                 {search && (
                   <SearchResultList search={search} />
@@ -112,7 +129,9 @@ function App() {
                 {!search && (
                   <CarouselC />
                 )}
+                {/* Start engagement / battle button */}
                 <Group justify='center'>
+                  {/* Button is only enabled if a unit with a positive health is presently selected */}
                   <Button
                     disabled={!selectedUnit || selectedUnit.unit_health <= 0}
                     size='compact-xl'
@@ -124,13 +143,14 @@ function App() {
                 </Group>
               </>
             ) : (
+              // Render the hierarchy
               <Hierarchy is_friendly={true} hierarchyRefresh={0} />
             )}
           </div>
         </AppShell.Main>
       </AppShell>
     </MantineProvider >
-  );
+  ); // End of return statement
 }
 
 export default App;
