@@ -1,8 +1,12 @@
-import { Box, Card, Container, Flex, Image, Text, Badge, Button, Group, Grid, Progress, HoverCard } from '@mantine/core';
+/**
+ *  Card.tsx renders a card UI component that displays a unit's information
+ */
+
+
+import { Card, Image, Text, Grid, HoverCard } from '@mantine/core';
 import classes from './Cards.module.css'
 import { useUnitProvider } from '../context/UnitContext';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { RawNodeDatum } from 'react-d3-tree';
+import { useNavigate, useParams } from 'react-router-dom';
 
 // Define Unit interface
 export interface Unit {
@@ -22,19 +26,23 @@ export interface Unit {
   root: boolean
 }
 
+// Define Card interface
 interface CardProps {
   unit: Unit;
 }
 
+
+// CardC renders the card
 function CardC({ unit }: CardProps) {
   const { unit_id, unit_type, unit_health, unit_symbol, is_friendly, role_type, unit_size, force_posture, force_mobility, force_readiness, force_skill } = unit;
-  const { sectionID } = useParams();
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
   const navigate = useNavigate();
 
-
+  
+  // Initalize health bar color to green
   let healthColor = 'green';
 
+  // Change color of health bar based on unit's health
   if (unit_health >= 75) {
     healthColor = '#6aa84f';
   } else if (unit_health < 75 && unit_health >= 50) {
@@ -45,14 +53,20 @@ function CardC({ unit }: CardProps) {
     healthColor = '#cc0000';
   }
 
+  // Return is where the card actually get's rendered
   return (
+    // Hovercard tag allows user to see detailed information about the unit when they hover over it's card
     <HoverCard width={280} shadow="md" openDelay={750}>
       <HoverCard.Target>
+        {/* Here is where the card itself is programmed */}
         <Card
           shadow={unit_id === selectedUnit ? '0' : 'lg'}
           padding={0}
           radius={0}
 
+          // User can only select card for battle if it's health is above 0
+          // When user selects card once, the card becomes select
+          // If the user clicks an already selected card, the user starts an engagement
           onClick={() => {
             if (unit_health > 0) {
               if (selectedUnit === unit_id) {
@@ -71,12 +85,17 @@ function CardC({ unit }: CardProps) {
           }}
           className='highlightable-card'
         >
+          {/* This is the content that shows up on the card */}
           <Grid style={{ margin: 0 }}>
+            {/* This is the left side of the card to include health bar and its background */}
             <Grid.Col span={1} style={{ backgroundColor: 'black', position: 'relative', padding: 0 }}>
+              {/* The highly desirable health bar */}
               <div className={classes.bar} style={{ height: `${unit_health}%`, width: '100%', backgroundColor: healthColor }} />
             </Grid.Col>
 
+            {/* The right side of the card */}
             <Grid.Col span={11} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '20px 20px' }}>
+              {/* The unit symbol image */}
               <Card.Section inheritPadding={true} style={{ marginRight: '10px' }}>
                 <Image
                   src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
@@ -86,6 +105,7 @@ function CardC({ unit }: CardProps) {
                   style={{ width: '100%', maxHeight: '100%', objectFit: 'contain' }}
                 />
               </Card.Section>
+              {/* Display the unit name */}
               <Card.Section>
                 <Text size="lg" c="dimmed" style={{ textAlign: 'center', marginRight: '10px', fontWeight: 'bold', color: 'white' }}>
                   {unit_id}
@@ -94,7 +114,9 @@ function CardC({ unit }: CardProps) {
             </Grid.Col>
           </Grid>
         </Card>
+        {/* End of card code */}
       </HoverCard.Target>
+      {/* What will be displayed on the hovercard */}
       <HoverCard.Dropdown>
         <Text size="sm">
           <strong>Unit ID:</strong> {unit_id}<br />
@@ -113,9 +135,11 @@ function CardC({ unit }: CardProps) {
   );
 }
 
+// GridC retrieves each unit card
 export function GridC({ units }: { units: Unit[] }) {
   return (
     <>
+      {/* Map all of the cards */}
       {units.map((unit, index) => (
         <CardC key={index} unit={unit} />
       ))}
