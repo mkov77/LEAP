@@ -7,6 +7,7 @@ import classes from './Cards.module.css';
 import { SegmentedControl, Modal, Tabs, Select, TextInput, Button, Text, HoverCard, Group } from '@mantine/core';
 import axios from 'axios';
 import { useUserRole } from '../context/UserContext';
+import getImageSRC from '../context/imageSrc';
 
 type UnitAttributes = {
   id: number;
@@ -27,6 +28,7 @@ type HierarchyProps = {
 };
 
 const buildHierarchy = (units: Unit[]): RawNodeDatum[] | null => {
+
   const unitMap = new Map<string, RawNodeDatum>();
 
   // First pass: Add all units to a map
@@ -93,6 +95,7 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
     force_skill,
   } = nodeDatum.attributes as UnitAttributes;
 
+
   return (
     <HoverCard width={280} shadow="md" openDelay={750}>
       <HoverCard.Target>
@@ -111,7 +114,7 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
             stroke="none"
           />
           <image
-            href='https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png'
+            href={getImageSRC(unit_type,is_friendly)}
             x={-imageSize / 2}
             y={-cardHeight / 2 + 10}
             width={100}
