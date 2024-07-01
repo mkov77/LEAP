@@ -95,7 +95,6 @@ function App() {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <h1>Welcome to the Student Page</h1>
               {sectionId && (
                 <p>
                   You are in section: <strong>{sectionId}</strong>

@@ -653,11 +653,11 @@ function BattlePage() {
               
               {/* Buttons to start and engagement or deselect the previously selected enemy unit */}
               <Group justify="center" mt="xl">
-                <Button onClick={handleStartEngagement} disabled={enemyUnit ? false : true}>{inEngagement ? 'Continue Enagement' : 'Start Engagement'}</Button>
                 {(!inEngagement && enemyUnit) ?
-                  (<Button onClick={handleSelectEnemy} disabled={enemyUnit ? false : true}>Deselect Enemy Unit</Button>) :
+                  (<Button onClick={handleSelectEnemy} disabled={enemyUnit ? false : true} color='red'>Deselect Enemy Unit</Button>) :
                   (<></>)
                 }
+                <Button onClick={handleStartEngagement} disabled={enemyUnit ? false : true}>{inEngagement ? 'Continue Enagement' : 'Start Engagement'}</Button>
               </Group>
             </div>
           </Stepper.Step>
@@ -797,7 +797,7 @@ function BattlePage() {
           {/* Displays the round summary page with comparisons between friendly and enemy units */}
           <Stepper.Step allowStepSelect={false} icon={<IconHeartbeat stroke={1.5} style={{ width: rem(35), height: rem(35) }} />}>
             <div>
-              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Final After-Action Review' : 'Round After-Action Review'}</h1>
+              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Final After-Action Report' : 'Round After-Action Report'}</h1>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
                 <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '150px', marginTop: '200px', textAlign: 'center' }} display={'flex'}>
                   <Card.Section >
