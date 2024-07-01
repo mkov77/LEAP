@@ -267,12 +267,12 @@ function BattlePage() {
     let maxFriendlyDamage = .5 * Number(unit_health);
     let totalFriendlyDamage = maxFriendlyDamage * prevFriendlyDamage;
 
-    setFriendlyHealth((Number(friendlyHealth)) - totalFriendlyDamage);
+    setFriendlyHealth(Math.round((Number(friendlyHealth)) - totalFriendlyDamage));
 
     let maxEnemyDamage = .5 * Number(unit_health);
     let prevEnemyDamage = Math.exp(-((r^2)/(2*(b^2))));
     let totalEnemyDamage = maxEnemyDamage * prevEnemyDamage;
-    setEnemyHealth(Number(enemyHealth) - totalEnemyDamage);
+    setEnemyHealth(Math.round((Number(enemyHealth)) - totalEnemyDamage));
 
     console.log("Total friendly damage: ", totalFriendlyDamage, " Total enemy damage: ", totalEnemyDamage)
     console.log("TESTING HERE! Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth)
@@ -548,7 +548,7 @@ function BattlePage() {
   // Checks that there is a unit to run an engagement
   const unitNull = () => {
     if (unit_id !== undefined) {
-      console.log("Unit found: ", unit_id)
+      // console.log("Unit found: ", unit_id)
       return true;
     }
   }
