@@ -25,7 +25,6 @@ import classes from './TableReviews.module.css'
 import { timeStamp } from 'console';
 import BattlePage from './battlePage';
 import axios from 'axios';
-import { sections } from '../data/sections';
 
 
 export interface recentEngagementData {
