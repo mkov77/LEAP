@@ -163,7 +163,8 @@ function SectionControls() {
 
 
 
-              {/* <Divider my="md" />
+ 
+              <Divider my="md" />
               <Switch
                 checked={sectionOnline}
                 onChange={toggleSectionOnline}
@@ -187,6 +188,8 @@ function SectionControls() {
                 }
               />
               <Divider my="md" />
+
+                     {/*
               <Table style={{ marginTop: 20 }}>
                 <thead>
                   <tr>
