@@ -342,7 +342,7 @@ export default function AAR() {
         <div style={{justifyContent:'right', display:'flex'}}>
             <Button size='sm' variant='link' onClick={handleAARClick} style={{ margin: '10px ' }}>Return</Button>
           </div>
-          <h1 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>After Action Reviews</h1>
+          <h1 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>After Action Reports</h1>
           <h2 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>Section: {sectionId}</h2>
           <AppShell>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
