@@ -2,34 +2,34 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AppShell, Burger, Group, Table, useMantineTheme, Image, Button, Text, Box, Switch, rem, Divider, Alert, useMantineColorScheme, useComputedColorScheme, MantineProvider, SegmentedControl, } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { engagements } from '../data/engagements';
+// import { engagements } from '../data/engagements';
 import { IconCheck, IconX, IconInfoCircle } from '@tabler/icons-react';
 import { useUserRole } from '../context/UserContext';
 import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
 import Hierarchy from '../components/HierarchyBuilder';
 import { UserRoleProvider } from '../context/UserContext';
 import axios from 'axios';
-export interface Engagement {
-  engagementID: string;
-  sectionID: string;
-  timeStamp: string;
-  friendlyID: string;
-  enemyID: string;
-  isWin: boolean;
-  friendlyHealth: number;
-  enemyHealth: number;
-  isCurrentState: boolean;
-}
+// export interface Engagement {
+//   engagementID: string;
+//   sectionID: string;
+//   timeStamp: string;
+//   friendlyID: string;
+//   enemyID: string;
+//   isWin: boolean;
+//   friendlyHealth: number;
+//   enemyHealth: number;
+//   isCurrentState: boolean;
+// }
 
 function SectionControls() {
   const { sectionId } = useParams<{ sectionId: string }>();
-  const [selectedEngagement, setSelectedEngagement] = useState<Engagement | null>(null);
+  // const [selectedEngagement, setSelectedEngagement] = useState<Engagement | null>(null);
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
   const [hierarchyToggle, setHierarchyToggle] = useState(false);
   const navigate = useNavigate();
   const theme = useMantineTheme();
-  const [engagementsData, setEngagementsData] = useState<Engagement[]>([]);
+  // const [engagementsData, setEngagementsData] = useState<Engagement[]>([]);
   const [sectionOnline, setSectionOnline] = useState(false);
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
   const [isFriendlyHierarchy, setIsFriendlyHierarchy] = useState('Friendly');
@@ -106,25 +106,25 @@ function SectionControls() {
     }
   };
 
-  useEffect(() => {
-    const filteredEngagements = engagements.filter((engagement) => engagement.sectionID === sectionId);
-    setEngagementsData(filteredEngagements);
-  }, [sectionId]);
+  // useEffect(() => {
+  //   const filteredEngagements = engagements.filter((engagement) => engagement.sectionID === sectionId);
+  //   setEngagementsData(filteredEngagements);
+  // }, [sectionId]);
 
-  const handleRowClick = (engagement: Engagement) => {
-    setSelectedEngagement(engagement);
-  };
+  // const handleRowClick = (engagement: Engagement) => {
+  //   setSelectedEngagement(engagement);
+  // };
 
-  const restoreState = () => {
-    if (selectedEngagement && !selectedEngagement.isCurrentState) {
-      const updatedEngagements = engagementsData.map((engagement) =>
-        engagement === selectedEngagement
-          ? { ...engagement, isCurrentState: true }
-          : { ...engagement, isCurrentState: false }
-      );
-      setEngagementsData(updatedEngagements);
-    }
-  };
+  // const restoreState = () => {
+  //   if (selectedEngagement && !selectedEngagement.isCurrentState) {
+  //     const updatedEngagements = engagementsData.map((engagement) =>
+  //       engagement === selectedEngagement
+  //         ? { ...engagement, isCurrentState: true }
+  //         : { ...engagement, isCurrentState: false }
+  //     );
+  //     setEngagementsData(updatedEngagements);
+  //   }
+  // };
 
   return (
     <MantineProvider defaultColorScheme='dark'>
@@ -162,9 +162,8 @@ function SectionControls() {
           </div>
 
 
-          {!hierarchyToggle ? (
-            <>
-              <Divider my="md" />
+
+              {/* <Divider my="md" />
               <Switch
                 checked={sectionOnline}
                 onChange={toggleSectionOnline}
@@ -254,10 +253,8 @@ function SectionControls() {
                 style={{ marginTop: 20 }}
               >
                 Restore state
-              </Button>
-            </>
-          ) : (
-            <>
+              </Button> */}
+
               <Group>
                 <SegmentedControl
                   value={isFriendlyHierarchy}
@@ -272,10 +269,6 @@ function SectionControls() {
                 
               </Group>
               <Hierarchy is_friendly={isFriendlyHierarchy === 'Friendly'} hierarchyRefresh={refreshHierarchy} />
-            </>
-          )
-          }
-
 
         </AppShell.Main>
       </AppShell>
