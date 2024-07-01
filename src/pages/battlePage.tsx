@@ -42,6 +42,7 @@ function BattlePage() {
   const [enemyHealth, setEnemyHealth] = useState<number>(0); // Variables for setting and getting the enemy unit health
   const [enemyUnit, setEnemyUnit] = useState<Unit | null>(null); // Variables for setting and getting the enemy unit
   const [inEngagement, setInEngagement] = useState<Boolean>(false); // Used to track whether a unit is in an engagement or not
+  const [round, setRound] = useState<number>(1); // Sets the round number for each round of the engagement
 
 
 
@@ -226,6 +227,8 @@ function BattlePage() {
   const [question6, setQuestion6] = useState('Yes')
   const [question7, setQuestion7] = useState('Yes')
 
+
+
   // This function handles the engagement tactics form submission
   const finalizeTactics = async () => {
 
@@ -281,6 +284,9 @@ function BattlePage() {
     setRealTimeScore(score);
     setScoreFinalized(true); // Mark the score as finalized
     nextStep();
+
+    
+    setRound(round + 1); // Updates the round as the scores are finalized
 
     console.log(unit_id);
 
@@ -559,6 +565,7 @@ function BattlePage() {
       <MantineProvider defaultColorScheme='dark'>
         <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
           <Stepper.Step allowStepSelect={false} icon={<IconSwords stroke={1.5} style={{ width: rem(27), height: rem(27) }} />}>
+          <h1 style={{justifyContent: 'center', display: 'flex', alignItems: 'center'}}>Round: {round}</h1>
             <div>
               <Grid justify='center' align='flex-start' gutter={100}>
                 <Grid.Col span={4}>
@@ -597,6 +604,7 @@ function BattlePage() {
                     )}
                   </Card>
                 </Grid.Col>
+            
 
                 {/* Displays a card that contains pertinent information about the selected enemy unit */}
                 <Grid.Col span={4}>
@@ -799,7 +807,7 @@ function BattlePage() {
             <div>
               <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Final After-Action Report' : 'Round After-Action Report'}</h1>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-                <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '150px', marginTop: '200px', textAlign: 'center' }} display={'flex'}>
+                <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px', textAlign: 'center' }} display={'flex'}>
                   <Card.Section >
                     <div style={{ textAlign: 'center' }}>
                       <h2>Round Summary</h2>
@@ -852,7 +860,7 @@ function BattlePage() {
                     </div>
 
                     {/* Displays a table with the scoring of each tactic of both friendly and enemy units */}
-                    <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center' }}>
+                    <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center'}}>
                       <Table.Thead>
                         <Table.Tr>
                           <Table.Th>Tactic</Table.Th>
@@ -868,7 +876,7 @@ function BattlePage() {
 
               {/* Button that either moves the engagement to the next round or ends the engagement based off of friendly and enemy health */}
               <Group justify="center" mt="xl" display={'flex'}>
-                <Button onClick={() => handleNextRound(Number(friendlyHealth), Number(enemyHealth))}>
+                <Button display='flex' onClick={() => handleNextRound(Number(friendlyHealth), Number(enemyHealth))}>
                   {((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Done' : 'Next Round'}
                 </Button>
               </Group>
