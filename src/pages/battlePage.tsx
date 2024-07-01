@@ -235,15 +235,46 @@ function BattlePage() {
     const isWin = friendlyTotalScore > enemyTotalScore;
 
     let r = Math.floor(Math.random() * (5 - 0 + 1)) + 0;
+    let b = 0;
 
-    // let prevFriendlyDamage = Math.exp(-((r^2)/2(b^2)));
+    if (unit_type === "Armored Mechanized" || "Armored Mechanized Tracked" || "Field Artillery"){
+      b = 20;
+    }
+    else if (unit_type === "Air Defense"){
+      b = 50;
+    }
+    else if (unit_type === "Infantry"){
+      b = 3;
+    }
+    else if (unit_type === "Reconnaissance" || "Unmanned Aerial Systems"){
+      b = 5;
+    }
+    else if (unit_type === "Combined Arms"){
+      b = 30;
+    }
+    else if (unit_type === "Self-propelled" || "Electronic Warfare" || "Air Assault" || "Aviation Rotary Wing"){
+      b = 15;
+    }
+    else if (unit_type === "Signal" || "Special Operations Forces"){
+      b = 10;
+    }
+    else {
+      b = 0;
+    }
+
+
+    let prevFriendlyDamage = Math.exp(-((r^2)/(2*(b^2))));
     let maxFriendlyDamage = .5 * Number(unit_health);
+    let totalFriendlyDamage = maxFriendlyDamage * prevFriendlyDamage;
 
-    setFriendlyHealth(Number(friendlyHealth));
+    setFriendlyHealth((Number(friendlyHealth)) - totalFriendlyDamage);
 
     let maxEnemyDamage = .5 * Number(unit_health);
-    // let prevEnemyDamage = Math.exp(-((r^2)/2(b^2)));
-    setEnemyHealth(Number(enemyHealth) - maxFriendlyDamage);
+    let prevEnemyDamage = Math.exp(-((r^2)/(2*(b^2))));
+    let totalEnemyDamage = maxEnemyDamage * prevEnemyDamage;
+    setEnemyHealth(Number(enemyHealth) - totalEnemyDamage);
+
+    console.log("Total friendly damage: ", totalFriendlyDamage, " Total enemy damage: ", totalEnemyDamage)
     console.log("TESTING HERE! Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth)
 
     const score = calculateRealTimeScore();
