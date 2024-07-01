@@ -15,6 +15,7 @@ import {
   Card,
   Text,
   Collapse,
+  Tooltip
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -156,51 +157,6 @@ export default function AAR() {
     { question: 'Within Range of a Pattern Force?', friendlypattern: 0, enemypattern: 15 }
   ]
 
-
-
-  // const tacticToRow = (tactics: Tactics[]) => (
-  //   tactics.map((tactic, index) => (
-  //     <React.Fragment key={index}>
-  //     <Table.Tr key={`question-${tactic.question}-friendlyawareness`}>
-  //       <Table.Td>{tactic.question}</Table.Td>
-  //       <Table.Td>{tactic.friendlyawareness}</Table.Td>
-  //       <Table.Td>{tactic.enemyawareness}</Table.Td>
-  //     </Table.Tr>
-  //     <Table.Tr key={`question-${tactic.question}-friendlylogistics`}>
-  //       <Table.Td>{tactic.question}</Table.Td>
-  //       <Table.Td>{tactic.friendlylogistics}</Table.Td>
-  //       <Table.Td>{tactic.enemylogistics}</Table.Td>
-  //     </Table.Tr>
-  //     <Table.Tr key={`question-${tactic.question}-friendlycoverage`}>
-  //       <Table.Td>{tactic.question}</Table.Td>
-  //       <Table.Td>{tactic.friendlycoverage}</Table.Td>
-  //       <Table.Td>{tactic.enemycoverage}</Table.Td>
-  //     </Table.Tr>
-  //     <Table.Tr key={`question-${tactic.question}-friendlygps`}>
-  //       <Table.Td>{tactic.question}</Table.Td>
-  //       <Table.Td>{tactic.friendlygps}</Table.Td>
-  //       <Table.Td>{tactic.enemygps}</Table.Td>
-  //     </Table.Tr>
-  //     <Table.Tr  key={`question-${tactic.question}-friendlycomms`}>
-  //       <Table.Td>{tactic.question}</Table.Td>
-  //       <Table.Td>{tactic.friendlycomms}</Table.Td>
-  //       <Table.Td>{tactic.enemycomms}</Table.Td>
-  //     </Table.Tr>
-  //     <Table.Tr  key={`question-${tactic.question}-friendlyfire`}>
-  //       <Table.Td>{tactic.question}</Table.Td>
-  //       <Table.Td>{tactic.friendlyfire}</Table.Td>
-  //       <Table.Td>{tactic.enemyfire}</Table.Td>
-  //     </Table.Tr>
-  //     <Table.Tr key={`question-${tactic.question}-friendlypattern`}>
-  //       <Table.Td>{tactic.question}</Table.Td>
-  //       <Table.Td>{tactic.friendlypattern}</Table.Td>
-  //       <Table.Td>{tactic.enemypattern}</Table.Td>
-  //     </Table.Tr>
-  //     </React.Fragment>
-  //   ))
-  // );
-
-
   const renderTacticsRows = (tactics: Tactics[] | undefined) => { // Changed: Added `renderTacticsRows` function for rendering tactics rows
 
 
@@ -339,35 +295,47 @@ export default function AAR() {
         </AppShell.Header>
 
         <AppShell.Main>
-        <div style={{justifyContent:'right', display:'flex'}}>
+          <div style={{ justifyContent: 'right', display: 'flex' }}>
             <Button size='sm' variant='link' onClick={handleAARClick} style={{ margin: '10px ' }}>Return</Button>
           </div>
           <h1 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>After Action Reports</h1>
           <h2 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>Section: {sectionId}</h2>
           <AppShell>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
-              <Card shadow="sm" padding="xl" radius="md" withBorder style={{ display: 'grid', justifyContent: 'center', alignItems: 'center', height: '40vh', width: '600px', placeItems: 'center', marginBottom: '100px', marginTop: '100px', textAlign: 'center'}}>
+              <Card shadow="sm" padding="xl" radius="md" withBorder style={{ display: 'grid', justifyContent: 'center', alignItems: 'center', height: '40vh', width: '600px', placeItems: 'center', marginBottom: '100px', marginTop: '100px', textAlign: 'center' }}>
                 <Card.Section >
                   <div style={{ textAlign: 'center' }}>
                     <h2>Most Recent Engagement</h2>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
                     <Progress.Root style={{ width: '200px', height: '25px' }}>
+                    <Tooltip
+                          position="top"
+                          transitionProps={{ transition: 'fade-up', duration: 300 }}
+                          label="Overall Score Out of 100"
+                        >
                       <Progress.Section
                         className={classes.progressSection}
                         value={Number(engagements[engagements.length - 1]?.friendlytotalscore)}
                         color="#4e87c1">
-                          {Number(engagements[engagements.length - 1]?.friendlytotalscore).toFixed(0)}
+                        {Number(engagements[engagements.length - 1]?.friendlytotalscore).toFixed(0)}
                       </Progress.Section>
+                      </Tooltip>
                     </Progress.Root>
                     <Progress.Root style={{ width: '200px', height: '25px' }}>
+                    <Tooltip
+                          position="top"
+                          transitionProps={{ transition: 'fade-up', duration: 300 }}
+                          label="Overall Score Out of 100"
+                        >
                       <Progress.Section
                         className={classes.progressSection}
                         value={Number(engagements[engagements.length - 1]?.enemytotalscore)}
                         color="#bd3058">
-                           {Number(engagements[engagements.length - 1]?.enemytotalscore).toFixed(0)}
+                        {Number(engagements[engagements.length - 1]?.enemytotalscore).toFixed(0)}
                       </Progress.Section>
-                     
+                      </Tooltip>
+
                     </Progress.Root>
                   </div>
                   <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center' }}>
@@ -384,19 +352,9 @@ export default function AAR() {
                 </Card.Section>
               </Card>
             </div>
-
-            {/* {engagements.map((engagement, index) => (
-            <li key={index}>
-              <strong>Engagement engagementid:</strong> {engagement.engagementid}, 
-              <strong> Timestamp:</strong> {engagement.friendlyid}, 
-              <strong> Friendly Unit:</strong> {engagement.enemyid}, 
-            </li>
-          ))} */}
-
             <Table verticalSpacing={'xs'} style={{ width: '100%', tableLayout: 'fixed', justifyContent: 'space-between' }}>
               <Table.Thead>
                 <Table.Tr>
-                  {/* <Table.Th>Time Stamp</Table.Th> */}
                   <Table.Th>Engagement ID</Table.Th>
                   <Table.Th>Friendly Unit Name</Table.Th>
                   <Table.Th>Friendly Total Score</Table.Th>
@@ -407,28 +365,39 @@ export default function AAR() {
               {engagements.map((row, index) => (
                 <Table.Tbody key={index}>
                   <Table.Tr key={row.engagementid} >
-                    {/* <Table.Td>{row.engagementid}</Table.Td> */}
                     <Table.Td>{row.engagementid}</Table.Td>
                     <Table.Td>{row.friendlyid}</Table.Td>
                     <Table.Td>
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={row.friendlytotalscore}
-                          color="#4e87c1">
-                          {Number(row.friendlytotalscore).toFixed(0)}
-                        </Progress.Section>
+                        <Tooltip
+                          position="top"
+                          transitionProps={{ transition: 'fade-up', duration: 300 }}
+                          label="Overall Score Out of 100"
+                        >
+                          <Progress.Section
+                            className={classes.progressSection}
+                            value={row.friendlytotalscore}
+                            color="#4e87c1">
+                            {Number(row.friendlytotalscore).toFixed(0)}
+                          </Progress.Section>
+                        </Tooltip>
                       </Progress.Root>
                     </Table.Td>
                     <Table.Td>{row.enemyid}</Table.Td>
                     <Table.Td>
                       <Progress.Root style={{ width: '200px', height: '25px', display: 'flex' }}>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={row.enemytotalscore}
-                          color="#bd3058">
-                          {Number(row.enemytotalscore).toFixed(0)}
-                        </Progress.Section>
+                        <Tooltip
+                          position="top"
+                          transitionProps={{ transition: 'fade-up', duration: 300 }}
+                          label="Overall Score Out of 100"
+                        >
+                          <Progress.Section
+                            className={classes.progressSection}
+                            value={row.enemytotalscore}
+                            color="#bd3058">
+                            {Number(row.enemytotalscore).toFixed(0)}
+                          </Progress.Section>
+                        </Tooltip>
                       </Progress.Root>
                     </Table.Td>
 
@@ -437,22 +406,22 @@ export default function AAR() {
                         {isOpen[index] ? 'Collapse' : 'Expand'}
                       </Button>
                     </Table.Td>
-              </Table.Tr>
+                  </Table.Tr>
 
-                  <Table.Tr style={{ display: 'flex', justifyContent: 'center', width: '100%', marginLeft: '255%'}}>
+                  <Table.Tr style={{ display: 'flex', justifyContent: 'center', width: '100%', marginLeft: '255%' }}>
                     <Collapse in={isOpen[index]} style={{ width: '100%' }}>
-                     
-                        <Table verticalSpacing={'xs'} style={{ maxWidth: '100%', width: '1000px' }} display={'fixed'}>
-                          <Table.Thead>
-                            <Table.Tr>
-                              <Table.Th style={{ width: '1000px' }}>Tactic</Table.Th>
-                              <Table.Th style={{ width: '250px', marginLeft: '100px' }}>Friendly Score</Table.Th>
-                              <Table.Th style={{ width: '150px', marginLeft: '100px' }}>Enemy Score</Table.Th>
-                            </Table.Tr>
-                          </Table.Thead>
-                          <Table.Tbody>{renderTacticsRows(tacticsMap.get(row.engagementid))}</Table.Tbody>
-                        </Table>
-                      
+
+                      <Table verticalSpacing={'xs'} style={{ maxWidth: '100%', width: '1000px' }} display={'fixed'}>
+                        <Table.Thead>
+                          <Table.Tr>
+                            <Table.Th style={{ width: '1000px' }}>Tactic</Table.Th>
+                            <Table.Th style={{ width: '250px', marginLeft: '100px' }}>Friendly Score</Table.Th>
+                            <Table.Th style={{ width: '150px', marginLeft: '100px' }}>Enemy Score</Table.Th>
+                          </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>{renderTacticsRows(tacticsMap.get(row.engagementid))}</Table.Tbody>
+                      </Table>
+
                     </Collapse>
                   </Table.Tr>
                 </Table.Tbody>

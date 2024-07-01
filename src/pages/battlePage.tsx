@@ -4,7 +4,7 @@ The engagement continues until either the friendly or enemy unit dies and the in
 import React, { useEffect, useState } from 'react';
 import '@mantine/core/styles.css';
 import '../App.css';
-import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Select, useMantineTheme, rgba } from '@mantine/core';
+import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Select, useMantineTheme, rgba, Tooltip } from '@mantine/core';
 import { useDisclosure, useInterval } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconSwords, IconHeartbeat, IconNumber1Small, IconNumber2Small, IconNumber3Small, IconNumber4Small } from '@tabler/icons-react';
@@ -26,7 +26,7 @@ export interface Form {
 function BattlePage() {
   //Initializes global variables
   const navigate = useNavigate(); // A way to navigate to different pages
-  const {userSection} = useUserRole(); // Tracks the class section
+  const { userSection } = useUserRole(); // Tracks the class section
   const [active, setActive] = useState(0);
   const closeLocation = '/studentPage/' + userSection; // A way to navigate back to the correct section of the student page
   const { selectedUnit, setSelectedUnit } = useUnitProvider(); // Tracks the selected unit for an engagement
@@ -34,16 +34,18 @@ function BattlePage() {
   const [realTimeScore, setRealTimeScore] = useState<number | null>(null); // State to track the real time (tactics) score of a unit
   const [scoreFinalized, setScoreFinalized] = useState(false); // State to track if score has been finalized
 
-  const [units, setUnits] = useState<Unit[]>([]); 
+  const [units, setUnits] = useState<Unit[]>([]);
   const [progress, setProgress] = useState(0); // Used to calculate the progress of the animation for the finalize tactics button
-  const [loaded, setLoaded] = useState(false); 
+  const [loaded, setLoaded] = useState(false);
   const theme = useMantineTheme();
   const [friendlyHealth, setFriendlyHealth] = useState<number>(0); // Variables for setting and getting the friendly unit health
   const [enemyHealth, setEnemyHealth] = useState<number>(0); // Variables for setting and getting the enemy unit health
   const [enemyUnit, setEnemyUnit] = useState<Unit | null>(null); // Variables for setting and getting the enemy unit
   const [inEngagement, setInEngagement] = useState<Boolean>(false); // Used to track whether a unit is in an engagement or not
   const [round, setRound] = useState<number>(1); // Sets the round number for each round of the engagement
-
+  const [totalEnemyDamage, setTotalEnemyDamage] = useState<number>(0);
+  const [totalFriendlyDamage, setTotalFriendlyDamage] = useState<number>(0);
+  const [winner, setWinner] = useState<string | null>(null);
 
 
   // Fetches data of the units based on class section
@@ -112,11 +114,12 @@ function BattlePage() {
     } else {
       updateUnitHealth(Number(id), 0);
       console.log("Current unit health:", unit_health);
-      console.log("2-- Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth)
+      console.log("2-- Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth);
       setSelectedUnit(null);
       navigate(closeLocation);
     }
   }
+
   //function that selects an enemy unit when it is clicked on to start an engagement
   const handleSelectEnemy = () => {
     if (enemyUnit === null) {
@@ -240,25 +243,25 @@ function BattlePage() {
     let r = Math.floor(Math.random() * (5 - 0 + 1)) + 0;
     let b = 0;
 
-    if (unit_type === "Armored Mechanized" || "Armored Mechanized Tracked" || "Field Artillery"){
+    if (unit_type === "Armored Mechanized" || "Armored Mechanized Tracked" || "Field Artillery") {
       b = 20;
     }
-    else if (unit_type === "Air Defense"){
+    else if (unit_type === "Air Defense") {
       b = 50;
     }
-    else if (unit_type === "Infantry"){
+    else if (unit_type === "Infantry") {
       b = 3;
     }
-    else if (unit_type === "Reconnaissance" || "Unmanned Aerial Systems"){
+    else if (unit_type === "Reconnaissance" || "Unmanned Aerial Systems") {
       b = 5;
     }
-    else if (unit_type === "Combined Arms"){
+    else if (unit_type === "Combined Arms") {
       b = 30;
     }
-    else if (unit_type === "Self-propelled" || "Electronic Warfare" || "Air Assault" || "Aviation Rotary Wing"){
+    else if (unit_type === "Self-propelled" || "Electronic Warfare" || "Air Assault" || "Aviation Rotary Wing") {
       b = 15;
     }
-    else if (unit_type === "Signal" || "Special Operations Forces"){
+    else if (unit_type === "Signal" || "Special Operations Forces") {
       b = 10;
     }
     else {
@@ -266,15 +269,15 @@ function BattlePage() {
     }
 
 
-    let prevFriendlyDamage = Math.exp(-((r^2)/(2*(b^2))));
+    let prevFriendlyDamage = Math.exp(-((r ^ 2) / (2 * (b ^ 2))));
     let maxFriendlyDamage = .5 * Number(unit_health);
-    let totalFriendlyDamage = maxFriendlyDamage * prevFriendlyDamage;
+    setTotalFriendlyDamage(maxFriendlyDamage * prevFriendlyDamage);
 
     setFriendlyHealth(Math.round((Number(friendlyHealth)) - totalFriendlyDamage));
 
     let maxEnemyDamage = .5 * Number(unit_health);
-    let prevEnemyDamage = Math.exp(-((r^2)/(2*(b^2))));
-    let totalEnemyDamage = maxEnemyDamage * prevEnemyDamage;
+    let prevEnemyDamage = Math.exp(-((r ^ 2) / (2 * (b ^ 2))));
+    setTotalEnemyDamage(maxEnemyDamage * prevEnemyDamage);
     setEnemyHealth(Math.round((Number(enemyHealth)) - totalEnemyDamage));
 
     console.log("Total friendly damage: ", totalFriendlyDamage, " Total enemy damage: ", totalEnemyDamage)
@@ -285,10 +288,9 @@ function BattlePage() {
     setScoreFinalized(true); // Mark the score as finalized
     nextStep();
 
-    
     setRound(round + 1); // Updates the round as the scores are finalized
 
-    console.log(unit_id);
+   console.log(unit_id);
 
     // Prepare data for engagement and tactics
     const engagementData = {
@@ -361,6 +363,18 @@ function BattlePage() {
 
   }; // End of finalize tactics
 
+
+  const friendlyTooltip = (
+    <div>
+      <Text>Damage to Friendly Health: {totalFriendlyDamage.toFixed(0)}</Text>
+    </div>
+  );
+
+  const enemyTooltip = (
+    <div>
+      <Text>Damage to Enemy Health: {totalEnemyDamage.toFixed(0)}</Text>
+    </div>
+  );
 
   // This is the intervale for the Finalize Tactics button animation
   const interval = useInterval(
@@ -550,6 +564,13 @@ function BattlePage() {
     );
   };
 
+  const displayWinner = (friendlyHealth: number, enemyHealth: number): string => {
+    if (friendlyHealth <= 0 || enemyHealth <= 0) {
+      return friendlyHealth > enemyHealth ? 'Friendly Won' : 'Enemy Won';
+    }
+    return 'Round Summary';
+  };
+
 
   // Checks that there is a unit to run an engagement
   const unitNull = () => {
@@ -565,7 +586,7 @@ function BattlePage() {
       <MantineProvider defaultColorScheme='dark'>
         <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
           <Stepper.Step allowStepSelect={false} icon={<IconSwords stroke={1.5} style={{ width: rem(27), height: rem(27) }} />}>
-          <h1 style={{justifyContent: 'center', display: 'flex', alignItems: 'center'}}>Round: {round}</h1>
+            <h1 style={{ justifyContent: 'center', display: 'flex', alignItems: 'center' }}>Round: {round}</h1>
             <div>
               <Grid justify='center' align='flex-start' gutter={100}>
                 <Grid.Col span={4}>
@@ -604,7 +625,7 @@ function BattlePage() {
                     )}
                   </Card>
                 </Grid.Col>
-            
+
 
                 {/* Displays a card that contains pertinent information about the selected enemy unit */}
                 <Grid.Col span={4}>
@@ -658,7 +679,7 @@ function BattlePage() {
                   }
                 </Grid.Col>
               </Grid>
-              
+
               {/* Buttons to start and engagement or deselect the previously selected enemy unit */}
               <Group justify="center" mt="xl">
                 {(!inEngagement && enemyUnit) ?
@@ -805,12 +826,12 @@ function BattlePage() {
           {/* Displays the round summary page with comparisons between friendly and enemy units */}
           <Stepper.Step allowStepSelect={false} icon={<IconHeartbeat stroke={1.5} style={{ width: rem(35), height: rem(35) }} />}>
             <div>
-              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Final After-Action Report' : 'Round After-Action Report'}</h1>
+              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? displayWinner(Number(friendlyHealth), Number(enemyHealth)) : 'Round '+ (round - 1) + ' After-Action Report'}</h1>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
                 <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px', textAlign: 'center' }} display={'flex'}>
                   <Card.Section >
                     <div style={{ textAlign: 'center' }}>
-                      <h2>Round Summary</h2>
+                      <h2>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Final Round' : 'Round Summary'}</h2>
                     </div>
 
                     {/* This displays the round summary based on calculations for tactics and overall unit characteristics for the friendly units */}
@@ -821,6 +842,8 @@ function BattlePage() {
                           <Text>{baseValue.toFixed(2)}</Text>
                           <Text size="lg">Friendly Tactics Score:</Text>
                           <Text> {calculateRealTimeScore()}</Text>
+                          <Text size="lg">Friendly Damage Taken:</Text>
+                          <Text> {totalFriendlyDamage.toFixed(0)}</Text>
                         </Grid.Col>
                       </Group>
 
@@ -833,6 +856,8 @@ function BattlePage() {
                           </Text>
                           <Text size="lg">Enemy Tactics Score:</Text>
                           <Text> {calculateRealTimeScore()}</Text>
+                          <Text size="lg">Enemy Damage Taken:</Text>
+                          <Text> {totalEnemyDamage.toFixed(0)}</Text>
                         </Grid.Col>
                       </Group>
                     </Grid>
@@ -840,27 +865,39 @@ function BattlePage() {
                     {/* Displays a progress bar with the total score (overall characteristics and tactics) for the friendly unit */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
-                          color="#4e87c1">
-                          {Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
-                        </Progress.Section>
+                        <Tooltip
+                          position="top"
+                          transitionProps={{ transition: 'fade-up', duration: 300 }}
+                          label="Overall Score Out of 100"
+                        >
+                          <Progress.Section
+                            className={classes.progressSection}
+                            value={Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
+                            color="#4e87c1">
+                            {Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
+                          </Progress.Section>
+                        </Tooltip>
                       </Progress.Root>
 
                       {/* Displays a progress bar with the total score (overall characteristics and tactics) for the enemy unit */}
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
-                          color="#bd3058">
-                          {Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
-                        </Progress.Section>
+                      <Tooltip
+                          position="top"
+                          transitionProps={{ transition: 'fade-up', duration: 300 }}
+                          label="Overall Score Out of 100"
+                        >
+                          <Progress.Section
+                            className={classes.progressSection}
+                            value={Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
+                            color="#bd3058">
+                            {Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
+                          </Progress.Section>
+                        </Tooltip>
                       </Progress.Root>
                     </div>
 
                     {/* Displays a table with the scoring of each tactic of both friendly and enemy units */}
-                    <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center'}}>
+                    <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center' }}>
                       <Table.Thead>
                         <Table.Tr>
                           <Table.Th>Tactic</Table.Th>
@@ -899,3 +936,4 @@ function BattlePage() {
 }
 
 export default BattlePage;
+
