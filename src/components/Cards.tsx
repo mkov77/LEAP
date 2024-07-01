@@ -136,6 +136,7 @@ function CardC({ unit }: CardProps) {
 }
 
 // GridC retrieves each unit card
+// This is only used in searchResults.tsx
 export function GridC({ units }: { units: Unit[] }) {
   return (
     <>
