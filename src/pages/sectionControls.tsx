@@ -155,7 +155,6 @@ function SectionControls() {
         <AppShell.Main>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h1><strong>{sectionId}</strong> Controls </h1>
-            <Button onClick={() => setHierarchyToggle(!hierarchyToggle)}>{!hierarchyToggle ? 'Hierarchy Builder' : 'Section Controls'}</Button>
           </div>
           <div>
 

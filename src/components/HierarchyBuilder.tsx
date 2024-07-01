@@ -342,7 +342,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh }: HierarchyProps) {
 
       {tree ? (
         <>
-          <h1>Select a node to add a child to it</h1>
+          {(userRole === "Administrator" ? <h1>Select a node to add a child to it</h1> : <></>)}
           <Tree
             data={tree}
             orientation='vertical'
