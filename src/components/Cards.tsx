@@ -7,6 +7,12 @@ import { Card, Image, Text, Grid, HoverCard } from '@mantine/core';
 import classes from './Cards.module.css'
 import { useUnitProvider } from '../context/UnitContext';
 import { useNavigate, useParams } from 'react-router-dom';
+import ImageLoader from '../context/imageLoader';
+
+
+interface images {
+
+}
 
 // Define Unit interface
 export interface Unit {
@@ -97,13 +103,7 @@ function CardC({ unit }: CardProps) {
             <Grid.Col span={11} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '20px 20px' }}>
               {/* The unit symbol image */}
               <Card.Section inheritPadding={true} style={{ marginRight: '10px' }}>
-                <Image
-                  src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
-                  fit="contain"
-                  height={160}
-                  alt={unit_id}
-                  style={{ width: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                />
+                <ImageLoader unitType={unit_type} isFriendly={is_friendly} />
               </Card.Section>
               {/* Display the unit name */}
               <Card.Section>
