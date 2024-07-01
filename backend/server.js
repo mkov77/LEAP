@@ -71,9 +71,9 @@ app.get('/api/tactics/:id', async (req, res) => {
 
 app.get('/api/units/sectionNullandAllianceSort', async (req, res) => {
   const sectionid = req.query.sectionid;
-  const is_friendly = req.query.is_friendly
+  const isFriendly = req.query.isFriendly
   try {
-    const result = await pool.query('SELECT * FROM units WHERE (section = $1 OR section IS NULL) AND "isFriendly" = $2', [sectionid, is_friendly]);
+    const result = await pool.query('SELECT * FROM units WHERE (section = $1 OR section IS NULL) AND "isFriendly" = $2', [sectionid, isFriendly]);
     console.log(result.rows);
     res.json(result.rows);
   } catch (err) {
@@ -400,7 +400,7 @@ app.put('/api/units/update', async (req, res) => {
 });
 
 app.put('/api/units/remove', async (req, res) => {
-  const { section, is_friendly } = req.body;
+  const { section, isFriendly } = req.body;
   try {
     // Update unit details
     const updateQuery = `
@@ -413,7 +413,7 @@ app.put('/api/units/remove', async (req, res) => {
     `;
     const updateValues = [
       section,
-      is_friendly
+      isFriendly
     ];
 
     const updateResult = await pool.query(updateQuery, updateValues);

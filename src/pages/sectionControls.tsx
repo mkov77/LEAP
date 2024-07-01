@@ -75,7 +75,7 @@ function SectionControls() {
     try {
       const response = await axios.put(`http://10.0.1.226:5000/api/units/remove`, {
         section: sectionId,
-        is_friendly: (isFriendlyHierarchy === 'Friendly')
+        isFriendly: (isFriendlyHierarchy === 'Friendly')
       });
 
 

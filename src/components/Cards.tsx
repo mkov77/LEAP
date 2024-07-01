@@ -19,7 +19,7 @@ export interface Unit {
   unit_id: string;
   unit_type: string;
   unit_symbol: string;
-  is_friendly: boolean;
+  isFriendly: boolean;
   unit_health: number;
   role_type: string;
   unit_size: string;
@@ -40,7 +40,7 @@ interface CardProps {
 
 // CardC renders the card
 function CardC({ unit }: CardProps) {
-  const { unit_id, unit_type, unit_health, unit_symbol, is_friendly, role_type, unit_size, force_posture, force_mobility, force_readiness, force_skill } = unit;
+  const { unit_id, unit_type, unit_health, unit_symbol, isFriendly, role_type, unit_size, force_posture, force_mobility, force_readiness, force_skill } = unit;
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
   const navigate = useNavigate();
 
@@ -103,7 +103,7 @@ function CardC({ unit }: CardProps) {
             <Grid.Col span={11} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '20px 20px' }}>
               {/* The unit symbol image */}
               <Card.Section inheritPadding={true} style={{ marginRight: '10px' }}>
-                <ImageLoader unitType={unit_type} isFriendly={is_friendly} />
+                <ImageLoader unitType={unit_type} isFriendly={isFriendly} />
               </Card.Section>
               {/* Display the unit name */}
               <Card.Section>
@@ -121,7 +121,7 @@ function CardC({ unit }: CardProps) {
         <Text size="sm">
           <strong>Unit ID:</strong> {unit_id}<br />
           <strong>Type:</strong> {unit_type}<br />
-          <strong>Friendly:</strong> {is_friendly ? 'Yes' : 'No'}<br />
+          <strong>Friendly:</strong> {isFriendly ? 'Yes' : 'No'}<br />
           <strong>Health:</strong> {unit_health}<br />
           <strong>Role Type:</strong> {role_type}<br />
           <strong>Unit Size:</strong> {unit_size}<br />

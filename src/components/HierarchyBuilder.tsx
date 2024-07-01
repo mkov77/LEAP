@@ -37,7 +37,7 @@ const buildHierarchy = (units: Unit[]): RawNodeDatum[] | null => {
       name: unit.unit_id,
       attributes: {
         unit_type: unit.unit_type,
-        is_friendly: unit.is_friendly,
+        is_friendly: unit.isFriendly,
         unit_health: unit.unit_health,
         role_type: unit.role_type,
         unit_size: unit.unit_size,
