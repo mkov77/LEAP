@@ -19,13 +19,16 @@ import { useUserRole } from '../context/UserContext';
 // The cards are sorted in when their 'unit_type' matches the unitType 'value' field
 const unitTypes = [
   {
-    value: 'Infantry',
+    label: 'JFLCC',
+    value: 'Infantry'
   },
   {
-    value: 'Special Operations Forces',
+    label: 'JFLCC',
+    value: 'Special Operations'
   },
   {
-    value: 'Other',
+    label: 'Other',
+    value: 'Other'
   },
 ];
 
@@ -62,7 +65,7 @@ function CarouselC() {
       {unitTypes.map((item) => (
         // Description for each carousel
         <div key={item.value} style={{ marginBottom: 20 }}>
-          <h2>{item.value}</h2>
+          <h2>{item.label}</h2>
           {/* The Carousel is rendered here */}
           <Carousel
             classNames={{ controls: classes.controls, root: classes.root }}
