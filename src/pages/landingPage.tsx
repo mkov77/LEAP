@@ -161,7 +161,7 @@ export default function LandingPage() {
           </div>
 
           {/* Clickable control that allows the switching of components between JFLCC and JFSOCC when their role is a student */}
-          {(role === 'Student') && (
+          {/* {(role === 'Student') && (
             <div style={{ margin: '10px'}} >
               <SegmentedControl
                 size="lg"
@@ -170,7 +170,7 @@ export default function LandingPage() {
                 onChange={setForce}
               />
             </div>
-          )}
+          )} */}
 
           {/* If a user identifies as an administrator, this handles the password input */}
           {role === 'Administrator' && (
