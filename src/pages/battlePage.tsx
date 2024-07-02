@@ -724,7 +724,7 @@ function BattlePage() {
                   (<Button onClick={handleSelectEnemy} disabled={enemyUnit ? false : true} color='red'>Deselect Enemy Unit</Button>) :
                   (<></>)
                 }
-                <Button onClick={handleStartEngagement} disabled={enemyUnit ? false : true}>{inEngagement ? 'Continue Enagement' : 'Start Engagement'}</Button>
+                <Button onClick={handleStartEngagement} disabled={enemyUnit ? false : true}>{inEngagement ? 'Start Round' : 'Start Engagement'}</Button>
               </Group>
             </div>
           </Stepper.Step>
@@ -959,7 +959,7 @@ function BattlePage() {
               {/* Button that either moves the engagement to the next round or ends the engagement based off of friendly and enemy health */}
               <Group justify="center" mt="xl" display={'flex'}>
                 <Button display='flex' onClick={() => handleNextRound(Number(friendlyHealth), Number(enemyHealth))}>
-                  {((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Done' : 'Next Round'}
+                  {((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Done' : 'Continue Enagement'}
                 </Button>
               </Group>
             </div>
