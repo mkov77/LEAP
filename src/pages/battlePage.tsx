@@ -237,12 +237,18 @@ function BattlePage() {
 
     // Dummy data for enemyscore
     const enemyTotalScore = 15;
+
+    // Calculates the total friendly score which is 70% of the base value plue 30% of the tactics value
     const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
     const isWin = friendlyTotalScore > enemyTotalScore;
 
+    // 'r' generates a random number 
     let r = Math.floor(Math.random() * (5 - 0 + 1)) + 0;
+
+    // Initializes 'b' to zero. 'b' is the variable for the range of weapons given for each unit type
     let b = 0;
 
+    // These are based on values given by Lt. Col. Rayl
     if (unit_type === "Armored Mechanized" || "Armored Mechanized Tracked" || "Field Artillery") {
       b = 20;
     }
@@ -268,21 +274,35 @@ function BattlePage() {
       b = 0;
     }
 
-
+    // Calculates the damage previously done to the friendly unit
     let prevFriendlyDamage = Math.exp(-((r ^ 2) / (2 * (b ^ 2))));
+
+    // Calculates the maximum damage that the friendly striking unit can inflict in a particular engagement
     let maxFriendlyDamage = .5 * Number(unit_health);
+
+    // Calculates the overall damage to the friendly unit
     setTotalFriendlyDamage(maxFriendlyDamage * prevFriendlyDamage);
 
+    // Subtracts the total damage from the previous friendly health in order to set a new health for the friendly unit
     setFriendlyHealth(Math.round((Number(friendlyHealth)) - totalFriendlyDamage));
 
+    // Calculates the maximum damage that the enemy striking unit can inflict in a particular engagement
     let maxEnemyDamage = .5 * Number(unit_health);
+
+    // Calculates the damage previously done to the enemy unit
     let prevEnemyDamage = Math.exp(-((r ^ 2) / (2 * (b ^ 2))));
+
+    // Calculates the overall damage to the enemy unit and sets it to the totalEnemyDamage variable
     setTotalEnemyDamage(maxEnemyDamage * prevEnemyDamage);
+
+    // Subtracts the total damage from the previous enemy health in order to set a new health for the enemy unit
     setEnemyHealth(Math.round((Number(enemyHealth)) - totalEnemyDamage));
 
     console.log("Total friendly damage: ", totalFriendlyDamage, " Total enemy damage: ", totalEnemyDamage)
     console.log("TESTING HERE! Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth)
+  
 
+    // Calls the function that calculates the score for each unit and sets the score as finalized
     const score = calculateRealTimeScore();
     setRealTimeScore(score);
     setScoreFinalized(true); // Mark the score as finalized
