@@ -624,7 +624,7 @@ function BattlePage() {
       <MantineProvider defaultColorScheme='dark'>
         <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
           <Stepper.Step allowStepSelect={false} icon={<IconSwords stroke={1.5} style={{ width: rem(27), height: rem(27) }} />}>
-            <h1 style={{ justifyContent: 'center', display: 'flex', alignItems: 'center' }}>Round: {round} {totalFriendlyDamage}</h1>
+            <h1 style={{ justifyContent: 'center', display: 'flex', alignItems: 'center' }}>Round: {round}</h1>
             <div>
               <Grid justify='center' align='flex-start' gutter={100}>
                 <Grid.Col span={4}>
@@ -884,7 +884,7 @@ function BattlePage() {
                       <Group style={{ flex: 1, textAlign: 'center' }}>
                         <Grid.Col>
                           <Text size="lg">Friendly Baseline Score: </Text>
-                          <Text>{baseValue.toFixed(2)}</Text>
+                          <Text>{baseValue.toFixed(0)}</Text>
                           <Text size="lg">Friendly Tactics Score:</Text>
                           <Text> {calculateRealTimeScore()}</Text>
                           <Text size="lg">Friendly Damage Taken:</Text>
@@ -897,7 +897,7 @@ function BattlePage() {
                         <Grid.Col>
                           <Text size="lg">Enemy Baseline Score: </Text>
                           <Text >
-                            {baseValue.toFixed(2)}
+                            {baseValue.toFixed(0)}
                           </Text>
                           <Text size="lg">Enemy Tactics Score:</Text>
                           <Text> {calculateRealTimeScore()}</Text>

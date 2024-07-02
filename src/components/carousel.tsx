@@ -23,8 +23,8 @@ const unitTypes = [
     value: 'Infantry'
   },
   {
-    label: 'JFLCC',
-    value: 'Special Operations'
+    label: 'JFSOC',
+    value: 'Special Operations Forces'
   },
   {
     label: 'Other',

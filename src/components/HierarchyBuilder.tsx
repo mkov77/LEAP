@@ -102,6 +102,7 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
     <HoverCard width={280} shadow="md" openDelay={750}>
       <HoverCard.Target>
         <g onClick={toggleModal}>
+
           <rect
             width={cardWidth}
             height={cardHeight}
@@ -112,18 +113,58 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
             ry={0}
             style={{
               filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.5))',
+              zIndex: -1,  // Ensures this element is on top
             }}
             stroke="none"
           />
           <image
             href={getImageSRC(unit_type,is_friendly)}
-            x={-imageSize / 2}
-            y={-cardHeight / 2 + 10}
-            width={100}
+            x={is_friendly ? -imageSize / 2 + 7.5: -imageSize / 2.75 + 7.5}
+            y={is_friendly ? -cardHeight / 2 + 10 : -cardHeight / 2 + 5 }
+            width={is_friendly ? 100 : 75}
           />
-          <text fill="white" x={-cardWidth / 2 + 10} y={cardHeight / 2 - 10} textAnchor="start" stroke="none">
+          <text fill="white" x={((Number(nodeDatum.name.length) / 2)*-9.5)+7.5} y={cardHeight / 2 - 10} width={40} textAnchor="start" stroke="none">
             {nodeDatum.name}
           </text>
+
+          <rect
+    width={15}  // Width of the black rectangle
+    height={cardHeight}  // Height of the card
+    x={-cardWidth / 2}  // Positioning the rectangle to the left of the card
+    y={-cardHeight / 2}  // Aligning the rectangle with the card height
+    fill={unit_health >= 75 ? '#6aa84f' : (unit_health >= 50 ? '#f1c232' : (unit_health >= 25 ? '#e69138' : '#cc0000'))}
+    rx={0}  // Optional: Rounded corner x-radius
+    ry={0}  // Optional: Rounded corner y-radius
+    style={{
+      filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.5))',  // Drop shadow effect
+      zIndex: 50,  // Ensures this element is on top
+    }}
+    stroke="none"  // No stroke
+  />
+  {/* if (unit_health >= 75) {
+    healthColor = '#6aa84f';
+  } else if (unit_health < 75 && unit_health >= 50) {
+    healthColor = '#f1c232';
+  } else if (unit_health < 50 && unit_health >= 25) {
+    healthColor = '#e69138';
+  } else {
+    healthColor = '#cc0000';
+  } */}
+
+<rect
+    width={15}  // Width of the red rectangle
+    height={cardHeight - (unit_health/100 * cardHeight)}  // Height of the card
+    x={-cardWidth / 2}  // Positioning the rectangle next to the black one
+    y={-cardHeight / 2}  // Aligning the rectangle with the card height
+    fill="black"  // Color of the rectangle
+    rx={0}  // Optional: Rounded corner x-radius
+    ry={0}  // Optional: Rounded corner y-radius
+    style={{
+      filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.5))',  // Drop shadow effect
+      zIndex: 2,  // Ensures this element is on top of the black rectangle
+    }}
+    stroke="none"  // No stroke
+  />
         </g>
       </HoverCard.Target>
       <HoverCard.Dropdown>
