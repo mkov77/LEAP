@@ -14,6 +14,7 @@ import { UnitProvider, useUnitProvider } from '../context/UnitContext';
 import { Unit } from '../components/Cards';
 import classes from './battlePage.module.css';
 import axios from 'axios';
+import getImageSRC from '../context/imageSrc';
 
 
 // The interface that is used to take in and send variables for the tactics tables
@@ -633,7 +634,7 @@ function BattlePage() {
                       <Group>
                         <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
                           <Image
-                            src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
+                            src={getImageSRC((unit_type ?? '').toString(), true)}
                             height={160}
                             style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
                           />
@@ -673,7 +674,7 @@ function BattlePage() {
                         <Group>
                           <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
                             <Image
-                              src={`https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png`}
+                              src={getImageSRC((unit_type ?? '').toString(), false)}
                               height={160}
                               style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
                             />
@@ -723,7 +724,7 @@ function BattlePage() {
                   (<Button onClick={handleSelectEnemy} disabled={enemyUnit ? false : true} color='red'>Deselect Enemy Unit</Button>) :
                   (<></>)
                 }
-                <Button onClick={handleStartEngagement} disabled={enemyUnit ? false : true}>{inEngagement ? 'Continue Enagement' : 'Start Engagement'}</Button>
+                <Button onClick={handleStartEngagement} disabled={enemyUnit ? false : true}>{inEngagement ? 'Start Round' : 'Start Engagement'}</Button>
               </Group>
             </div>
           </Stepper.Step>
@@ -958,7 +959,7 @@ function BattlePage() {
               {/* Button that either moves the engagement to the next round or ends the engagement based off of friendly and enemy health */}
               <Group justify="center" mt="xl" display={'flex'}>
                 <Button display='flex' onClick={() => handleNextRound(Number(friendlyHealth), Number(enemyHealth))}>
-                  {((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Done' : 'Next Round'}
+                  {((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Done' : 'Continue Enagement'}
                 </Button>
               </Group>
             </div>
