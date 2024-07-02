@@ -184,7 +184,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh }: HierarchyProps) {
       const response = await axios.get<Unit[]>(`http://10.0.1.226:5000/api/units/sectionNullandAllianceSort`, {
         params: {
           sectionid: userSection,
-          is_friendly: is_friendly
+          isFriendly: is_friendly
         }
       });
       const normalizedData = response.data.map(unit => ({
