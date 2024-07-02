@@ -18,7 +18,6 @@ interface images {
 export interface Unit {
   unit_id: string;
   unit_type: string;
-  unit_symbol: string;
   isFriendly: boolean;
   unit_health: number;
   role_type: string;
@@ -40,7 +39,7 @@ interface CardProps {
 
 // CardC renders the card
 function CardC({ unit }: CardProps) {
-  const { unit_id, unit_type, unit_health, unit_symbol, isFriendly, role_type, unit_size, force_posture, force_mobility, force_readiness, force_skill } = unit;
+  const { unit_id, unit_type, unit_health, isFriendly, role_type, unit_size, force_posture, force_mobility, force_readiness, force_skill } = unit;
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
   const navigate = useNavigate();
 
