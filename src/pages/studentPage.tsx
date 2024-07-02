@@ -144,7 +144,7 @@ function App() {
               </>
             ) : (
               // Render the hierarchy
-              <Hierarchy is_friendly={true} hierarchyRefresh={0} />
+              <Hierarchy is_friendly={true} hierarchyRefresh={0} xCoord={1250} yCoord={70}/>
             )}
           </div>
         </AppShell.Main>

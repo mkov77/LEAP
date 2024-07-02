@@ -270,7 +270,7 @@ function SectionControls() {
                 <Button color='red' size="xl" justify='right' onClick={handleClear} >Clear</Button>
                 
               </Group>
-              <Hierarchy is_friendly={isFriendlyHierarchy === 'Friendly'} hierarchyRefresh={refreshHierarchy} />
+              <Hierarchy is_friendly={isFriendlyHierarchy === 'Friendly'} hierarchyRefresh={refreshHierarchy} xCoord={1250} yCoord={70}/>
 
         </AppShell.Main>
       </AppShell>

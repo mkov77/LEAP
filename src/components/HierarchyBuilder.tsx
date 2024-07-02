@@ -25,6 +25,8 @@ type UnitAttributes = {
 type HierarchyProps = {
   is_friendly: boolean;
   hierarchyRefresh: Number;
+  xCoord: Number;
+  yCoord: Number;
 };
 
 const buildHierarchy = (units: Unit[]): RawNodeDatum[] | null => {
@@ -144,7 +146,7 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
 
 
 
-function Hierarchy({ is_friendly, hierarchyRefresh }: HierarchyProps) {
+function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyProps) {
   const [units, setUnits] = useState<Unit[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [tree, setTree] = useState<RawNodeDatum[] | null>();
@@ -184,7 +186,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh }: HierarchyProps) {
       const response = await axios.get<Unit[]>(`http://10.0.1.226:5000/api/units/sectionNullandAllianceSort`, {
         params: {
           sectionid: userSection,
-          is_friendly: is_friendly
+          isFriendly: is_friendly
         }
       });
       const normalizedData = response.data.map(unit => ({
@@ -350,7 +352,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh }: HierarchyProps) {
             data={tree}
             orientation='vertical'
             nodeSize={{ x: 160, y: 150 }}
-            translate={{ x: 1250, y: 70 }}
+            translate={{ x: Number(xCoord), y: Number(yCoord) }}
             collapsible={false}
             pathFunc={'step'}
             zoom={1.2}
