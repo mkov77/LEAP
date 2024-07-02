@@ -44,7 +44,7 @@ function BattlePage() {
   const [inEngagement, setInEngagement] = useState<Boolean>(false); // Used to track whether a unit is in an engagement or not
   const [round, setRound] = useState<number>(1); // Sets the round number for each round of the engagement
   const [totalEnemyDamage, setTotalEnemyDamage] = useState<number>(0);
-  const [totalFriendlyDamage, setTotalFriendlyDamage] = useState<number>(0);
+  const [totalFriendlyDamage, setTotalFriendlyDamage] = useState<number | null>(null);
   const [winner, setWinner] = useState<string | null>(null);
 
 
@@ -235,39 +235,48 @@ function BattlePage() {
   // This function handles the engagement tactics form submission
   const finalizeTactics = async () => {
 
+    console.log("total friendly damage: ", totalFriendlyDamage);
+
     // Dummy data for enemyscore
     const enemyTotalScore = 15;
 
     // Calculates the total friendly score which is 70% of the base value plue 30% of the tactics value
     const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
+
+    // Checks whether the friendly unit won the engagement or not
     const isWin = friendlyTotalScore > enemyTotalScore;
 
     // 'r' generates a random number 
     let r = Math.floor(Math.random() * (5 - 0 + 1)) + 0;
 
+    console.log("R: ", r);
+
     // Initializes 'b' to zero. 'b' is the variable for the range of weapons given for each unit type
     let b = 0;
 
+    console.log("Unit Type: ", unit_type);
+
     // These are based on values given by Lt. Col. Rayl
-    if (unit_type === "Armored Mechanized" || "Armored Mechanized Tracked" || "Field Artillery") {
+    if (unit_type === 'Armored Mechanized' || unit_type === 'Armored Mechanized Tracked' || unit_type === 'Field Artillery') {
       b = 20;
     }
-    else if (unit_type === "Air Defense") {
+    else if (unit_type === 'Air Defense') {
       b = 50;
     }
-    else if (unit_type === "Infantry") {
+    else if (unit_type === 'Infantry') {
       b = 3;
+      console.log('we are here!')
     }
-    else if (unit_type === "Reconnaissance" || "Unmanned Aerial Systems") {
+    else if (unit_type === 'Reconnaissance' || unit_type === 'Unmanned Aerial Systems') {
       b = 5;
     }
-    else if (unit_type === "Combined Arms") {
+    else if (unit_type === 'Combined Arms') {
       b = 30;
     }
-    else if (unit_type === "Self-propelled" || "Electronic Warfare" || "Air Assault" || "Aviation Rotary Wing") {
+    else if (unit_type === 'Self-propelled' || unit_type === 'Electronic Warfare' || unit_type === 'Air Assault' || unit_type === 'Aviation Rotary Wing') {
       b = 15;
     }
-    else if (unit_type === "Signal" || "Special Operations Forces") {
+    else if (unit_type === 'Signal' || unit_type === 'Special Operations Forces') {
       b = 10;
     }
     else {
@@ -277,14 +286,20 @@ function BattlePage() {
     // Calculates the damage previously done to the friendly unit
     let prevFriendlyDamage = Math.exp(-((r ^ 2) / (2 * (b ^ 2))));
 
+    console.log("prev damage: ", prevFriendlyDamage);
+
     // Calculates the maximum damage that the friendly striking unit can inflict in a particular engagement
     let maxFriendlyDamage = .5 * Number(unit_health);
+
+    console.log("max friendly damage: ", maxFriendlyDamage);
 
     // Calculates the overall damage to the friendly unit
     setTotalFriendlyDamage(maxFriendlyDamage * prevFriendlyDamage);
 
+    console.log("total friendly damage: ", totalFriendlyDamage);
+
     // Subtracts the total damage from the previous friendly health in order to set a new health for the friendly unit
-    setFriendlyHealth(Math.round((Number(friendlyHealth)) - totalFriendlyDamage));
+    setFriendlyHealth(Math.round((Number(friendlyHealth)) - (maxFriendlyDamage * prevFriendlyDamage)));
 
     // Calculates the maximum damage that the enemy striking unit can inflict in a particular engagement
     let maxEnemyDamage = .5 * Number(unit_health);
@@ -293,7 +308,9 @@ function BattlePage() {
     let prevEnemyDamage = Math.exp(-((r ^ 2) / (2 * (b ^ 2))));
 
     // Calculates the overall damage to the enemy unit and sets it to the totalEnemyDamage variable
-    setTotalEnemyDamage(maxEnemyDamage * prevEnemyDamage);
+    setTotalEnemyDamage(25);
+    // maxEnemyDamage * prevEnemyDamage
+    console.log("ENEMY DAMAGE TOTAL: ", totalEnemyDamage);
 
     // Subtracts the total damage from the previous enemy health in order to set a new health for the enemy unit
     setEnemyHealth(Math.round((Number(enemyHealth)) - totalEnemyDamage));
@@ -306,7 +323,6 @@ function BattlePage() {
     const score = calculateRealTimeScore();
     setRealTimeScore(score);
     setScoreFinalized(true); // Mark the score as finalized
-    nextStep();
 
     setRound(round + 1); // Updates the round as the scores are finalized
 
@@ -386,7 +402,7 @@ function BattlePage() {
 
   const friendlyTooltip = (
     <div>
-      <Text>Damage to Friendly Health: {totalFriendlyDamage.toFixed(0)}</Text>
+      <Text>Damage to Friendly Health: {Number(totalFriendlyDamage).toFixed(0)}</Text>
     </div>
   );
 
@@ -404,10 +420,11 @@ function BattlePage() {
           return current + 1;
         }
 
-        finalizeTactics();
-
         interval.stop();
         setLoaded(true);
+
+        nextStep();
+
         return 0;
       }),
     40
@@ -606,7 +623,7 @@ function BattlePage() {
       <MantineProvider defaultColorScheme='dark'>
         <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
           <Stepper.Step allowStepSelect={false} icon={<IconSwords stroke={1.5} style={{ width: rem(27), height: rem(27) }} />}>
-            <h1 style={{ justifyContent: 'center', display: 'flex', alignItems: 'center' }}>Round: {round}</h1>
+            <h1 style={{ justifyContent: 'center', display: 'flex', alignItems: 'center' }}>Round: {round} {totalFriendlyDamage}</h1>
             <div>
               <Grid justify='center' align='flex-start' gutter={100}>
                 <Grid.Col span={4}>
@@ -823,7 +840,14 @@ function BattlePage() {
                 {/* Finalize Score button that includes a animated progress bar to visually slow down the calculations to the cadet*/}
                 <Button
                   className={classes.button}
-                  onClick={() => (!interval.active && interval.start())}
+                  onClick={() => {
+                    if (!interval.active) {
+                      interval.start();
+                    }
+                    console.log("Trying this out pls pls: ", totalFriendlyDamage);
+                    finalizeTactics();
+                    console.log("total friendly damage: ", totalFriendlyDamage);
+                  }}
                   color={theme.primaryColor}
                 >
                   <div className={classes.label}>    {progress !== 0 ? 'Calculating Scores...' : loaded ? 'Complete' : 'Finalize Tactics'}</div>
@@ -863,7 +887,7 @@ function BattlePage() {
                           <Text size="lg">Friendly Tactics Score:</Text>
                           <Text> {calculateRealTimeScore()}</Text>
                           <Text size="lg">Friendly Damage Taken:</Text>
-                          <Text> {totalFriendlyDamage.toFixed(0)}</Text>
+                          <Text> {Number(totalFriendlyDamage).toFixed(0)}</Text>
                         </Grid.Col>
                       </Group>
 
