@@ -24,6 +24,16 @@ export interface Form {
   enemyScore: number;
 }
 
+interface UnitTactics {
+  awareness: number;
+  logistics: number;
+  coverage: number;
+  gps: number;
+  comms: number;
+  fire: number;
+  pattern: number;
+}
+
 function BattlePage() {
   //Initializes global variables
   const navigate = useNavigate(); // A way to navigate to different pages
@@ -48,6 +58,8 @@ function BattlePage() {
   const [totalFriendlyDamage, setTotalFriendlyDamage] = useState<number | null>(null);
   const [winner, setWinner] = useState<string | null>(null);
   const [enemyUnits, setEnemyUnits] = useState<Unit[]>([]);
+  const [unitTactics, setUnitTactics] = useState<UnitTactics | null>(null);
+  const [enemyBaseValue, setEnemyBaseValue] = useState<number>(0); // Sets and gets the state for the enemy base value 
 
   // Fetches data of the units based on class section
   useEffect(() => {
@@ -83,6 +95,22 @@ function BattlePage() {
     };
     fetchData();
   }, []);
+
+
+  useEffect(() => {
+    const fetchUnitTactics = async () => {
+      try {
+        const response = await axios.get<UnitTactics>(`http://10.0.1.226:5000/api/unitTactics/${enemyUnit?.id}`);
+        setUnitTactics(response.data);
+      } catch (error) {
+        console.error('Error fetching unit tactics:', error);
+      }
+    };
+
+    if (enemyUnit) {
+      fetchUnitTactics();
+    }
+  }, [enemyUnit]);
 
 
 
@@ -146,8 +174,6 @@ function BattlePage() {
 
   // function for the button (either 'Next Round' or 'Done') that moves an engagement from one round to another based on health of both the enemy and friendly units
   const handleNextRound = (currentFriendlyHealth: number, currentEnemyHealth: number) => {
-    console.log("Handling Next Round");
-    console.log("1-- Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth)
     if (currentEnemyHealth > 0 && currentFriendlyHealth > 0) {
       setActive(0);
       setLoaded(false);
@@ -164,8 +190,6 @@ function BattlePage() {
         updateUnitHealth(Number(enemyUnit?.id), 0);
       }
 
-      console.log("Current unit health:", unit_health);
-      console.log("2-- Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth);
       setSelectedUnit(null);
       navigate(closeLocation);
     }
@@ -178,7 +202,6 @@ function BattlePage() {
     setEnemyUnit(selectedUnit || null);
     // Set initial enemyHealth based on enemy unit health
     setEnemyHealth(selectedUnit?.unit_health ?? 0);
-    console.log("WEEEEEEE Enemy Unit: ", enemyUnit);
   };
 
   // Handle deselect enemy unit
@@ -230,11 +253,6 @@ function BattlePage() {
       const calculatedValue = calculateBaseValue(unit);
       setBaseValue(calculatedValue);
 
-      // if (enemyUnit){
-      //   const enemyCalculatedValue = calculateBaseValue(enemyUnit);
-      //   setBaseValue(enemyCalculatedValue);
-      // }
-
       // Set initial friendlyHealth based on unit_health
       setFriendlyHealth(unit.unit_health ?? 0);
 
@@ -242,6 +260,10 @@ function BattlePage() {
       setInEngagement(false);
 
     }
+  if (enemyUnit){
+    const enemyCalculatedValue = calculateBaseValue(enemyUnit);
+    setEnemyBaseValue(enemyCalculatedValue);
+  }
   }, [unit]);
 
   //function to move to the next set of questions or backwards in the yes/no questions sections
@@ -294,7 +316,7 @@ function BattlePage() {
   const finalizeTactics = async () => {
 
     // Dummy data for enemyscore
-    const enemyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
+    const enemyTotalScore = ((enemyBaseValue * .70) + (Number(realTimeScore) * .30));
 
     // Calculates the total friendly score which is 70% of the base value plue 30% of the tactics value
     const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
@@ -304,6 +326,7 @@ function BattlePage() {
 
     // 'r' generates a random number 
     let r = Math.floor(Math.random() * (5 - 0 + 1)) + 0;
+    let r_enemy = Math.floor(Math.random() * (5 - 0 + 1)) + 0;
 
     // Initializes 'b' to zero. 'b' is the variable for the range of weapons given for each unit type
     let b = 0;
@@ -385,7 +408,7 @@ function BattlePage() {
     let prevEnemyDamage = 0;
     // Calculates the damage previously done to the enemy unit
     if (b > 0) {
-      prevEnemyDamage = Math.exp(-((r ** 2) / (2 * (b ** 2))));
+      prevEnemyDamage = Math.exp(-((r_enemy ** 2) / (2 * (b ** 2))));
     }
     else {
       prevEnemyDamage = 0;
@@ -552,13 +575,13 @@ function BattlePage() {
 
   // Printing scores into the Engagement Data card in AAR
   const answers: Form[] = [
-    { ID: 'Aware of OPFOR?', friendlyScore: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
-    { ID: 'Within Logistics Support Range?', friendlyScore: weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], enemyScore: 25 },
-    { ID: 'Within RPA/ISR Coverage?', friendlyScore: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
-    { ID: 'Working GPS?', friendlyScore: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
-    { ID: 'Working Communications?', friendlyScore: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], enemyScore: 15 },
-    { ID: 'Within Fire Support Range?', friendlyScore: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], enemyScore: 0 },
-    { ID: 'Within Range of a Pattern Force?', friendlyScore: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], enemyScore: 15 }
+    { ID: 'Aware of OPFOR?', friendlyScore: weights.awareOfPresence[question1.toLowerCase() as 'yes' | 'no'], enemyScore: 20 * Number(unitTactics?.awareness) },
+    { ID: 'Within Logistics Support Range?', friendlyScore: weights.logisticsSupportRange[question2.toLowerCase() as 'yes' | 'no'], enemyScore: 25 * Number(unitTactics?.logistics) },
+    { ID: 'Within RPA/ISR Coverage?', friendlyScore: weights.isrCoverage[question3.toLowerCase() as 'yes' | 'no'], enemyScore: 10 * Number(unitTactics?.coverage) },
+    { ID: 'Working GPS?', friendlyScore: weights.gpsWorking[question4.toLowerCase() as 'yes' | 'no'], enemyScore: 10 * Number(unitTactics?.gps) },
+    { ID: 'Working Communications?', friendlyScore: weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'], enemyScore: 10 * Number(unitTactics?.comms) },
+    { ID: 'Within Fire Support Range?', friendlyScore: weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'], enemyScore: 15 * Number(unitTactics?.fire) },
+    { ID: 'Within Range of a Pattern Force?', friendlyScore: weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'], enemyScore: 10 * Number(unitTactics?.pattern) }
   ]
 
 
@@ -824,9 +847,23 @@ function BattlePage() {
                 <Grid.Col span={6}>
                   <h1>Enemy: {enemyUnit?.unit_id}</h1>
                   <p>Aware of OPFOR presence?</p>
-                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <SegmentedControl
+                    size='xl'
+                    radius='xs'
+                    color="gray"
+                    data={['Yes', 'No']}
+                    value={unitTactics?.awareness ? 'Yes' : 'No'} // Assuming awareness is a boolean in unitTactics
+                    disabled
+                  />
                   <p>Within logistics support range?</p>
-                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <SegmentedControl
+                    size='xl'
+                    radius='xs'
+                    color="gray"
+                    data={['Yes', 'No']}
+                    value={unitTactics?.logistics ? 'Yes' : 'No'}
+                    disabled
+                  />
                 </Grid.Col>
               </Grid>
 
@@ -853,9 +890,23 @@ function BattlePage() {
                 <Grid.Col span={6}>
                   <h1>Enemy: {enemyUnit?.unit_id}</h1>
                   <p>Under ISR coverage?</p>
-                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <SegmentedControl
+                    size='xl'
+                    radius='xs'
+                    color="gray"
+                    data={['Yes', 'No']}
+                    value={unitTactics?.coverage ? 'Yes' : 'No'}
+                    disabled
+                  />
                   <p>Working GPS?</p>
-                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <SegmentedControl
+                    size='xl'
+                    radius='xs'
+                    color="gray"
+                    data={['Yes', 'No']}
+                    value={unitTactics?.gps ? 'Yes' : 'No'}
+                    disabled
+                  />
                 </Grid.Col>
               </Grid>
 
@@ -882,9 +933,23 @@ function BattlePage() {
                 <Grid.Col span={6}>
                   <h1>Enemy: {enemyUnit?.unit_id}</h1>
                   <p>Working communications?</p>
-                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <SegmentedControl
+                    size='xl'
+                    radius='xs'
+                    color="gray"
+                    data={['Yes', 'No']}
+                    value={unitTactics?.comms ? 'Yes' : 'No'}
+                    disabled
+                  />
                   <p>Within fire support range?</p>
-                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <SegmentedControl
+                    size='xl'
+                    radius='xs'
+                    color="gray"
+                    data={['Yes', 'No']}
+                    value={unitTactics?.fire ? 'Yes' : 'No'}
+                    disabled
+                  />
                 </Grid.Col>
               </Grid>
 
@@ -909,7 +974,14 @@ function BattlePage() {
                 <Grid.Col span={6}>
                   <h1>Enemy: {enemyUnit?.unit_id}</h1>
                   <p>Accessible by pattern force?</p>
-                  <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
+                  <SegmentedControl
+                    size='xl'
+                    radius='xs'
+                    color="gray"
+                    data={['Yes', 'No']}
+                    value={unitTactics?.pattern ? 'Yes' : 'No'}
+                    disabled
+                  />
                 </Grid.Col>
               </Grid>
               <Group justify="center" mt="xl">
