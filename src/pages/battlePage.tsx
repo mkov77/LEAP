@@ -152,7 +152,18 @@ function BattlePage() {
       setActive(0);
       setLoaded(false);
     } else {
-      updateUnitHealth(Number(id), 0);
+      if (friendlyHealth > 0) {
+        updateUnitHealth(Number(id), friendlyHealth);
+      } else {
+        updateUnitHealth(Number(id), 0);
+      }
+
+      if (enemyHealth > 0) {
+        updateUnitHealth(Number(enemyUnit?.id), enemyHealth);
+      } else {
+        updateUnitHealth(Number(enemyUnit?.id), 0);
+      }
+
       console.log("Current unit health:", unit_health);
       console.log("2-- Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth);
       setSelectedUnit(null);
@@ -351,10 +362,16 @@ function BattlePage() {
     }
 
     // Calculates the damage previously done to the friendly unit
-    let prevFriendlyDamage = Math.exp(-((r ^ 2) / (2 * (b ^ 2))));
+    let prevFriendlyDamage
+    if (b_enemy > 0) {
+      prevFriendlyDamage = Math.exp(-((r ** 2) / (2 * (b_enemy ** 2))));
+    }
+    else {
+      prevFriendlyDamage = 0;
+    }
 
     // Calculates the maximum damage that the friendly striking unit can inflict in a particular engagement
-    let maxFriendlyDamage = .5 * Number(unit_health);
+    let maxFriendlyDamage = .5 * Number(enemyUnit?.unit_health);
 
     // Calculates the overall damage to the friendly unit
     setTotalFriendlyDamage(maxFriendlyDamage * prevFriendlyDamage);
@@ -363,23 +380,22 @@ function BattlePage() {
     setFriendlyHealth(Math.round((Number(friendlyHealth)) - (maxFriendlyDamage * prevFriendlyDamage)));
 
     // Calculates the maximum damage that the enemy striking unit can inflict in a particular engagement
-    let maxEnemyDamage = .5 * Number(enemyUnit?.unit_health);
-    console.log("Enemy unit health: ", enemyUnit?.unit_health);
+    let maxEnemyDamage = .5 * Number(unit_health);
 
-    console.log("max enemy damage: ", maxEnemyDamage)
-
+    let prevEnemyDamage = 0;
     // Calculates the damage previously done to the enemy unit
-    let prevEnemyDamage = Math.exp(-((r ^ 2) / (2 * (b_enemy ^ 2))));
-
-    console.log("prev enemy damage: ", prevEnemyDamage)
+    if (b > 0) {
+      prevEnemyDamage = Math.exp(-((r ** 2) / (2 * (b ** 2))));
+    }
+    else {
+      prevEnemyDamage = 0;
+    }
 
     // // Calculates the overall damage to the enemy unit and sets it to the totalEnemyDamage variable
     setTotalEnemyDamage(maxEnemyDamage * prevEnemyDamage);
 
-    console.log("total damage: ", totalEnemyDamage);
     // Subtracts the total damage from the previous enemy health in order to set a new health for the enemy unit
-    setEnemyHealth(Math.round((Number(enemyHealth)) -(maxEnemyDamage * prevEnemyDamage)));
-
+    setEnemyHealth(Math.round((Number(enemyHealth)) - (maxEnemyDamage * prevEnemyDamage)));
 
     // Calls the function that calculates the score for each unit and sets the score as finalized
     const score = calculateRealTimeScore();
