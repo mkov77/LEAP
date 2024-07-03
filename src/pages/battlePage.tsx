@@ -258,13 +258,20 @@ function BattlePage() {
 
       // Set initial inEngagement to false
       setInEngagement(false);
-
     }
-  if (enemyUnit){
-    const enemyCalculatedValue = calculateBaseValue(enemyUnit);
-    setEnemyBaseValue(enemyCalculatedValue);
-  }
   }, [unit]);
+
+  //calls the calculateBaseValue() equation and initializes health variables for each enemy unit and ensures that each unit is not currently in an engagement
+  useEffect(() => {
+    if (enemyUnit) {
+      const calculatedValue = calculateBaseValue(enemyUnit);
+      setEnemyBaseValue(calculatedValue);
+
+      // Set initial inEngagement to false
+      setInEngagement(false);
+    }
+  }, [enemyUnit]);
+  
 
   //function to move to the next set of questions or backwards in the yes/no questions sections
   const nextStep = () => setActive((current) => (current < 6 ? current + 1 : current));
@@ -435,7 +442,7 @@ function BattlePage() {
       FriendlyID: unit_id,
       EnemyID: unit_id,
       FriendlyBaseScore: baseValue,
-      EnemyBaseScore: baseValue,
+      EnemyBaseScore: enemyBaseValue,
       FriendlyTacticsScore: realTimeScore,
       EnemyTacticsScore: realTimeScore,
       FriendlyTotalScore: friendlyTotalScore,
@@ -568,6 +575,16 @@ function BattlePage() {
     score += weights.communicationsWorking[question5.toLowerCase() as 'yes' | 'no'];
     score += weights.fireSupportRange[question6.toLowerCase() as 'yes' | 'no'];
     score += weights.patternForceRange[question7.toLowerCase() as 'yes' | 'no'];
+
+    return score;
+  };
+
+  // Calculates the score based on different tactics for each engagement
+  const calculateEnemyRealTimeScore = () => {
+    let score = 0;
+
+    score = ((20 * Number(unitTactics?.awareness)) + (25 * Number(unitTactics?.logistics) + (10 * Number(unitTactics?.coverage)) + (10 * Number(unitTactics?.gps)) +
+      (10 * Number(unitTactics?.comms)) + (15 * Number(unitTactics?.fire)) + (10 * Number(unitTactics?.pattern))));
 
     return score;
   };
@@ -1048,10 +1065,10 @@ function BattlePage() {
                         <Grid.Col>
                           <Text size="lg">Enemy Baseline Score: </Text>
                           <Text >
-                            {baseValue.toFixed(0)}
+                            {enemyBaseValue.toFixed(0)}
                           </Text>
                           <Text size="lg">Enemy Tactics Score:</Text>
-                          <Text> {calculateRealTimeScore()}</Text>
+                          <Text> {calculateEnemyRealTimeScore()}</Text>
                           <Text size="lg">Enemy Damage Taken:</Text>
                           <Text> {totalEnemyDamage.toFixed(0)}</Text>
                         </Grid.Col>
@@ -1084,9 +1101,9 @@ function BattlePage() {
                         >
                           <Progress.Section
                             className={classes.progressSection}
-                            value={Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
+                            value={Math.round((enemyBaseValue * .70) + (Number(realTimeScore) * .30))}
                             color="#bd3058">
-                            {Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
+                            {Math.round((enemyBaseValue * .70) + (Number(realTimeScore) * .30))}
                           </Progress.Section>
                         </Tooltip>
                       </Progress.Root>
