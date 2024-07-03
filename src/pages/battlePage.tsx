@@ -66,8 +66,8 @@ function BattlePage() {
     fetchData();
   }, []);
 
-   // Fetches data of the enemy units based on class section
-   useEffect(() => {
+  // Fetches data of the enemy units based on class section
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units/enemyUnits', {
@@ -103,9 +103,9 @@ function BattlePage() {
   // }, [units]);
 
 
-  
+
   // initializes the characteristics of each enemy unit
-  const unit = units.find((u) => u.unit_id === selectedUnit );
+  const unit = units.find((u) => u.unit_id === selectedUnit);
   const {
     unit_id,
     unit_type,
@@ -116,6 +116,8 @@ function BattlePage() {
     force_skill,
     id
   } = unit || {};
+
+
 
 
   // function to update unit health after each round of an engagement
@@ -158,15 +160,20 @@ function BattlePage() {
     }
   }
 
-  //function that selects an enemy unit when it is clicked on to start an engagement
-  const handleSelectEnemy = () => {
-    if (enemyUnit === null) {
-      setEnemyUnit(selectedUnit);
-    } else {
-      //sets the enemy unit to null after an engagement is done to avoid a glitch that allowed a dead unit to participate in an engagement
-      setEnemyUnit(null);
-    }
-  }
+  // Function that selects an enemy unit when it is clicked on to start an engagement
+  // Handle select enemy unit change
+  const handleSelectEnemy = (value: string | null) => {
+    const selectedUnit = enemyUnits.find(unit => unit.id.toString() === value);
+    setEnemyUnit(selectedUnit || null);
+    // Set initial enemyHealth based on enemy unit health
+    setEnemyHealth(selectedUnit?.unit_health ?? 0);
+    console.log("WEEEEEEE Enemy Unit: ", enemyUnit);
+  };
+
+  // Handle deselect enemy unit
+  const handleDeselectEnemy = () => {
+    setEnemyUnit(null);
+  };
 
   //handler function to start an engagement and move into the yes/no question pages
   const handleStartEngagement = () => {
@@ -212,10 +219,14 @@ function BattlePage() {
       const calculatedValue = calculateBaseValue(unit);
       setBaseValue(calculatedValue);
 
+      // if (enemyUnit){
+      //   const enemyCalculatedValue = calculateBaseValue(enemyUnit);
+      //   setBaseValue(enemyCalculatedValue);
+      // }
+
       // Set initial friendlyHealth based on unit_health
       setFriendlyHealth(unit.unit_health ?? 0);
-      // Set initial enemyHealth based on enemy unit health
-      setEnemyHealth(unit.unit_health ?? 0);
+
       // Set initial inEngagement to false
       setInEngagement(false);
 
@@ -271,10 +282,8 @@ function BattlePage() {
   // This function handles the engagement tactics form submission
   const finalizeTactics = async () => {
 
-    console.log("total friendly damage: ", totalFriendlyDamage);
-
     // Dummy data for enemyscore
-    const enemyTotalScore = 15;
+    const enemyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
 
     // Calculates the total friendly score which is 70% of the base value plue 30% of the tactics value
     const friendlyTotalScore = ((baseValue * .70) + (Number(realTimeScore) * .30));
@@ -285,12 +294,9 @@ function BattlePage() {
     // 'r' generates a random number 
     let r = Math.floor(Math.random() * (5 - 0 + 1)) + 0;
 
-    console.log("R: ", r);
-
     // Initializes 'b' to zero. 'b' is the variable for the range of weapons given for each unit type
     let b = 0;
-
-    console.log("Unit Type: ", unit_type);
+    let b_enemy = 0;
 
     // These are based on values given by Lt. Col. Rayl
     if (unit_type === 'Armored Mechanized' || unit_type === 'Armored Mechanized Tracked' || unit_type === 'Field Artillery') {
@@ -301,7 +307,6 @@ function BattlePage() {
     }
     else if (unit_type === 'Infantry') {
       b = 3;
-      console.log('we are here!')
     }
     else if (unit_type === 'Reconnaissance' || unit_type === 'Unmanned Aerial Systems') {
       b = 5;
@@ -319,41 +324,62 @@ function BattlePage() {
       b = 0;
     }
 
+    // These are based on values given by Lt. Col. Rayl
+    if (enemyUnit?.unit_type === 'Armored Mechanized' || enemyUnit?.unit_type === 'Armored Mechanized Tracked' || enemyUnit?.unit_type === 'Field Artillery') {
+      b_enemy = 20;
+    }
+    else if (enemyUnit?.unit_type === 'Air Defense') {
+      b_enemy = 50;
+    }
+    else if (enemyUnit?.unit_type === 'Infantry') {
+      b_enemy = 3;
+    }
+    else if (enemyUnit?.unit_type === 'Reconnaissance' || enemyUnit?.unit_type === 'Unmanned Aerial Systems') {
+      b_enemy = 5;
+    }
+    else if (enemyUnit?.unit_type === 'Combined Arms') {
+      b_enemy = 30;
+    }
+    else if (enemyUnit?.unit_type === 'Self-propelled' || enemyUnit?.unit_type === 'Electronic Warfare' || enemyUnit?.unit_type === 'Air Assault' || unit_type === 'Aviation Rotary Wing') {
+      b_enemy = 15;
+    }
+    else if (enemyUnit?.unit_type === 'Signal' || enemyUnit?.unit_type === 'Special Operations Forces') {
+      b_enemy = 10;
+    }
+    else {
+      b_enemy = 0;
+    }
+
     // Calculates the damage previously done to the friendly unit
     let prevFriendlyDamage = Math.exp(-((r ^ 2) / (2 * (b ^ 2))));
-
-    console.log("prev damage: ", prevFriendlyDamage);
 
     // Calculates the maximum damage that the friendly striking unit can inflict in a particular engagement
     let maxFriendlyDamage = .5 * Number(unit_health);
 
-    console.log("max friendly damage: ", maxFriendlyDamage);
-
     // Calculates the overall damage to the friendly unit
     setTotalFriendlyDamage(maxFriendlyDamage * prevFriendlyDamage);
-
-    console.log("total friendly damage: ", totalFriendlyDamage);
 
     // Subtracts the total damage from the previous friendly health in order to set a new health for the friendly unit
     setFriendlyHealth(Math.round((Number(friendlyHealth)) - (maxFriendlyDamage * prevFriendlyDamage)));
 
     // Calculates the maximum damage that the enemy striking unit can inflict in a particular engagement
-    let maxEnemyDamage = .5 * Number(unit_health);
+    let maxEnemyDamage = .5 * Number(enemyUnit?.unit_health);
+    console.log("Enemy unit health: ", enemyUnit?.unit_health);
+
+    console.log("max enemy damage: ", maxEnemyDamage)
 
     // Calculates the damage previously done to the enemy unit
-    let prevEnemyDamage = Math.exp(-((r ^ 2) / (2 * (b ^ 2))));
+    let prevEnemyDamage = Math.exp(-((r ^ 2) / (2 * (b_enemy ^ 2))));
 
-    // Calculates the overall damage to the enemy unit and sets it to the totalEnemyDamage variable
-    setTotalEnemyDamage(25);
-    // maxEnemyDamage * prevEnemyDamage
-    console.log("ENEMY DAMAGE TOTAL: ", totalEnemyDamage);
+    console.log("prev enemy damage: ", prevEnemyDamage)
 
+    // // Calculates the overall damage to the enemy unit and sets it to the totalEnemyDamage variable
+    setTotalEnemyDamage(maxEnemyDamage * prevEnemyDamage);
+
+    console.log("total damage: ", totalEnemyDamage);
     // Subtracts the total damage from the previous enemy health in order to set a new health for the enemy unit
-    setEnemyHealth(Math.round((Number(enemyHealth)) - totalEnemyDamage));
+    setEnemyHealth(Math.round((Number(enemyHealth)) -(maxEnemyDamage * prevEnemyDamage)));
 
-    console.log("Total friendly damage: ", totalFriendlyDamage, " Total enemy damage: ", totalEnemyDamage)
-    console.log("TESTING HERE! Friendly Health: ", friendlyHealth, " Enemy Health: ", enemyHealth)
-  
 
     // Calls the function that calculates the score for each unit and sets the score as finalized
     const score = calculateRealTimeScore();
@@ -362,7 +388,7 @@ function BattlePage() {
 
     setRound(round + 1); // Updates the round as the scores are finalized
 
-   console.log(unit_id);
+    console.log(unit_id);
 
     // Prepare data for engagement and tactics
     const engagementData = {
@@ -648,7 +674,6 @@ function BattlePage() {
   // Checks that there is a unit to run an engagement
   const unitNull = () => {
     if (unit_id !== undefined) {
-      console.log("Unit found: ", unit_id);
       return true;
     }
     console.log("Test 1: ", unit_id);
@@ -711,7 +736,7 @@ function BattlePage() {
                         <Group>
                           <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
                             <Image
-                              src={getImageSRC((unit_type ?? '').toString(), false)}
+                              src={getImageSRC((enemyUnit?.unit_type ?? '').toString(), false)}
                               height={160}
                               style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
                             />
@@ -719,20 +744,20 @@ function BattlePage() {
                         </Group>
                       </Card.Section>
 
-                      <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
+                      <Card.Section className={classes.section}><h2>{enemyUnit.unit_id}</h2></Card.Section>
                       {unit ? (
                         <Text size="xl">
-                          <strong>Type:</strong> {unit_type}<br />
-                          <strong>Unit Size:</strong> {unit_size}<br />
-                          <strong>Force Mobility:</strong> {force_mobility}<br />
+                          <strong>Type:</strong> {enemyUnit.unit_type}<br />
+                          <strong>Unit Size:</strong> {enemyUnit.unit_size}<br />
+                          <strong>Force Mobility:</strong> {enemyUnit.force_mobility}<br />
                           <strong>Health:</strong> {enemyHealth}<br />
                           <CustomProgressBarHealth value={Number(enemyHealth)} />
 
-                          <strong>Force Readiness:</strong> {force_readiness}<br />
-                          <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
+                          <strong>Force Readiness:</strong> {enemyUnit.force_readiness}<br />
+                          <CustomProgressBarReadiness value={Number(getReadinessProgress(enemyUnit.force_readiness))} />
 
-                          <strong>Force Skill:</strong> {force_skill}<br />
-                          <CustomProgressBarSkill value={Number(getForceSkill((force_skill)))} />
+                          <strong>Force Skill:</strong> {enemyUnit.force_skill}<br />
+                          <CustomProgressBarSkill value={Number(getForceSkill((enemyUnit.force_skill)))} />
 
                         </Text>
                       ) : (
@@ -747,6 +772,7 @@ function BattlePage() {
                       placeholder='Select Enemy Unit'
                       data={enemyUnits.map(eUnit => ({ value: eUnit.id.toString(), label: eUnit.unit_id }))}
                       searchable
+                      value={enemyUnit}
                       onChange={handleSelectEnemy}
                     >
                     </Select>
@@ -758,7 +784,7 @@ function BattlePage() {
               {/* Buttons to start and engagement or deselect the previously selected enemy unit */}
               <Group justify="center" mt="xl">
                 {(!inEngagement && enemyUnit) ?
-                  (<Button onClick={handleSelectEnemy} disabled={enemyUnit ? false : true} color='red'>Deselect Enemy Unit</Button>) :
+                  (<Button onClick={handleDeselectEnemy} disabled={enemyUnit ? false : true} color='red'>Deselect Enemy Unit</Button>) :
                   (<></>)
                 }
                 <Button onClick={handleStartEngagement} disabled={enemyUnit ? false : true}>{inEngagement ? 'Start Round' : 'Start Engagement'}</Button>
@@ -773,14 +799,14 @@ function BattlePage() {
               <p>Phase 1: Force Strength</p>
               <Grid>
                 <Grid.Col span={4}>
-                  <h1>Friendly {selectedUnit}</h1>
+                  <h1>Friendly: {selectedUnit}</h1>
                   <p>Aware of OPFOR presence?</p>
                   <SegmentedControl value={question1} onChange={setQuestion1} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                   <p>Within logistics support range?</p>
                   <SegmentedControl value={question2} onChange={setQuestion2} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 </Grid.Col>
                 <Grid.Col span={6}>
-                  <h1>Enemy INF-BRIG-C</h1>
+                  <h1>Enemy: {enemyUnit?.unit_id}</h1>
                   <p>Aware of OPFOR presence?</p>
                   <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                   <p>Within logistics support range?</p>
@@ -802,14 +828,14 @@ function BattlePage() {
               <p>Phase 2: Tactical Advantage</p>
               <Grid>
                 <Grid.Col span={6}>
-                  <h1>Friendly {selectedUnit}</h1>
+                  <h1>Friendly: {selectedUnit}</h1>
                   <p>Under ISR coverage?</p>
                   <SegmentedControl value={question3} onChange={setQuestion3} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                   <p>Working GPS?</p>
                   <SegmentedControl value={question4} onChange={setQuestion4} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 </Grid.Col>
                 <Grid.Col span={6}>
-                  <h1>Enemy INF-BRIG-C</h1>
+                  <h1>Enemy: {enemyUnit?.unit_id}</h1>
                   <p>Under ISR coverage?</p>
                   <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                   <p>Working GPS?</p>
@@ -831,14 +857,14 @@ function BattlePage() {
               <p>Phase 3: Fire Support</p>
               <Grid>
                 <Grid.Col span={6}>
-                  <h1>Friendly {selectedUnit}</h1>
+                  <h1>Friendly: {selectedUnit}</h1>
                   <p>Working communications?</p>
                   <SegmentedControl value={question5} onChange={setQuestion5} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                   <p>Within fire support range?</p>
                   <SegmentedControl value={question6} onChange={setQuestion6} size='xl' radius='xs' color="gray" data={['Yes', 'No']} />
                 </Grid.Col>
                 <Grid.Col span={6}>
-                  <h1>Enemy INF-BRIG-C</h1>
+                  <h1>Enemy: {enemyUnit?.unit_id}</h1>
                   <p>Working communications?</p>
                   <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                   <p>Within fire support range?</p>
@@ -860,12 +886,12 @@ function BattlePage() {
               <p>Phase 4: Terrain</p>
               <Grid>
                 <Grid.Col span={6}>
-                  <h1>Friendly {selectedUnit}</h1>
+                  <h1>Friendly: {selectedUnit}</h1>
                   <p>Accessible by pattern force?</p>
                   <SegmentedControl value={question7} onChange={setQuestion7} size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled={progress !== 0} />
                 </Grid.Col>
                 <Grid.Col span={6}>
-                  <h1>Enemy INF-BRIG-C</h1>
+                  <h1>Enemy: {enemyUnit?.unit_id}</h1>
                   <p>Accessible by pattern force?</p>
                   <SegmentedControl size='xl' radius='xs' color="gray" data={['Yes', 'No']} disabled />
                 </Grid.Col>
@@ -908,7 +934,7 @@ function BattlePage() {
           {/* Displays the round summary page with comparisons between friendly and enemy units */}
           <Stepper.Step allowStepSelect={false} icon={<IconHeartbeat stroke={1.5} style={{ width: rem(35), height: rem(35) }} />}>
             <div>
-              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? displayWinner(Number(friendlyHealth), Number(enemyHealth)) : 'Round '+ (round - 1) + ' After-Action Report'}</h1>
+              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? displayWinner(Number(friendlyHealth), Number(enemyHealth)) : 'Round ' + (round - 1) + ' After-Action Report'}</h1>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
                 <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px', textAlign: 'center' }} display={'flex'}>
                   <Card.Section >
@@ -963,7 +989,7 @@ function BattlePage() {
 
                       {/* Displays a progress bar with the total score (overall characteristics and tactics) for the enemy unit */}
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
-                      <Tooltip
+                        <Tooltip
                           position="top"
                           transitionProps={{ transition: 'fade-up', duration: 300 }}
                           label="Overall Score Out of 100"
