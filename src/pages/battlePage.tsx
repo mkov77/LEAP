@@ -47,7 +47,7 @@ function BattlePage() {
   const [totalEnemyDamage, setTotalEnemyDamage] = useState<number>(0);
   const [totalFriendlyDamage, setTotalFriendlyDamage] = useState<number | null>(null);
   const [winner, setWinner] = useState<string | null>(null);
-
+  const [enemyUnits, setEnemyUnits] = useState<Unit[]>([]);
 
   // Fetches data of the units based on class section
   useEffect(() => {
@@ -66,9 +66,46 @@ function BattlePage() {
     fetchData();
   }, []);
 
+   // Fetches data of the enemy units based on class section
+   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units/enemyUnits', {
+          params: {
+            sectionid: userSection  // Pass userSection as a query parameter
+          }
+        });
+        setEnemyUnits(response.data);
+        console.log('Enemy units:', enemyUnits);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
-  // initializes the characteristics of each unit
-  const unit = units.find((u) => u.unit_id === selectedUnit);
+
+
+  // // Function to filter units where isFriendly is false
+  // const filterUnfriendlyUnits = () => {
+  //   const unfriendlyUnits = units.filter(unit => unit.isFriendly === false);
+  //   setEnemyUnits(unfriendlyUnits);
+  // };
+
+  // // Optionally call the filter function when units data is fetched
+  // useEffect(() => {
+  //   console.log(units)
+  //   if (units.length > 0) {
+  //     console.log('Its running');
+  //     filterUnfriendlyUnits();
+  //     console.log(enemyUnits)
+  //   }
+  // }, [units]);
+
+
+  
+  // initializes the characteristics of each enemy unit
+  const unit = units.find((u) => u.unit_id === selectedUnit );
   const {
     unit_id,
     unit_type,
@@ -230,8 +267,6 @@ function BattlePage() {
   const [question5, setQuestion5] = useState('Yes')
   const [question6, setQuestion6] = useState('Yes')
   const [question7, setQuestion7] = useState('Yes')
-
-
 
   // This function handles the engagement tactics form submission
   const finalizeTactics = async () => {
@@ -613,9 +648,11 @@ function BattlePage() {
   // Checks that there is a unit to run an engagement
   const unitNull = () => {
     if (unit_id !== undefined) {
-      // console.log("Unit found: ", unit_id)
+      console.log("Unit found: ", unit_id);
       return true;
     }
+    console.log("Test 1: ", unit_id);
+    console.log("Test 2: ", selectedUnit);
   }
 
   // Starts the battle page if a unit has been selected
@@ -708,7 +745,7 @@ function BattlePage() {
                     (<Select
                       label="Select Enemy Unit"
                       placeholder='Select Enemy Unit'
-                      data={['INF-BRIG-B', 'ARTY-PLT-C', 'INF-PLT-G', 'INF-BRIG-A']}
+                      data={enemyUnits.map(eUnit => ({ value: eUnit.id.toString(), label: eUnit.unit_id }))}
                       searchable
                       onChange={handleSelectEnemy}
                     >
@@ -973,6 +1010,7 @@ function BattlePage() {
   // If there is no selected unit, navigate back to the home page
   // Deals with an issue with the refresh button
   else {
+    console.log('Selected Unit: ', selectedUnit);
     navigate('/')
     return (
       <Text> Error. Rerouting. </Text>
