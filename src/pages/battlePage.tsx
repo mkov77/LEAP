@@ -4,7 +4,7 @@ The engagement continues until either the friendly or enemy unit dies and the in
 import React, { useEffect, useState } from 'react';
 import '@mantine/core/styles.css';
 import '../App.css';
-import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Select, useMantineTheme, rgba, Tooltip } from '@mantine/core';
+import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Select, useMantineTheme, rgba, Tooltip, Space, Container } from '@mantine/core';
 import { useDisclosure, useInterval } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconSwords, IconHeartbeat, IconNumber1Small, IconNumber2Small, IconNumber3Small, IconNumber4Small } from '@tabler/icons-react';
@@ -271,7 +271,7 @@ function BattlePage() {
       setInEngagement(false);
     }
   }, [enemyUnit]);
-  
+
 
   //function to move to the next set of questions or backwards in the yes/no questions sections
   const nextStep = () => setActive((current) => (current < 6 ? current + 1 : current));
@@ -719,12 +719,12 @@ function BattlePage() {
     );
   };
 
-  const displayWinner = (friendlyHealth: number, enemyHealth: number): string => {
-    if (friendlyHealth <= 0 || enemyHealth <= 0) {
-      return friendlyHealth > enemyHealth ? 'Friendly Won' : 'Enemy Won';
-    }
-    return 'Round Summary';
-  };
+  // const displayWinner = (friendlyHealth: number, enemyHealth: number): string => {
+  //   if (friendlyHealth <= 0 || enemyHealth <= 0) {
+  //     return friendlyHealth > enemyHealth ? 'Friendly Won' : 'Enemy Won';
+  //   }
+  //   return 'Round Summary';
+  // };
 
 
   // Checks that there is a unit to run an engagement
@@ -742,7 +742,7 @@ function BattlePage() {
       <MantineProvider defaultColorScheme='dark'>
         <Stepper active={active} onStepClick={setActive} allowNextStepsSelect={false} style={{ padding: '20px' }}>
           <Stepper.Step allowStepSelect={false} icon={<IconSwords stroke={1.5} style={{ width: rem(27), height: rem(27) }} />}>
-            <h1 style={{ justifyContent: 'center', display: 'flex', alignItems: 'center' }}>Round: {round}</h1>
+            <h1 style={{ justifyContent: 'center', display: 'flex', alignItems: 'center' }}>Round {round}</h1>
             <div>
               <Grid justify='center' align='flex-start' gutter={100}>
                 <Grid.Col span={4}>
@@ -1035,48 +1035,206 @@ function BattlePage() {
           </Stepper.Step>
           {/* Dnd of yes/no questions for cadets */}
 
-
+          {/* AAR PAGE */}
           {/* Displays the round summary page with comparisons between friendly and enemy units */}
           <Stepper.Step allowStepSelect={false} icon={<IconHeartbeat stroke={1.5} style={{ width: rem(35), height: rem(35) }} />}>
             <div>
-              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? displayWinner(Number(friendlyHealth), Number(enemyHealth)) : 'Round ' + (round - 1) + ' After-Action Report'}</h1>
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-                <Card shadow="sm" padding="xl" radius="md" withBorder style={{ width: '600px', marginBottom: '200px', marginTop: '200px', textAlign: 'center' }} display={'flex'}>
-                  <Card.Section >
+              {/*  style={{backgroundColor: 'yellow'}} */}
+              {/* <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? displayWinner(Number(friendlyHealth), Number(enemyHealth)) : 'Round ' + (round - 1) + ' After Action Review'}</h1> */}
+
+              <Group justify="center" mt="xl" display={'flex'}>
+                <Card shadow="sm" padding="md" radius="md" withBorder style={{ width: '600px', textAlign: 'center' }} display={'flex'}>
+                  <Card.Section withBorder inheritPadding py="xs">
                     <div style={{ textAlign: 'center' }}>
-                      <h2>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Final Round' : 'Round Summary'}</h2>
+                      <h2>{((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Final After Action Review' : 'Round After Action Review'}</h2>
                     </div>
+                  </Card.Section>
+
+                  <Card.Section withBorder inheritPadding py="xs">
+                    <Container>
+                      <Text size="xl" fw={700}>Damage</Text>
+                    </Container>
+
+                    {/* Friendly Damage Bar */}
+                    <Grid >
+                      <Grid.Col span={2} style={{ display: 'flex', alignItems: 'center'}}>
+                        <Text size="sm">{unit_id}</Text>
+                      </Grid.Col>
+
+                      <Grid.Col span={10}>
+                        <Tooltip
+                          color="gray"
+                          position="bottom"
+                          transitionProps={{ transition: 'fade-up', duration: 400 }}
+                          label="Friendly Health"
+                        >
+                          <Progress.Root size={30} classNames={{ label: classes.progressLabel }} m={10}>
+                            <Progress.Section value={friendlyHealth - Number(totalFriendlyDamage)} color={'#3d85c6'} key={'damage'}>
+                              {totalFriendlyDamage === 0 ? 'No Damage' : ''}
+                            </Progress.Section>
+
+
+                            <Progress.Section value={Number(totalFriendlyDamage)} color={'#2b5d8b'} key={'damage'}>
+                              {'-' + Number(totalFriendlyDamage).toFixed(0)}
+                            </Progress.Section>
+                          </Progress.Root>
+                        </Tooltip>
+                      </Grid.Col>
+                    </Grid>
+
+                    {/* Enemy Damage Bar */}
+                    <Grid >
+                      <Grid.Col span={2} style={{ display: 'flex', alignItems: 'center' }}>
+                        <Text size="sm">{enemyUnit?.unit_id}</Text>
+                      </Grid.Col>
+
+                      <Grid.Col span={10}>
+                        <Tooltip
+                          color="gray"
+                          position="bottom"
+                          transitionProps={{ transition: 'fade-up', duration: 400 }}
+                          label="Enemy Health"
+                        >
+                          <Progress.Root size={30} classNames={{ label: classes.progressLabel }} m={10}>
+                            <Progress.Section value={enemyHealth} color={'#c1432d'} key={'damage'}>
+                              {totalEnemyDamage === 0 ? 'No Damage' : ''}
+                            </Progress.Section>
+
+                            <Progress.Section value={Number(totalEnemyDamage)} color={'#872f1f'} key={'damage'}>
+                              {enemyHealth === 0 ? 'FATAL' : '-' + Number(totalEnemyDamage).toFixed(0)}
+                            </Progress.Section>
+                          </Progress.Root>
+                        </Tooltip>
+                      </Grid.Col>
+                    </Grid>
+                  </Card.Section>
+
+
+                  <Card.Section withBorder inheritPadding py="xs">
+                    <Container>
+                      <Text size="xl" fw={700}>Tactics</Text>
+                    </Container>
+
+                    {/* Displays a table with the scoring of each tactic of both friendly and enemy units */}
+                    <Table verticalSpacing={'xs'} style={{ justifyContent: 'center' }}>
+                      <Table.Thead>
+                        <Table.Tr>
+                          <Table.Th>Tactic</Table.Th>
+                          <Table.Th style={{ color: '#3d85c6' }}>Friendly Score</Table.Th>
+                          <Table.Th style={{ color: '#c1432d' }}>Enemy Score</Table.Th>
+                        </Table.Tr>
+                      </Table.Thead>
+                      <Table.Tbody>{tacticToRow(answers)}</Table.Tbody>
+                    </Table>
+                  </Card.Section>
+
+
+                  <Card.Section withBorder inheritPadding py="xs">
+
+
+                    <Text size="xl" fw={700}>Scores</Text>
 
                     {/* This displays the round summary based on calculations for tactics and overall unit characteristics for the friendly units */}
                     <Grid style={{ justifyContent: 'center', alignItems: 'center' }}>
                       <Group style={{ flex: 1, textAlign: 'center' }}>
                         <Grid.Col>
-                          <Text size="lg">Friendly Baseline Score: </Text>
-                          <Text>{baseValue.toFixed(0)}</Text>
-                          <Text size="lg">Friendly Tactics Score:</Text>
-                          <Text> {calculateRealTimeScore()}</Text>
+                          <Text size="lg" fw={500}>Attributes</Text>
+
+                          {/* Friendly Attribute Score */}
+                          <Tooltip
+                            color="gray"
+                            position="bottom"
+                            transitionProps={{ transition: 'fade-up', duration: 400 }}
+                            label="Friendly Attribute Score"
+                          >
+                            <Progress.Root m={10} style={{ height: '20px' }}>
+
+                              <Progress.Section
+                                className={classes.progressSection}
+                                value={baseValue}
+                                color='#3d85c6'>
+                                {baseValue.toFixed(0)}
+                              </Progress.Section>
+
+                            </Progress.Root>
+                          </Tooltip>
+
+                          {/* Enemy Attribute Score */}
+                          <Tooltip
+                            color="gray"
+                            position="bottom"
+                            transitionProps={{ transition: 'fade-up', duration: 400 }}
+                            label="Enemy Attribute Score"
+                          >
+                            <Progress.Root m={10} style={{ height: '20px' }}>
+
+                              <Progress.Section
+                                className={classes.progressSection}
+                                value={enemyBaseValue}
+                                color='#c1432d'>
+                                {enemyBaseValue.toFixed(0)}
+                              </Progress.Section>
+
+                            </Progress.Root>
+                          </Tooltip>
+                          {/* 
                           <Text size="lg">Friendly Damage Taken:</Text>
-                          <Text> {Number(totalFriendlyDamage).toFixed(0)}</Text>
+                          <Text> {Number(totalFriendlyDamage).toFixed(0)}</Text> */}
                         </Grid.Col>
                       </Group>
+
 
                       {/* This displays the round summary based on calculations for tactics and overall unit characteristics for the enemy units */}
                       <Group style={{ flex: 1, textAlign: 'center' }}>
                         <Grid.Col>
-                          <Text size="lg">Enemy Baseline Score: </Text>
-                          <Text >
-                            {enemyBaseValue.toFixed(0)}
-                          </Text>
-                          <Text size="lg">Enemy Tactics Score:</Text>
-                          <Text> {calculateEnemyRealTimeScore()}</Text>
-                          <Text size="lg">Enemy Damage Taken:</Text>
-                          <Text> {totalEnemyDamage.toFixed(0)}</Text>
+                          <Text size="lg" fw={500}>Tactics</Text>
+
+                          {/* Friendly Tactics Score */}
+                          <Tooltip
+                            color="gray"
+                            position="bottom"
+                            transitionProps={{ transition: 'fade-up', duration: 400 }}
+                            label="Friendly Tactics Score"
+                          >
+                            <Progress.Root m={10} style={{ height: '20px' }}>
+
+                              <Progress.Section
+                                className={classes.progressSection}
+                                value={calculateRealTimeScore()}
+                                color='#3d85c6'>
+                                {calculateRealTimeScore()}
+                              </Progress.Section>
+
+                            </Progress.Root>
+                          </Tooltip>
+
+                          {/* Enemy Tactics Score */}
+                          <Tooltip
+                            color="gray"
+                            position="bottom"
+                            transitionProps={{ transition: 'fade-up', duration: 400 }}
+                            label="Enemy Tactics Score"
+                          >
+                            <Progress.Root m={10} style={{ height: '20px' }}>
+
+                              <Progress.Section
+                                className={classes.progressSection}
+                                value={calculateEnemyRealTimeScore()}
+                                color='#c1432d'>
+                                {calculateEnemyRealTimeScore()}
+                              </Progress.Section>
+
+                            </Progress.Root>
+                          </Tooltip>
+
+                          {/* <Text size="lg">Enemy Damage Taken:</Text>
+                          <Text> {totalEnemyDamage.toFixed(0)}</Text> */}
                         </Grid.Col>
                       </Group>
                     </Grid>
 
                     {/* Displays a progress bar with the total score (overall characteristics and tactics) for the friendly unit */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
+                    {/* <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
                       <Progress.Root style={{ width: '200px', height: '25px' }}>
                         <Tooltip
                           position="top"
@@ -1090,10 +1248,10 @@ function BattlePage() {
                             {Math.round((baseValue * .70) + (Number(realTimeScore) * .30))}
                           </Progress.Section>
                         </Tooltip>
-                      </Progress.Root>
+                      </Progress.Root> */}
 
-                      {/* Displays a progress bar with the total score (overall characteristics and tactics) for the enemy unit */}
-                      <Progress.Root style={{ width: '200px', height: '25px' }}>
+                    {/* Displays a progress bar with the total score (overall characteristics and tactics) for the enemy unit */}
+                    {/* <Progress.Root style={{ width: '200px', height: '25px' }}>
                         <Tooltip
                           position="top"
                           transitionProps={{ transition: 'fade-up', duration: 300 }}
@@ -1107,27 +1265,22 @@ function BattlePage() {
                           </Progress.Section>
                         </Tooltip>
                       </Progress.Root>
-                    </div>
+                    </div> */}
 
-                    {/* Displays a table with the scoring of each tactic of both friendly and enemy units */}
-                    <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center' }}>
-                      <Table.Thead>
-                        <Table.Tr>
-                          <Table.Th>Tactic</Table.Th>
-                          <Table.Th>Friendly Score</Table.Th>
-                          <Table.Th>Enemy Score</Table.Th>
-                        </Table.Tr>
-                      </Table.Thead>
-                      <Table.Tbody>{tacticToRow(answers)}</Table.Tbody>
-                    </Table>
                   </Card.Section>
+
+
+
+
+
                 </Card>
-              </div>
+              </Group>
+
 
               {/* Button that either moves the engagement to the next round or ends the engagement based off of friendly and enemy health */}
               <Group justify="center" mt="xl" display={'flex'}>
                 <Button display='flex' onClick={() => handleNextRound(Number(friendlyHealth), Number(enemyHealth))}>
-                  {((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Done' : 'Continue Enagement'}
+                  {((Number(friendlyHealth) <= 0) || (Number(enemyHealth) <= 0)) ? 'Exit' : 'Continue Enagement'}
                 </Button>
               </Group>
             </div>

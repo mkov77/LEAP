@@ -91,7 +91,7 @@ function App() {
         <AppShell.Main>
           <div style={{justifyContent:'right', display:'flex'}}>
             {/* After action report Button where user can switch views */}
-            <Button size='sm' variant='link' onClick={handleAARClick} style={{ margin: '10px ' }}>After Action Reports</Button>
+            <Button size='sm' variant='link' onClick={handleAARClick} style={{ margin: '10px ' }}>After Action Reviews</Button>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>

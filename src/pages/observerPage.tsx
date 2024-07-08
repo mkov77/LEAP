@@ -125,7 +125,7 @@ function ObserverPage() {
     navigate('/');
   };
 
-  // Navigate to the After Action Reports page for the current section
+  // Navigate to the After Action Reviews page for the current section
   const handleAARClick = () => {
     navigate(`/AAR/${sectionId}`)
   }
