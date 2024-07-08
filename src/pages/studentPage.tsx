@@ -4,9 +4,9 @@
 import '../App.css';
 import CarouselC from '../components/carousel'; // Remove the '.tsx' extension
 import SearchResultList from '../components/searchResults'
-import { AppShell, Burger, Group, Skeleton, Image, TextInput, useMantineColorScheme, useComputedColorScheme, Button, MantineProvider, Modal } from '@mantine/core';
+import { AppShell, Burger, Group, Skeleton, Image, TextInput, useMantineColorScheme, useComputedColorScheme, Button, MantineProvider, Modal, SegmentedControl } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, SetStateAction } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserRole } from '../context/UserContext';
 import { useUnitProvider } from '../context/UnitContext';
@@ -23,6 +23,7 @@ function App() {
   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
   const { selectedUnit, setSelectedUnit } = useUnitProvider();
   const [hierarchyToggle, setHierarchyToggle] = useState(false);
+  const [view, setView] = useState('Unit Selection');
 
   // Redirects to the home page if the user is not a 'Student' or if their section ID does not match the current section ID.
   useEffect(() => {
@@ -32,6 +33,17 @@ function App() {
       navigate('/');
     }
   }, [navigate, userRole]);
+
+  const handleViewChange = (value: SetStateAction<string>) => {
+    setView(value);
+    if (value === 'After Action Reviews') {
+      handleAARClick();
+    } else if (value === 'Hierarchy View') {
+      setHierarchyToggle(true);
+    } else {
+      setHierarchyToggle(false);
+    }
+  };
 
   // Updates the search state with the value from the input field
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,20 +101,46 @@ function App() {
 
         {/* Everything that isn't the header / nav bar */}
         <AppShell.Main>
-          <div style={{justifyContent:'right', display:'flex'}}>
-            {/* After action report Button where user can switch views */}
+          {/* After action report Button where user can switch views */}
+          {/* <div style={{ justifyContent: 'right', display: 'flex' }}>
             <Button size='sm' variant='link' onClick={handleAARClick} style={{ margin: '10px ' }}>After Action Reviews</Button>
-          </div>
+          </div> */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+            
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <h1>Friendly Units</h1>
+
               {sectionId && (
-                <p>
-                  You are in section: <strong>{sectionId}</strong>
-                </p>
+                <h1>
+                  Section <strong>{sectionId}</strong>
+                </h1>
               )}
-              {/* Unit Search Bar */}
-              {!hierarchyToggle && (
+              
+            </div>
+
+            <SegmentedControl
+            value={view}
+            onChange={handleViewChange}
+            data={[
+              { label: 'Unit Selection', value: 'Unit Selection' },
+              { label: 'Hierarchy View', value: 'Hierarchy View' },
+              { label: 'After Action Reviews', value: 'After Action Reviews' }
+            ]}
+            size = 'md'
+            style={{ margin: 15 }}
+          />
+            {/* Toggle between selection and hierarchy view */}
+            {/* <div>
+              <Button onClick={() => setHierarchyToggle(!hierarchyToggle)}>
+                {hierarchyToggle ? 'Selection Menu' : 'Hierarchy View'}
+              </Button>
+            </div> */}
+          </div>
+
+          <div style={{ width: '250px' }}>
+
+          {/* Unit Search Bar */}
+          {!hierarchyToggle && (
                 <TextInput
                   placeholder='Search'
                   style={{ width: '100%' }}
@@ -110,14 +148,8 @@ function App() {
                   onChange={handleChange}
                 />
               )}
-            </div>
-            {/* Toggle between selection and hierarchy view */}
-            <div>
-              <Button onClick={() => setHierarchyToggle(!hierarchyToggle)}>
-                {hierarchyToggle ? 'Selection Menu' : 'Hierarchy View'}
-              </Button>
-            </div>
           </div>
+
           <div className="App">
             {/* Decides what to render depending on toggle */}
             {!hierarchyToggle ? (
@@ -144,7 +176,7 @@ function App() {
               </>
             ) : (
               // Render the hierarchy
-              <Hierarchy is_friendly={true} hierarchyRefresh={0} xCoord={1250} yCoord={70}/>
+              <Hierarchy is_friendly={true} hierarchyRefresh={0} xCoord={1250} yCoord={70} />
             )}
           </div>
         </AppShell.Main>

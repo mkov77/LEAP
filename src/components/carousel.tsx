@@ -20,16 +20,12 @@ import { useUserRole } from '../context/UserContext';
 const unitTypes = [
   {
     label: 'JFLCC',
-    value: 'Infantry'
+    value: 'JFLCC'
   },
   {
     label: 'JFSOC',
     value: 'Special Operations Forces'
-  },
-  {
-    label: 'Other',
-    value: 'Other'
-  },
+  }
 ];
 
 
@@ -94,10 +90,8 @@ function CarouselC() {
 
 // Function to filter units by type
 function filterUnitsByType(type: string, units: Unit[]): Unit[] {
-  if (type === 'Other') {
-    return units.filter(
-      (unit) => unit.unit_type !== 'Infantry' && unit.unit_type !== 'Special Operations Forces'
-    );
+  if (type === 'JFLCC') {
+    return units.filter((unit) => unit.unit_type !== 'Special Operations Forces');
   } else {
     return units.filter((unit) => unit.unit_type === type);
   }
