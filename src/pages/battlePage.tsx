@@ -1069,7 +1069,7 @@ function BattlePage() {
                           label="Friendly Health"
                         >
                           <Progress.Root size={30} classNames={{ label: classes.progressLabel }} m={10}>
-                            <Progress.Section value={friendlyHealth - Number(totalFriendlyDamage)} color={'#3d85c6'} key={'damage'}>
+                            <Progress.Section value={friendlyHealth} color={'#3d85c6'} key={'damage'}>
                               {totalFriendlyDamage === 0 ? 'No Damage' : ''}
                             </Progress.Section>
 
