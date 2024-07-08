@@ -403,11 +403,20 @@ function BattlePage() {
     // Calculates the maximum damage that the friendly striking unit can inflict in a particular engagement
     let maxFriendlyDamage = .5 * Number(enemyUnit?.unit_health);
 
+    let friendlyDamage = maxFriendlyDamage * prevFriendlyDamage;
+    console.log("First friendly damage: ", friendlyDamage)
+    console.log("Friendly Health: ", Number(unit_health))
+    if (Number(unit_health) < friendlyDamage){
+      friendlyDamage = Number(unit_health);
+    }
+    console.log("Second friendly damage: ", friendlyDamage)
+
+
     // Calculates the overall damage to the friendly unit
-    setTotalFriendlyDamage(maxFriendlyDamage * prevFriendlyDamage);
+    setTotalFriendlyDamage(friendlyDamage);
 
     // Subtracts the total damage from the previous friendly health in order to set a new health for the friendly unit
-    setFriendlyHealth(Math.round((Number(friendlyHealth)) - (maxFriendlyDamage * prevFriendlyDamage)));
+    setFriendlyHealth(Math.round((Number(friendlyHealth)) - friendlyDamage));
 
     // Calculates the maximum damage that the enemy striking unit can inflict in a particular engagement
     let maxEnemyDamage = .5 * Number(unit_health);
@@ -421,11 +430,20 @@ function BattlePage() {
       prevEnemyDamage = 0;
     }
 
+    // Make sure enemy health is never negative
+    let enemyDamage = maxEnemyDamage * prevEnemyDamage;
+    console.log("First enemy damage: ", enemyDamage)
+    console.log("Enemy Health: ", enemyHealth)
+    if (enemyHealth < enemyDamage){
+      enemyDamage = enemyHealth;
+    }
+    console.log("Second enemy damage: ", enemyDamage)
+
     // // Calculates the overall damage to the enemy unit and sets it to the totalEnemyDamage variable
-    setTotalEnemyDamage(maxEnemyDamage * prevEnemyDamage);
+    setTotalEnemyDamage(enemyDamage);
 
     // Subtracts the total damage from the previous enemy health in order to set a new health for the enemy unit
-    setEnemyHealth(Math.round((Number(enemyHealth)) - (maxEnemyDamage * prevEnemyDamage)));
+    setEnemyHealth(Math.round((Number(enemyHealth)) - enemyDamage));
 
     // Calls the function that calculates the score for each unit and sets the score as finalized
     const score = calculateRealTimeScore();
@@ -671,7 +689,17 @@ function BattlePage() {
     }
 
     return (
-      <Progress value={value} color={color} size={'xl'} />
+      <Group grow gap={5} mb="xs">
+        <Progress
+          size="xl"
+          color={color}
+          value={value > 0 ? 100 : 0}
+          transitionDuration={0}
+        />
+        <Progress size="xl" color={color} transitionDuration={0} value={value < 30 ? 0 : 100} />
+        <Progress size="xl" color={color} transitionDuration={0} value={value < 50 ? 0 : 100} />
+        <Progress size="xl" color={color} transitionDuration={0} value={value < 70 ? 0 : 100} />
+      </Group>
     );
   };
 
@@ -691,7 +719,17 @@ function BattlePage() {
     }
 
     return (
-      <Progress value={value} color={color} size={'xl'} />
+      <Group grow gap={5} mb="xs">
+        <Progress
+          size="xl"
+          color={color}
+          value={value > 0 ? 100 : 0}
+          transitionDuration={0}
+        />
+        <Progress size="xl" color={color} transitionDuration={0} value={value < 30 ? 0 : 100} />
+        <Progress size="xl" color={color} transitionDuration={0} value={value < 50 ? 0 : 100} />
+        <Progress size="xl" color={color} transitionDuration={0} value={value < 70 ? 0 : 100} />
+      </Group>
     );
   };
 
@@ -715,7 +753,7 @@ function BattlePage() {
     }
 
     return (
-      <Progress value={value} color={color} size={'xl'} />
+      <Progress value={value} color={color} size={'xl'} mb='xs' />
     );
   };
 
@@ -761,20 +799,24 @@ function BattlePage() {
                     </Card.Section>
 
                     {/* Displays a card that contains pertinent information about the selected friendly unit */}
-                    <Card.Section className={classes.section}><h2>{selectedUnit}</h2></Card.Section>
+                    <Card.Section><Center><h2>{selectedUnit}</h2></Center></Card.Section>
                     {unit ? (
                       <Text size="xl" style={{ whiteSpace: 'pre-line' }}>
                         <strong>Type:</strong> {unit_type}<br />
+                        <Space mb="5px"/>
                         <strong>Unit Size:</strong> {unit_size}<br />
+                        <Space mb="5px"/>
                         <strong>Force Mobility:</strong> {force_mobility}<br />
-                        <strong>Health:</strong> {friendlyHealth}<br />
-                        <CustomProgressBarHealth value={Number(friendlyHealth)} />
+                        <Space mb="5px"/>
 
                         <strong>Force Readiness:</strong> {force_readiness}<br />
                         <CustomProgressBarReadiness value={Number(getReadinessProgress(force_readiness))} />
 
                         <strong>Force Skill:</strong> {force_skill}<br />
                         <CustomProgressBarSkill value={Number(getForceSkill((force_skill)))} />
+
+                        <strong>Health:</strong> {friendlyHealth}<br />
+                        <CustomProgressBarHealth value={Number(friendlyHealth)} />
                       </Text>
                     ) : (
                       <Text size="sm">Unit not found</Text>
@@ -787,9 +829,9 @@ function BattlePage() {
                 <Grid.Col span={4}>
                   {enemyUnit ? (
                     <Card withBorder radius="md" className={classes.card} >
-                      <Card.Section className={classes.imageSection} mt="md" >
+                      <Card.Section className={classes.imageSection} mt="md">
                         {/* Military icon for the selected enemy unit */}
-                        <Group>
+
                           <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
                             <Image
                               src={getImageSRC((enemyUnit?.unit_type ?? '').toString(), false)}
@@ -797,23 +839,27 @@ function BattlePage() {
                               style={{ width: 'auto', maxHeight: '100%', objectFit: 'contain' }}
                             />
                           </div>
-                        </Group>
+
                       </Card.Section>
 
-                      <Card.Section className={classes.section}><h2>{enemyUnit.unit_id}</h2></Card.Section>
+                      <Card.Section><Center><h2>{enemyUnit.unit_id}</h2></Center></Card.Section>
                       {unit ? (
                         <Text size="xl">
                           <strong>Type:</strong> {enemyUnit.unit_type}<br />
+                          <Space mb="5px"/>
                           <strong>Unit Size:</strong> {enemyUnit.unit_size}<br />
+                          <Space mb="5px"/>
                           <strong>Force Mobility:</strong> {enemyUnit.force_mobility}<br />
-                          <strong>Health:</strong> {enemyHealth}<br />
-                          <CustomProgressBarHealth value={Number(enemyHealth)} />
+                          <Space mb="5px"/>
 
                           <strong>Force Readiness:</strong> {enemyUnit.force_readiness}<br />
                           <CustomProgressBarReadiness value={Number(getReadinessProgress(enemyUnit.force_readiness))} />
 
                           <strong>Force Skill:</strong> {enemyUnit.force_skill}<br />
                           <CustomProgressBarSkill value={Number(getForceSkill((enemyUnit.force_skill)))} />
+                          
+                          <strong>Health:</strong> {enemyHealth}<br />
+                          <CustomProgressBarHealth value={Number(enemyHealth)} />
 
                         </Text>
                       ) : (
@@ -1057,7 +1103,7 @@ function BattlePage() {
 
                     {/* Friendly Damage Bar */}
                     <Grid >
-                      <Grid.Col span={2} style={{ display: 'flex', alignItems: 'center'}}>
+                      <Grid.Col span={2} style={{ display: 'flex', alignItems: 'center' }}>
                         <Text size="sm">{unit_id}</Text>
                       </Grid.Col>
 
@@ -1066,16 +1112,17 @@ function BattlePage() {
                           color="gray"
                           position="bottom"
                           transitionProps={{ transition: 'fade-up', duration: 400 }}
-                          label="Friendly Health"
+                          label={"Friendly Health Remaining: " + (friendlyHealth-Number(totalFriendlyDamage)).toFixed(0)}
                         >
                           <Progress.Root size={30} classNames={{ label: classes.progressLabel }} m={10}>
-                            <Progress.Section value={friendlyHealth} color={'#3d85c6'} key={'damage'}>
+                            <Progress.Section value={friendlyHealth-Number(totalFriendlyDamage)} color={'#3d85c6'} key={'damage'}>
                               {totalFriendlyDamage === 0 ? 'No Damage' : ''}
                             </Progress.Section>
 
 
                             <Progress.Section value={Number(totalFriendlyDamage)} color={'#2b5d8b'} key={'damage'}>
                               {'-' + Number(totalFriendlyDamage).toFixed(0)}
+                              {/* friendlyHealth < Number(totalFriendlyDamage) ? 'FATAL' :  */}
                             </Progress.Section>
                           </Progress.Root>
                         </Tooltip>
@@ -1093,7 +1140,7 @@ function BattlePage() {
                           color="gray"
                           position="bottom"
                           transitionProps={{ transition: 'fade-up', duration: 400 }}
-                          label="Enemy Health"
+                          label= {"Enemy Health Remaining: " + enemyHealth}
                         >
                           <Progress.Root size={30} classNames={{ label: classes.progressLabel }} m={10}>
                             <Progress.Section value={enemyHealth} color={'#c1432d'} key={'damage'}>
@@ -1101,7 +1148,7 @@ function BattlePage() {
                             </Progress.Section>
 
                             <Progress.Section value={Number(totalEnemyDamage)} color={'#872f1f'} key={'damage'}>
-                              {enemyHealth === 0 ? 'FATAL' : '-' + Number(totalEnemyDamage).toFixed(0)}
+                              {enemyHealth <= 0? 'FATAL' : '-' + Number(totalEnemyDamage).toFixed(0)}
                             </Progress.Section>
                           </Progress.Root>
                         </Tooltip>
