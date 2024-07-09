@@ -1,4 +1,4 @@
-# LEAP documentation:
+# LEAP Documentation
 ## Introduction
 
 The Land Engagement Adjudication Platform is a web application developed by C1Cs Michaela Kovalsky, Kieran McCauley, Aaron Eakins, Luke Kuklis (Class of 2025) for the United State Air Force Academy's Multi-Domain Laboratory. Development and testing took place in June 2024 at the Air Force Research Laboratory's Gaming Research Integration for Learning Laboratory.
