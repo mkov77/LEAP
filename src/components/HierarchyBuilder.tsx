@@ -190,7 +190,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyP
   const [units, setUnits] = useState<Unit[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [tree, setTree] = useState<RawNodeDatum[] | null>();
-  const { userRole, setUserRole, userSection, setUserSection } = useUserRole()
+  const { userRole, userSection } = useUserRole()
   const [formValues, setFormValues] = useState({
     ID: 0,
     unitType: '',
