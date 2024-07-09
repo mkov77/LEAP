@@ -428,6 +428,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyP
                 placeholder="Pick one"
                 name='unit'
                 required
+                searchable
                 value={formValues.ID.toString()}
                 onChange={(value) => handleSelectChange(value, 'ID')}
                 data={filteredUnits.map(unit => ({
@@ -444,6 +445,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyP
                 mt="md"
                 value={formValues.unitType}
                 onChange={(value) => handleSelectChange(value, 'unitType')}
+                searchable
                 data={[
                   'Command and Control',
                   'Infantry',
@@ -491,6 +493,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyP
                 mt="md"
                 value={formValues.unitRole}
                 onChange={(value) => handleSelectChange(value, 'unitRole')}
+                searchable
                 data={[
                   'Combat',
                   'Headquarters',
@@ -508,6 +511,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyP
                 mt="md"
                 value={formValues.unitSize}
                 onChange={(value) => handleSelectChange(value, 'unitSize')}
+                searchable
                 data={[
                   'Squad/Team',
                   'Platoon',
