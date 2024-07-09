@@ -4,24 +4,20 @@
 import '../App.css';
 import { AppShell, Image, Button, MantineProvider, Grid } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import React, { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserRole } from '../context/UserContext';
-import { useUnitProvider } from '../context/UnitContext';
-import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
+import { FaArrowAltCircleLeft } from "react-icons/fa";
 import Hierarchy from '../components/HierarchyBuilder';
 import logo from '../images/logo/Tr_FullColor_NoSlogan.png'
 
 // Function where the page renders
 function ObserverPage() {
-  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
-  const [search, setSearch] = useState("");
+  const [mobileOpened] = useDisclosure(false);
+  const [desktopOpened] = useDisclosure(false);
   const navigate = useNavigate();
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
-  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
-  const { selectedUnit, setSelectedUnit } = useUnitProvider();
-  const [hierarchyToggle, setHierarchyToggle] = useState(false);
+  const { userRole, userSection } = useUserRole();
 
   // Redirects to the home page if the user is not a 'Student' or if their section ID does not match the current section ID.
   useEffect(() => {
@@ -31,12 +27,6 @@ function ObserverPage() {
       navigate('/');
     }
   }, [navigate, userRole]);
-
-  // Updates the search state with the value from the input field
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setSearch(value);
-  }
 
   // Navigate to the main login page
   const handleLogoClick = () => {
