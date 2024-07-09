@@ -4,13 +4,12 @@ The engagement continues until either the friendly or enemy unit dies and the in
 import React, { useEffect, useState } from 'react';
 import '@mantine/core/styles.css';
 import '../App.css';
-import { Table, Progress, Text, AppShell, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Select, useMantineTheme, rgba, Tooltip, Space, Container } from '@mantine/core';
-import { useDisclosure, useInterval } from '@mantine/hooks';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Table, Progress, Text, Group, Image, Stepper, Button, SegmentedControl, rem, MantineProvider, Grid, Card, Center, Select, useMantineTheme, rgba, Tooltip, Space, Container } from '@mantine/core';
+import { useInterval } from '@mantine/hooks';
+import { useNavigate } from 'react-router-dom';
 import { IconSwords, IconHeartbeat, IconNumber1Small, IconNumber2Small, IconNumber3Small, IconNumber4Small } from '@tabler/icons-react';
-import { FaSun, FaMoon } from "react-icons/fa";
 import { useUserRole } from '../context/UserContext';
-import { UnitProvider, useUnitProvider } from '../context/UnitContext';
+import { useUnitProvider } from '../context/UnitContext';
 import { Unit } from '../components/Cards';
 import classes from './battlePage.module.css';
 import axios from 'axios';
@@ -43,8 +42,6 @@ function BattlePage() {
   const { selectedUnit, setSelectedUnit } = useUnitProvider(); // Tracks the selected unit for an engagement
   const [baseValue, setBaseValue] = useState<number>(0); // State to track the base value (based on characteristics of each individual unit) of a unit
   const [realTimeScore, setRealTimeScore] = useState<number | null>(null); // State to track the real time (tactics) score of a unit
-  const [scoreFinalized, setScoreFinalized] = useState(false); // State to track if score has been finalized
-
   const [units, setUnits] = useState<Unit[]>([]);
   const [progress, setProgress] = useState(0); // Used to calculate the progress of the animation for the finalize tactics button
   const [loaded, setLoaded] = useState(false);
@@ -56,7 +53,6 @@ function BattlePage() {
   const [round, setRound] = useState<number>(1); // Sets the round number for each round of the engagement
   const [totalEnemyDamage, setTotalEnemyDamage] = useState<number>(0);
   const [totalFriendlyDamage, setTotalFriendlyDamage] = useState<number | null>(null);
-  const [winner, setWinner] = useState<string | null>(null);
   const [enemyUnits, setEnemyUnits] = useState<Unit[]>([]);
   const [unitTactics, setUnitTactics] = useState<UnitTactics | null>(null);
   const [enemyBaseValue, setEnemyBaseValue] = useState<number>(0); // Sets and gets the state for the enemy base value 
@@ -281,38 +277,7 @@ function BattlePage() {
   const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
 
 
-  //sets the values for each of the tactics
-  const weightValues = {
-    awareOfPresence: {
-      yes: 20,
-      no: 0
-    },
-    logisticsSupportRange: {
-      yes: 25,
-      no: 0
-    },
-    isrCoverage: {
-      yes: 10,
-      no: 0
-    },
-    gpsWorking: {
-      yes: 10,
-      no: 0
-    },
-    communicationsWorking: {
-      yes: 10,
-      no: 0
-    },
-    fireSupportRange: {
-      yes: 15,
-      no: 0
-    },
-    patternForceRange: {
-      yes: 10,
-      no: 0
-    }
-  };
-
+  
   // Update user answers
   const [question1, setQuestion1] = useState('Yes')
   const [question2, setQuestion2] = useState('Yes')
@@ -451,7 +416,6 @@ function BattlePage() {
     // Calls the function that calculates the score for each unit and sets the score as finalized
     const score = calculateRealTimeScore();
     setRealTimeScore(score);
-    setScoreFinalized(true); // Mark the score as finalized
 
     setRound(round + 1); // Updates the round as the scores are finalized
 
@@ -527,19 +491,6 @@ function BattlePage() {
     }
 
   }; // End of finalize tactics
-
-
-  const friendlyTooltip = (
-    <div>
-      <Text>Damage to Friendly Health: {Number(totalFriendlyDamage).toFixed(0)}</Text>
-    </div>
-  );
-
-  const enemyTooltip = (
-    <div>
-      <Text>Damage to Enemy Health: {totalEnemyDamage.toFixed(0)}</Text>
-    </div>
-  );
 
   // This is the intervale for the Finalize Tactics button animation
   const interval = useInterval(
@@ -635,7 +586,6 @@ function BattlePage() {
   );
 
   // Sets value of readiness bar in inital display based on readiness level that is initialized
-  let readinessColor = 'green';
   const getReadinessProgress = (force_readiness: string | undefined) => {
     switch (force_readiness) {
       case 'Untrained':
