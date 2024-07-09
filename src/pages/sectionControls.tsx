@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AppShell, Burger, Group, Table, useMantineTheme, Image, Button, Text, Box, Switch, rem, Divider, Alert, useMantineColorScheme, useComputedColorScheme, MantineProvider, SegmentedControl, } from '@mantine/core';
+import { AppShell, Group, useMantineTheme, Image, Button, Switch, rem, Divider, MantineProvider, SegmentedControl, } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 // import { engagements } from '../data/engagements';
-import { IconCheck, IconX, IconInfoCircle } from '@tabler/icons-react';
+import { IconCheck, IconX} from '@tabler/icons-react';
 import { useUserRole } from '../context/UserContext';
-import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
+import { FaArrowAltCircleLeft } from "react-icons/fa";
 import Hierarchy from '../components/HierarchyBuilder';
-import { UserRoleProvider } from '../context/UserContext';
 import logo from '../images/logo/Tr_FullColor_NoSlogan.png'
 import axios from 'axios';
 // export interface Engagement {
@@ -24,15 +23,12 @@ import axios from 'axios';
 
 function SectionControls() {
   const { sectionId } = useParams<{ sectionId: string }>();
-  // const [selectedEngagement, setSelectedEngagement] = useState<Engagement | null>(null);
-  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
-  const [hierarchyToggle, setHierarchyToggle] = useState(false);
+  const [mobileOpened] = useDisclosure(false);
+  const [desktopOpened] = useDisclosure(false);
   const navigate = useNavigate();
   const theme = useMantineTheme();
-  // const [engagementsData, setEngagementsData] = useState<Engagement[]>([]);
   const [sectionOnline, setSectionOnline] = useState(false);
-  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
+  const { userRole, setUserSection } = useUserRole();
   const [isFriendlyHierarchy, setIsFriendlyHierarchy] = useState('Friendly');
   const [refreshHierarchy, setRefreshHierarchy] = useState(0);
 
@@ -106,26 +102,6 @@ function SectionControls() {
       console.error('Error toggling section online status:', error);
     }
   };
-
-  // useEffect(() => {
-  //   const filteredEngagements = engagements.filter((engagement) => engagement.sectionID === sectionId);
-  //   setEngagementsData(filteredEngagements);
-  // }, [sectionId]);
-
-  // const handleRowClick = (engagement: Engagement) => {
-  //   setSelectedEngagement(engagement);
-  // };
-
-  // const restoreState = () => {
-  //   if (selectedEngagement && !selectedEngagement.isCurrentState) {
-  //     const updatedEngagements = engagementsData.map((engagement) =>
-  //       engagement === selectedEngagement
-  //         ? { ...engagement, isCurrentState: true }
-  //         : { ...engagement, isCurrentState: false }
-  //     );
-  //     setEngagementsData(updatedEngagements);
-  //   }
-  // };
 
   return (
     <MantineProvider defaultColorScheme='dark'>
