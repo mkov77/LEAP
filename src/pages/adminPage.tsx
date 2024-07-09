@@ -1,10 +1,8 @@
 // pages/adminPage.js
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   AppShell,
-  Burger,
   Group,
-  Skeleton,
   Image,
   Box,
   Table,
@@ -14,8 +12,6 @@ import {
   TextInput,
   useMantineTheme,
   MantineProvider,
-  useMantineColorScheme,
-  useComputedColorScheme,
   FocusTrap,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -28,8 +24,8 @@ import { Section } from './landingPage';
 
 
 function AdminPage() {
-  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
+  const [mobileOpened] = useDisclosure(false);
+  const [desktopOpened] = useDisclosure(false);
   const navigate = useNavigate();
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
@@ -37,7 +33,7 @@ function AdminPage() {
   const theme = useMantineTheme();
   const [newSectionName, setNewSectionName] = useState('');
   const [modalOpened, setModalOpened] = useState(false);
-  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
+  const { userRole, setUserSection } = useUserRole();
 
   useEffect(() => {
     if (userRole !== 'Administrator') {
