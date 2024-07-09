@@ -1,30 +1,21 @@
 //afterActionReviewStorage.tsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect} from 'react';
 import {
   AppShell,
-  Burger,
   Group,
-  Skeleton,
   Image,
-  Box,
   Table,
-  Checkbox,
   Button,
   MantineProvider,
   Progress,
   Card,
-  Text,
   Collapse,
   Tooltip
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
-import { useUserRole } from '../context/UserContext';
-import { useUnitProvider } from '../context/UnitContext';
-import classes from './TableReviews.module.css'
-import { timeStamp } from 'console';
-import BattlePage from './battlePage';
+import { FaArrowAltCircleLeft } from "react-icons/fa";
+import classes from './TableReviews.module.css';
 import axios from 'axios';
 
 
@@ -58,14 +49,6 @@ export interface Tactics {
   engagementid?: number;
 }
 
-// export interface engagementData {
-//   timeStamp: string;
-//   engagementID: string;
-//   friendlyUnitName: string;
-//   enemyUnitName: string;
-
-// }
-
 export interface Engagement {
   friendlyid: string;
   enemyid: string;
@@ -81,16 +64,9 @@ export interface Engagement {
 
 export default function AAR() {
   const navigate = useNavigate();
-  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
-  const [search, setSearch] = useState("");
+  const [mobileOpened] = useDisclosure(false);
+  const [desktopOpened] = useDisclosure(false);
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
-  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
-  const { selectedUnit, setSelectedUnit } = useUnitProvider();
-  const [scrolled, setScrolled] = useState(false);
-  // const [isOpen, setOpen] = useState(false);
-  const [progress, setProgress] = useState(0);
-  // const [engagementsData, setEngagementsData] = useState<engagementData[]>([]);
   const [engagements, setEngagements] = useState<Engagement[]>([]);
   const [tacticsMap, setTacticsMap] = useState<Map<string, Tactics[]>>(new Map()); // Changed: Added `tacticsMap` state for storing tactics data
 
@@ -146,20 +122,7 @@ export default function AAR() {
     fetchEngagementData();
   }, [sectionId]);
 
-
-  const tactics: Tactics[] = [
-    { question: 'Aware of OPFOR?', friendlyawareness: 15, enemyawareness: 0 },
-    { question: 'Within Logistics Support Range?', friendlylogistics: 0, enemylogistics: 25 },
-    { question: 'Within RPA/ISR Coverage?', friendlycoverage: 10, enemycoverage: 0 },
-    { question: 'Working GPS?', friendlygps: 10, enemygps: 0 },
-    { question: 'Within Communications Range?', friendlycomms: 10, enemycomms: 0 },
-    { question: 'Within Fire Support Range?', friendlyfire: 10, enemyfire: 0 },
-    { question: 'Within Range of a Pattern Force?', friendlypattern: 0, enemypattern: 15 }
-  ]
-
   const renderTacticsRows = (tactics: Tactics[] | undefined) => { // Changed: Added `renderTacticsRows` function for rendering tactics rows
-
-
     if (!tactics || tactics.length === 0) {
       return (
         <Table.Tr>
@@ -210,8 +173,6 @@ export default function AAR() {
     ));
   };
 
-  let index: number = 0;
-
   const [isOpen, setIsOpen] = useState<boolean[]>(Array(engagements.length).fill(false));
 
   const handleToggle = (index: number) => {
@@ -222,48 +183,32 @@ export default function AAR() {
     });
   };
 
-  const row = engagements.map((rowData) => (
-    <Table.Tr key={rowData.engagementid}>
-      <Table.Td>{rowData.friendlyid}</Table.Td>
-      <Table.Td>{rowData.engagementid}</Table.Td>
-      <Table.Td>{rowData.friendlyid}</Table.Td>
-      <Table.Td>
-        <Progress.Root style={{ width: '600px', height: '50px' }}>
-          <Progress.Section
-            className={classes.progressSection}
-            value={rowData.friendlytotalscore}
-            color="#4e87c1">
-          </Progress.Section>
-        </Progress.Root>
-      </Table.Td>
-      <Table.Td>{rowData.enemyid}</Table.Td>
-      <Table.Td>
-        <Progress.Root style={{ width: '600px', height: '50px' }}>
-          <Progress.Section
-            className={classes.progressSection}
-            value={rowData.enemytotalscore}
-            color="#bd3058">
-          </Progress.Section>
-        </Progress.Root>
-      </Table.Td>
-    </Table.Tr>
-  ));
-
-  const updateProgress = () => {
-    const scrollPx = document.documentElement.scrollTop;
-    const winHeightPx =
-      document.documentElement.scrollHeight -
-      document.documentElement.clientHeight;
-    const scrolled = (scrollPx / winHeightPx) * 100;
-    setProgress(scrolled);
-  };
-
-  useEffect(() => {
-    window.addEventListener('scroll', updateProgress);
-    return () => {
-      window.removeEventListener('scroll', updateProgress);
-    };
-  }, []);
+  // const row = engagements.map((rowData) => (
+  //   <Table.Tr key={rowData.engagementid}>
+  //     <Table.Td>{rowData.friendlyid}</Table.Td>
+  //     <Table.Td>{rowData.engagementid}</Table.Td>
+  //     <Table.Td>{rowData.friendlyid}</Table.Td>
+  //     <Table.Td>
+  //       <Progress.Root style={{ width: '600px', height: '50px' }}>
+  //         <Progress.Section
+  //           className={classes.progressSection}
+  //           value={rowData.friendlytotalscore}
+  //           color="#4e87c1">
+  //         </Progress.Section>
+  //       </Progress.Root>
+  //     </Table.Td>
+  //     <Table.Td>{rowData.enemyid}</Table.Td>
+  //     <Table.Td>
+  //       <Progress.Root style={{ width: '600px', height: '50px' }}>
+  //         <Progress.Section
+  //           className={classes.progressSection}
+  //           value={rowData.enemytotalscore}
+  //           color="#bd3058">
+  //         </Progress.Section>
+  //       </Progress.Root>
+  //     </Table.Td>
+  //   </Table.Tr>
+  // ));
 
 
   return (
