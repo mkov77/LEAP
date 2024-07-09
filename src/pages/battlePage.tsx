@@ -870,17 +870,20 @@ function BattlePage() {
                   )
                     :
                     // Drop down menu to select the proper enemy unit to begin an engagement with
-                    (<Select
-                      label="Select Enemy Unit"
-                      placeholder='Select Enemy Unit'
-                      data={enemyUnits.map(eUnit => ({ value: eUnit.id.toString(), label: eUnit.unit_id }))}
-                      searchable
-                      value={enemyUnit}
-                      onChange={handleSelectEnemy}
-                    >
-                    </Select>
-                    )
-                  }
+                    (
+                      enemyUnits.length === 0 ? (
+                        <h2>No enemy units to select</h2>
+                      ) : (
+                        <Select
+                          label="Select Enemy Unit"
+                          placeholder="Select Enemy Unit"
+                          data={enemyUnits.map(eUnit => ({ value: eUnit.id.toString(), label: eUnit.unit_id }))}
+                          searchable
+                          value={enemyUnit}
+                          onChange={handleSelectEnemy}
+                        />
+                      )
+                  )}
                 </Grid.Col>
               </Grid>
 
