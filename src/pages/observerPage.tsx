@@ -1,80 +1,3 @@
-// import '../App.css';
-// import React, { useEffect } from 'react';
-// import CarouselC from '../components/carousel'; // Remove the '.tsx' extension
-// import { AppShell, Burger, Group, Skeleton, Image, useMantineColorScheme, useComputedColorScheme, Button, MantineProvider, } from '@mantine/core';
-// import { useDisclosure } from '@mantine/hooks';
-// import { useNavigate, useParams } from 'react-router-dom';
-// import { useUserRole } from '../context/UserContext';
-// import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
-// import Hierarchy from '../components/HierarchyBuilder';
-
-// function ObserverPage() {
-//   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
-//   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
-//   const navigate = useNavigate();
-//   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
-//   const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
-
-//   useEffect(() => {
-//     if (userRole !== 'Observer' || userSection !== userSection) {
-//       navigate('/');
-//     }
-//   }, [navigate, userRole]);
-
-//   const handleLogoClick = () => {
-//     navigate('/'); // Navigate to the main login page
-//   };
-
-
-//   const handleArrowClick = () => {
-//     navigate('/');
-//   };
-
-//   return (
-//     <MantineProvider defaultColorScheme='dark'>
-//       <AppShell
-//         header={{ height: 60 }}
-//         navbar={{
-//           width: 300,
-//           breakpoint: 'sm',
-//           collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
-//         }}
-//         padding="md"
-//       >
-//         <AppShell.Header>
-//           <div style={{ display: 'flex', alignItems: 'center' }}>
-//           <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}>
-//             <FaArrowAltCircleLeft />
-//           </Button>
-//           <Image
-//             src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
-//             radius="md"
-//             h={50}
-//             fallbackSrc="https://placehold.co/600x400?text=Placeholder"
-//             onClick={handleLogoClick}
-//             style={{ cursor: 'pointer', scale: '1', padding:'8px' }}
-//           />
-//           </div>
-//         </AppShell.Header>
-//         <AppShell.Main>
-//           <div>
-//             {sectionId && (
-//               <p>
-//                 You are observing section: <strong>{sectionId}</strong>
-//               </p>
-//             )}
-//           </div>
-//           <div className="App">
-//             <Hierarchy is_friendly={true} hierarchyRefresh={0} />
-//           </div>
-//         </AppShell.Main>
-//       </AppShell>
-//     </MantineProvider>
-//   );
-// }
-
-// export default ObserverPage;
-
 /**
  * studentPage.tsx renders the student page where the students can view and start engagements with their units
  */
@@ -87,7 +10,7 @@ import { useUserRole } from '../context/UserContext';
 import { useUnitProvider } from '../context/UnitContext';
 import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
 import Hierarchy from '../components/HierarchyBuilder';
-import Tree from 'react-d3-tree';
+import logo from '../images/logo/Tr_FullColor_NoSlogan.png'
 
 // Function where the page renders
 function ObserverPage() {
@@ -152,7 +75,7 @@ function ObserverPage() {
               </Button>
               {/* Clickable logo that takes user back to homepage */}
               <Image
-                src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
+                src={logo}
                 radius="md"
                 h={50}
                 fallbackSrc="https://placehold.co/600x400?text=Placeholder"

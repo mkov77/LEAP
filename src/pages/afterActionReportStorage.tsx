@@ -17,6 +17,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FaArrowAltCircleLeft } from "react-icons/fa";
 import classes from './TableReviews.module.css';
 import axios from 'axios';
+import logo from '../images/logo/Tr_FullColor_NoSlogan.png'
 
 
 export interface recentEngagementData {
@@ -228,7 +229,7 @@ export default function AAR() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between" }}>
               <Button size='sm' variant='link' onClick={handleArrowClick} style={{ margin: '10px' }}><FaArrowAltCircleLeft /> </Button>
               <Image
-                src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
+                src={logo}
                 radius="md"
                 h={50}
                 fallbackSrc="https://placehold.co/600x400?text=Placeholder"

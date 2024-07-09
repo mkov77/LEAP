@@ -18,9 +18,10 @@ import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
 //import { sections as initialSections } from '../data/sections';
 import { useUserRole } from '../context/UserContext';
-import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
+import { FaArrowAltCircleLeft } from "react-icons/fa";
 import axios from 'axios';
 import { Section } from './landingPage';
+import logo from '../images/logo/Tr_FullColor_NoSlogan.png'
 
 
 function AdminPage() {
@@ -207,7 +208,7 @@ function AdminPage() {
               <FaArrowAltCircleLeft />
             </Button>
             <Image
-              src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
+              src={logo}
               radius="md"
               h={50}
               fallbackSrc="https://placehold.co/600x400?text=Placeholder"

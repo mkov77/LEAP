@@ -9,6 +9,7 @@ import { useForm } from '@mantine/form';
 import classes from './landingPage.module.css';
 import { useUserRole } from '../context/UserContext';
 import { MantineProvider } from '@mantine/core';
+import logo from '../images/logo/Tr_FullColor.png'
 
 
 // Sets the dynamic interface of the class section
@@ -144,7 +145,7 @@ export default function LandingPage() {
           <div style={{ display: 'flex', justifyContent: 'center', margin: '40px', scale:'0.75' }}>
             <Image
               radius="md"
-              src="https://github.com/mkov77/LEAP/blob/main/Tr_FullColor.png?raw=true"
+              src={logo}
               h={200}
               fallbackSrc='https://placehold.co/600x400?text=Placeholder'
             />

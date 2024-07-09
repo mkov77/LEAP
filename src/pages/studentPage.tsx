@@ -12,6 +12,7 @@ import { useUserRole } from '../context/UserContext';
 import { useUnitProvider } from '../context/UnitContext';
 import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
 import Hierarchy from '../components/HierarchyBuilder';
+import logo from '../images/logo/Tr_FullColor_NoSlogan.png'
 
 // Function where the page renders
 function App() {
@@ -88,7 +89,7 @@ function App() {
               </Button>
               {/* Clickable logo that takes user back to homepage */}
               <Image
-                src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
+                src={logo}
                 radius="md"
                 h={50}
                 fallbackSrc="https://placehold.co/600x400?text=Placeholder"

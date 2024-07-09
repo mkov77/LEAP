@@ -8,6 +8,7 @@ import { useUserRole } from '../context/UserContext';
 import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
 import Hierarchy from '../components/HierarchyBuilder';
 import { UserRoleProvider } from '../context/UserContext';
+import logo from '../images/logo/Tr_FullColor_NoSlogan.png'
 import axios from 'axios';
 // export interface Engagement {
 //   engagementID: string;
@@ -143,7 +144,7 @@ function SectionControls() {
               <FaArrowAltCircleLeft />
             </Button>
             <Image
-              src='https://github.com/mkov77/LEAP/blob/main/Tr_FullColor_NoSlogan.png?raw=true'
+              src={logo}
               radius="md"
               h={50}
               fallbackSrc="https://placehold.co/600x400?text=Placeholder"
