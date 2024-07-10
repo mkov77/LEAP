@@ -1,16 +1,15 @@
 /* LandingPage.tsx is the page that the site automatically opens up to. It is the "home page" of LEAP and serves as a site where 
 administrators, students, and observers can launch other parts of the application from, */
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Table, Box, useMantineTheme, FocusTrap, Image, Paper, PasswordInput, Button, Title, SegmentedControl } from '@mantine/core'; // Adjust imports as needed
+import { Table, Box, useMantineTheme, FocusTrap, Image, Paper, PasswordInput, Button, SegmentedControl } from '@mantine/core'; // Adjust imports as needed
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import classes from './landingPage.module.css';
 import { useUserRole } from '../context/UserContext';
 import { MantineProvider } from '@mantine/core';
 import logo from '../images/logo/Tr_FullColor.png'
-
 
 // Sets the dynamic interface of the class section
 export interface Section {
@@ -21,7 +20,6 @@ export interface Section {
 export default function LandingPage() {
   const navigate = useNavigate(); // Used to navigate to different pages from the landing page
   const [role, setRole] = useState('Student'); // Sets the segmented control to student automatically, but is able to be changed
-  const [force, setForce] = useState('JFLCC'); // Sets the segmented control to the JFLCC automatically, but is able to be changed
   const theme = useMantineTheme(); // Used to set the dark theme for the page
   const [selectedSection, setSelectedSection] = useState<string | null>(null); // State to track the selected class section throughout the application
   const { setUserRole, setUserSection } = useUserRole(); // Setters to set the user section and role
@@ -79,60 +77,60 @@ export default function LandingPage() {
 
   // Function to render the table that displays each function and whether or not it is online
   const renderSectionsTable = () => (
-    <Box style={{ maxWidth: 600, margin: '0 auto'}}>
-        <h1 className='sessionCentered' >
-             Select Student Session
-        </h1>
-        <Table withRowBorders>
-          <Table.Thead>
-            <Table.Tr>
-              <th className='left-oriented'>Section ID</th>
-              <th className='isonlineCentered'>Status</th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {/* Displays each section ID and whether each section is online or not in the table*/}
-            {sections.map((section) => (
-              <Table.Tr
-                key={section.sectionid}
-                onClick={() => {
-                  if (section.isonline) {
-                    if(selectedSection === section.sectionid){
-                      handleLogin(form.values);
-                    }
-                    setSelectedSection((prev) =>
-                      prev === section.sectionid ? null : section.sectionid
-                    );
+    <Box style={{ maxWidth: 600, margin: '0 auto' }}>
+      <h1 className='sessionCentered' >
+        Select Student Session
+      </h1>
+      <Table withRowBorders>
+        <Table.Thead>
+          <Table.Tr>
+            <th className='left-oriented'>Section ID</th>
+            <th className='isonlineCentered'>Status</th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {/* Displays each section ID and whether each section is online or not in the table*/}
+          {sections.map((section) => (
+            <Table.Tr
+              key={section.sectionid}
+              onClick={() => {
+                if (section.isonline) {
+                  if (selectedSection === section.sectionid) {
+                    handleLogin(form.values);
                   }
-                }}
-                // Does not allow a student to click on a section that is not online
-                style={{
-                  cursor: section.isonline ? 'pointer' : 'not-allowed',
-                  backgroundColor: selectedSection === section.sectionid ? 'rgba(128, 128, 128, 0.5)' : '',
-                  textAlign: 'center',
-                }}
-                className="highlightable-row"
-              >
-                <Table.Td>{section.sectionid}</Table.Td>
-                <Table.Td>
-                  {/* Creates the online or offline boxes in the table */}
-                  <Box
-                    style={{
-                      backgroundColor: section.isonline ? theme.colors.green[0] : theme.colors.red[0],
-                      color: section.isonline ? theme.colors.green[9] : theme.colors.red[9],
-                      padding: '4px',
-                      borderRadius: '4px',
-                      display: 'block',                    
-                    }}
-                    className = "isonlineCentered"
-                  >
-                    {section.isonline ? 'Online' : 'Offline'}
-                  </Box>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
+                  setSelectedSection((prev) =>
+                    prev === section.sectionid ? null : section.sectionid
+                  );
+                }
+              }}
+              // Does not allow a student to click on a section that is not online
+              style={{
+                cursor: section.isonline ? 'pointer' : 'not-allowed',
+                backgroundColor: selectedSection === section.sectionid ? 'rgba(128, 128, 128, 0.5)' : '',
+                textAlign: 'center',
+              }}
+              className="highlightable-row"
+            >
+              <Table.Td>{section.sectionid}</Table.Td>
+              <Table.Td>
+                {/* Creates the online or offline boxes in the table */}
+                <Box
+                  style={{
+                    backgroundColor: section.isonline ? theme.colors.green[0] : theme.colors.red[0],
+                    color: section.isonline ? theme.colors.green[9] : theme.colors.red[9],
+                    padding: '4px',
+                    borderRadius: '4px',
+                    display: 'block',
+                  }}
+                  className="isonlineCentered"
+                >
+                  {section.isonline ? 'Online' : 'Offline'}
+                </Box>
+              </Table.Td>
+            </Table.Tr>
+          ))}
+        </Table.Tbody>
+      </Table>
     </Box>
   );
 
@@ -142,7 +140,7 @@ export default function LandingPage() {
       <div className={classes.wrapper}>
         <Paper className={classes.form} radius={0} p={30}>
           {/* Displays the LEAP image */}
-          <div style={{ display: 'flex', justifyContent: 'center', margin: '40px', scale:'0.75' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '40px', scale: '0.75' }}>
             <Image
               radius="md"
               src={logo}
@@ -152,7 +150,7 @@ export default function LandingPage() {
           </div>
 
           {/* Clickable control that allows the switching of roles between student, observer, and administrator */}
-          <div style={{ margin: '10px'}} >
+          <div style={{ margin: '10px' }} >
             <SegmentedControl
               size="lg"
               data={['Student', 'Observer', 'Administrator']}
@@ -175,42 +173,42 @@ export default function LandingPage() {
 
           {/* If a user identifies as an administrator, this handles the password input */}
           {role === 'Administrator' && (
-          <FocusTrap>
-            <div ref={trapRef} tabIndex={-1}>
-              <form onSubmit={form.onSubmit((values) => handleLogin(values))}>
-                <center>
-                <PasswordInput
-                  label="Password"
-                  placeholder="Admin password"
-                  mt="md"
-                  size="md"
-                  style={{justifyContent: 'center', width: '250px', alignItems: 'center'}}
-                  {...form.getInputProps('password')}
-                />
-        
-                <div style={{ margin: '10px', width: '250px', justifyContent: "center", textAlign: "center", alignItems: 'center'}} >
-                  <Button 
-                    fullWidth
-                    mt="xl"
-                    size="md"
-                    type="submit"
-                    disabled={!form.values.password}
-                  >
-                    Login
-                  </Button>
-                </div>
-                </center>
-              </form>
-            </div>
-          </FocusTrap>
+            <FocusTrap>
+              <div ref={trapRef} tabIndex={-1}>
+                <form onSubmit={form.onSubmit((values) => handleLogin(values))}>
+                  <center>
+                    <PasswordInput
+                      label="Password"
+                      placeholder="Admin password"
+                      mt="md"
+                      size="md"
+                      style={{ justifyContent: 'center', width: '250px', alignItems: 'center' }}
+                      {...form.getInputProps('password')}
+                    />
+
+                    <div style={{ margin: '10px', width: '250px', justifyContent: "center", textAlign: "center", alignItems: 'center' }} >
+                      <Button
+                        fullWidth
+                        mt="xl"
+                        size="md"
+                        type="submit"
+                        disabled={!form.values.password}
+                      >
+                        Login
+                      </Button>
+                    </div>
+                  </center>
+                </form>
+              </div>
+            </FocusTrap>
           )}
 
           {/* Displays the table with student sections and their online availability if the user is a student or observer */}
           {(role === 'Student' || role === 'Observer') && renderSectionsTable()}
           {(role === 'Student' || role === 'Observer') && (
-            <div style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
+            <div style={{ display: "flex", justifyContent: "center", textAlign: "center" }}>
               <Button
-                style={{height: '30px', width: '250px',textAlign: "center"}}
+                style={{ height: '30px', width: '250px', textAlign: "center" }}
                 mt="xl"
                 size="md"
                 onClick={() => handleLogin(form.values)} // Update route

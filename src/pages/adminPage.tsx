@@ -117,7 +117,6 @@ function AdminPage() {
     setModalOpened(false);
   };
 
-
   const handleDeleteSections = async () => {
     try {
       console.log("Section ID: ", selectedSections);
@@ -136,6 +135,8 @@ function AdminPage() {
     } catch (error) {
       console.error('Error deleting sections:', error);
     }
+
+    setSelectedSection(null)
   };
 
   const handleRowDoubleClick = (sectionid: string) => {
@@ -154,16 +155,17 @@ function AdminPage() {
             <th>Delete Select</th>
           </tr>
         </thead>
-        <tbody>
+        <Table.Tbody>
           {sections.map((section) => (
-            <tr
+            <Table.Tr
               key={section.sectionid}
               onClick={() => setSelectedSection(section.sectionid)}
               onDoubleClick={() => handleRowDoubleClick(section.sectionid)}
               style={{
                 cursor: 'pointer',
-                backgroundColor: selectedSection === section.sectionid ? theme.colors.gray[0] : '',
+                backgroundColor: selectedSection === section.sectionid ? 'rgba(128, 128, 128, 0.5)' : '',
               }}
+              className="highlightable-row"
             >
               <td>{section.sectionid}</td>
               <td>
@@ -187,9 +189,9 @@ function AdminPage() {
                 />
                 </Center>
               </td>
-            </tr>
+            </Table.Tr>
           ))}
-        </tbody>
+        </Table.Tbody>
       </Table>
     </Box>
   );
