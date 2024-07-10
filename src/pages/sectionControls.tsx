@@ -136,10 +136,6 @@ function SectionControls() {
           <div>
 
           </div>
-
-
-
- 
               <Divider my="md" />
               <Switch
                 checked={sectionOnline}
