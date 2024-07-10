@@ -506,7 +506,28 @@ app.put('/api/units/health', async (req, res) => {
   }
 });
 
+// Endpoint to add a new unit
+app.post('/api/newunit', async (req, res) => {
+  const { unit_id, is_friendly } = req.body;
 
+  console.log('Received request to create unit:', req.body); // Log the request body
+
+  try {
+    const client = await pool.connect();
+    const result = await client.query(
+      'INSERT INTO units (unit_id, "isFriendly", children) VALUES ($1, $2, $3) RETURNING *',
+      [unit_id, is_friendly, '{}']
+    );
+
+    console.log('Unit created:', result.rows[0]); // Log the created unit
+
+    client.release();
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error creating unit:', error); // Log the error
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 app.listen(port, () => {

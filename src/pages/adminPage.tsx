@@ -14,6 +14,7 @@ import {
   MantineProvider,
   FocusTrap,
   Center,
+  Space,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
@@ -23,6 +24,8 @@ import { FaArrowAltCircleLeft } from "react-icons/fa";
 import axios from 'axios';
 import { Section } from './landingPage';
 import logo from '../images/logo/Tr_FullColor_NoSlogan.png'
+import { IconCubePlus } from '@tabler/icons-react';
+import UnitCreationModule from '../components/UnitCreationModule';
 
 
 function AdminPage() {
@@ -36,6 +39,8 @@ function AdminPage() {
   const [newSectionName, setNewSectionName] = useState('');
   const [modalOpened, setModalOpened] = useState(false);
   const { userRole, setUserSection } = useUserRole();
+  const [unitModalOpened, setUnitModalOpened] = useState(false);
+
 
   useEffect(() => {
     if (userRole !== 'Administrator') {
@@ -200,6 +205,14 @@ function AdminPage() {
     </Box>
   );
 
+  function handleCreateUnit() {
+    setUnitModalOpened(true); // Open the modal when the button is clicked
+  }
+
+  const closeUnitModal = () => {
+    setUnitModalOpened(false); // Close the modal
+  };
+
   return (
     <MantineProvider defaultColorScheme='dark'>
       <AppShell
@@ -249,8 +262,17 @@ function AdminPage() {
                 Delete
               </Button>
             </Group>
+            <Group mt="md" style={{ display: "flex", justifyContent: "center", textAlign: "center" }}>
+
+            <Button color="green" onClick={handleCreateUnit} style={{width: '150px', marginTop: 20}}>
+                <IconCubePlus/><Space w="10" />Unit Creator
+            </Button>
+              </Group>
           </div>
         </AppShell.Main>
+
+        <UnitCreationModule isOpen={unitModalOpened} onClose={closeUnitModal} />
+
         <Modal opened={modalOpened} onClose={closeModal} title="New Section" centered>
           <FocusTrap>
             <div>
