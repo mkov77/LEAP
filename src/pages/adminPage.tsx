@@ -13,6 +13,7 @@ import {
   useMantineTheme,
   MantineProvider,
   FocusTrap,
+  Center,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
@@ -150,7 +151,7 @@ function AdminPage() {
           <tr>
             <th>Section ID</th>
             <th>Status</th>
-            <th>Select</th>
+            <th>Delete Select</th>
           </tr>
         </thead>
         <tbody>
@@ -179,10 +180,12 @@ function AdminPage() {
                 </Box>
               </td>
               <td>
+                <Center>
                 <Checkbox
                   checked={selectedSections.includes(section.sectionid)}
                   onChange={() => handleCheckboxChange(section.sectionid)}
                 />
+                </Center>
               </td>
             </tr>
           ))}
