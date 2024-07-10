@@ -4,25 +4,25 @@
 import '../App.css';
 import CarouselC from '../components/carousel'; // Remove the '.tsx' extension
 import SearchResultList from '../components/searchResults'
-import { AppShell, Burger, Group, Skeleton, Image, TextInput, useMantineColorScheme, useComputedColorScheme, Button, MantineProvider, Modal, SegmentedControl } from '@mantine/core';
+import { AppShell, Group, Image, TextInput, Button, MantineProvider, SegmentedControl } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useState, useEffect, SetStateAction } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserRole } from '../context/UserContext';
 import { useUnitProvider } from '../context/UnitContext';
-import { FaSun, FaMoon, FaArrowAltCircleLeft } from "react-icons/fa";
+import { FaArrowAltCircleLeft } from "react-icons/fa";
 import Hierarchy from '../components/HierarchyBuilder';
 import logo from '../images/logo/Tr_FullColor_NoSlogan.png'
 
 // Function where the page renders
 function App() {
-  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
+  const [mobileOpened] = useDisclosure(false);
+  const [desktopOpened] = useDisclosure(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { sectionId } = useParams(); // Retrieve sectionId from route parameters
-  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
-  const { selectedUnit, setSelectedUnit } = useUnitProvider();
+  const { userRole, userSection } = useUserRole();
+  const { selectedUnit } = useUnitProvider();
   const [hierarchyToggle, setHierarchyToggle] = useState(false);
   const [view, setView] = useState('Unit Selection');
 
