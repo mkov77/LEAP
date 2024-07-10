@@ -425,7 +425,7 @@ function BattlePage() {
     const engagementData = {
       SectionID: userSection,
       FriendlyID: unit_id,
-      EnemyID: unit_id,
+      EnemyID: enemyUnit?.unit_id,
       FriendlyBaseScore: baseValue,
       EnemyBaseScore: enemyBaseValue,
       FriendlyTacticsScore: realTimeScore,

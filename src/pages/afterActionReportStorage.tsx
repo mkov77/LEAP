@@ -10,7 +10,8 @@ import {
   Progress,
   Card,
   Collapse,
-  Tooltip
+  Tooltip,
+  Text
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -245,48 +246,53 @@ export default function AAR() {
           <h1 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>After Action Reviews</h1>
           <h2 style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>Section: {sectionId}</h2>
           <AppShell>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
-              <Card shadow="sm" padding="xl" radius="md" withBorder style={{ display: 'grid', justifyContent: 'center', alignItems: 'center', height: '40vh', width: '600px', placeItems: 'center', marginBottom: '100px', marginTop: '100px', textAlign: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '45vh' }}>
+              <Card shadow="sm" radius="md" withBorder style={{ display: 'grid', height: '40vh', width: '600px', placeItems: 'center', marginBottom: '125px', marginTop: '100px', textAlign: 'center' }}>
                 <Card.Section >
-                  <div style={{ textAlign: 'center' }}>
-                    <h2>Most Recent Round</h2>
+                  <div style={{ textAlign: 'center'}}>
+                    <h2 style={{ marginTop: 10 }}>Most Recent Round</h2>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px' }}>
-                    <Tooltip
-                      position="bottom"
-                      color="gray"
-                      transitionProps={{ transition: 'fade-up', duration: 300 }}
-                      label="Overall Score Out of 100"
-                    >
-                      <Progress.Root style={{ width: '200px', height: '25px' }}>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={Number(engagements[engagements.length - 1]?.friendlytotalscore)}
-                          color="#4e87c1">
-                          {Number(engagements[engagements.length - 1]?.friendlytotalscore).toFixed(0)}
-                        </Progress.Section>
 
-                      </Progress.Root>
-                    </Tooltip>
+                  <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 30}}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <Text>{engagements[engagements.length - 1]?.friendlyid}</Text>
+                      <Tooltip
+                        position="bottom"
+                        color="gray"
+                        transitionProps={{ transition: 'fade-up', duration: 300 }}
+                        label="Overall Score Out of 100"
+                      >
+                        <Progress.Root style={{ width: '200px', height: '25px' }}>
+                          <Progress.Section
+                            className={classes.progressSection}
+                            value={Number(engagements[engagements.length - 1]?.friendlytotalscore)}
+                            color='#3d85c6'>
+                            {Number(engagements[engagements.length - 1]?.friendlytotalscore).toFixed(0)}
+                          </Progress.Section>
+                        </Progress.Root>
+                      </Tooltip>
+                    </div>
 
-                    <Tooltip
-                      position="bottom"
-                      color="gray"
-                      transitionProps={{ transition: 'fade-up', duration: 300 }}
-                      label="Overall Score Out of 100"
-                    >
-                      <Progress.Root style={{ width: '200px', height: '25px' }}>
-                        <Progress.Section
-                          className={classes.progressSection}
-                          value={Number(engagements[engagements.length - 1]?.enemytotalscore)}
-                          color="#bd3058">
-                          {Number(engagements[engagements.length - 1]?.enemytotalscore).toFixed(0)}
-                        </Progress.Section>
-
-                      </Progress.Root>
-                    </Tooltip>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <Text>{engagements[engagements.length - 1]?.enemyid}</Text>
+                      <Tooltip
+                        position="bottom"
+                        color="gray"
+                        transitionProps={{ transition: 'fade-up', duration: 300 }}
+                        label="Overall Score Out of 100"
+                      >
+                        <Progress.Root style={{ width: '200px', height: '25px' }}>
+                          <Progress.Section
+                            className={classes.progressSection}
+                            value={Number(engagements[engagements.length - 1]?.enemytotalscore)}
+                            color='#c1432d'>
+                            {Number(engagements[engagements.length - 1]?.enemytotalscore).toFixed(0)}
+                          </Progress.Section>
+                        </Progress.Root>
+                      </Tooltip>
+                    </div>
                   </div>
-                  <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center' }}>
+                  <Table verticalSpacing={'xs'} style={{ width: '600px', justifyContent: 'center'}}>
                     <Table.Thead>
                       <Table.Tr>
                         <Table.Th>Tactic</Table.Th>
@@ -327,7 +333,7 @@ export default function AAR() {
                           <Progress.Section
                             className={classes.progressSection}
                             value={row.friendlytotalscore}
-                            color="#4e87c1">
+                            color='#3d85c6'>
                             {Number(row.friendlytotalscore).toFixed(0)}
                           </Progress.Section>
 
@@ -336,22 +342,22 @@ export default function AAR() {
                     </Table.Td>
                     <Table.Td>{row.enemyid}</Table.Td>
                     <Table.Td>
-                    <Tooltip
-                          position="bottom"
-                          color="gray"
-                          transitionProps={{ transition: 'fade-up', duration: 300 }}
-                          label="Overall Score Out of 100"
-                        >
-                      <Progress.Root style={{ width: '200px', height: '25px', display: 'flex' }}>
-                        
+                      <Tooltip
+                        position="bottom"
+                        color="gray"
+                        transitionProps={{ transition: 'fade-up', duration: 300 }}
+                        label="Overall Score Out of 100"
+                      >
+                        <Progress.Root style={{ width: '200px', height: '25px', display: 'flex' }}>
+
                           <Progress.Section
                             className={classes.progressSection}
                             value={row.enemytotalscore}
-                            color="#bd3058">
+                            color='#c1432d'>
                             {Number(row.enemytotalscore).toFixed(0)}
                           </Progress.Section>
-                        
-                      </Progress.Root>
+
+                        </Progress.Root>
                       </Tooltip>
                     </Table.Td>
 
