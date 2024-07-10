@@ -149,7 +149,7 @@ function AdminPage() {
         <thead>
           <tr>
             <th>Section ID</th>
-            <th>Is Online</th>
+            <th>Status</th>
             <th>Select</th>
           </tr>
         </thead>
