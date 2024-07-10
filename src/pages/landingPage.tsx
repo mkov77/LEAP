@@ -122,8 +122,10 @@ export default function LandingPage() {
                     backgroundColor: section.isonline ? theme.colors.green[0] : theme.colors.red[0],
                     color: section.isonline ? theme.colors.green[9] : theme.colors.red[9],
                     padding: '4px',
+                    paddingRight: '25px',
+                    paddingLeft: '25px',
                     borderRadius: '4px',
-                    display: 'block',
+                    display: 'inline-block',
                   }}
                   className="isonlineCentered"
                 >

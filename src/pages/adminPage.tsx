@@ -174,6 +174,9 @@ function AdminPage() {
                     backgroundColor: section.isonline ? theme.colors.green[0] : theme.colors.red[0],
                     color: section.isonline ? theme.colors.green[9] : theme.colors.red[9],
                     padding: '4px',
+                    margin: '5px',
+                    paddingRight: '20px',
+                    paddingLeft: '20px',
                     borderRadius: '4px',
                     display: 'inline-block',
                   }}
@@ -186,6 +189,7 @@ function AdminPage() {
                 <Checkbox
                   checked={selectedSections.includes(section.sectionid)}
                   onChange={() => handleCheckboxChange(section.sectionid)}
+                  color='red'
                 />
                 </Center>
               </td>
