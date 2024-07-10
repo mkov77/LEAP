@@ -250,7 +250,7 @@ function BattlePage() {
       setBaseValue(calculatedValue);
 
       // Set initial friendlyHealth based on unit_health
-      if(!inEngagement){
+      if (!inEngagement) {
         console.log('FriendlyHealth set to ' + unit.unit_health);
         setFriendlyHealth(unit.unit_health ?? 0);
       }
@@ -277,7 +277,7 @@ function BattlePage() {
   const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
 
 
-  
+
   // Update user answers
   const [question1, setQuestion1] = useState('Yes')
   const [question2, setQuestion2] = useState('Yes')
@@ -437,19 +437,19 @@ function BattlePage() {
 
     const tacticsData = {
       FriendlyAwareness: question1 === "Yes" ? 1 : 0,
-      EnemyAwareness: question1 === "Yes" ? 1 : 0,
+      EnemyAwareness: unitTactics?.awareness,
       FriendlyLogistics: question2 === "Yes" ? 1 : 0,
-      EnemyLogistics: question2 === "Yes" ? 1 : 0,
+      EnemyLogistics: unitTactics?.logistics,
       FriendlyCoverage: question3 === "Yes" ? 1 : 0,
-      EnemyCoverage: question3 === "Yes" ? 1 : 0,
+      EnemyCoverage: unitTactics?.coverage,
       FriendlyGPS: question4 === "Yes" ? 1 : 0,
-      EnemyGPS: question4 === "Yes" ? 1 : 0,
+      EnemyGPS: unitTactics?.gps,
       FriendlyComms: question5 === "Yes" ? 1 : 0,
-      EnemyComms: question5 === "Yes" ? 1 : 0,
+      EnemyComms: unitTactics?.comms,
       FriendlyFire: question6 === "Yes" ? 1 : 0,
-      EnemyFire: question6 === "Yes" ? 1 : 0,
+      EnemyFire: unitTactics?.fire,
       FriendlyPattern: question7 === "Yes" ? 1 : 0,
-      EnemyPattern: question7 === "Yes" ? 1 : 0,
+      EnemyPattern: unitTactics?.pattern,
     };
 
     // Submit answers to backend
@@ -833,7 +833,7 @@ function BattlePage() {
                           onChange={handleSelectEnemy}
                         />
                       )
-                  )}
+                    )}
                 </Grid.Col>
               </Grid>
 
