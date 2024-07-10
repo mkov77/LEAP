@@ -7,12 +7,14 @@ import React, { useState, useEffect } from 'react';
 import { GridC } from './Cards'; // Import your Card component
 import axios from 'axios';
 import { Unit } from '../components/Cards';
+import { useUserRole } from '../context/UserContext';
 
 interface Props {
   search: string;
 }
 
 const SearchResultList: React.FC<Props> = (props) => {
+  const { userSection } = useUserRole();
 
   const [units, setUnits] = useState<Unit[]>([]);
 
@@ -20,7 +22,11 @@ const SearchResultList: React.FC<Props> = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units/sectionSort');
+        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units/sectionSort', {
+          params: {
+            sectionid: userSection  // Pass userSection as a query parameter
+          }
+        });
         setUnits(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -38,7 +44,7 @@ const SearchResultList: React.FC<Props> = (props) => {
 
   // Render search
   return (
-    <div style={{}}>
+    <div style={{marginTop: 25}}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
         {/* Pass array of units to the GridC component */}
         {filteredUnits.map(unitResult => (

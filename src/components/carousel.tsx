@@ -8,8 +8,6 @@ import CardC from './Cards';
 import { type Unit } from './Cards';
 import '@mantine/carousel/styles.css';
 import '@mantine/core/styles.css';
-import { useUnitProvider } from '../context/UnitContext';
-import { useNavigate, useParams } from 'react-router-dom';
 import classes from './carousel.module.css';
 import axios from 'axios';
 import { useUserRole } from '../context/UserContext';
@@ -31,8 +29,7 @@ const unitTypes = [
 
 // CarouselC() renders all of the carousels
 function CarouselC() {
-  const { selectedUnit, setSelectedUnit } = useUnitProvider();
-  const { userRole, setUserRole, userSection, setUserSection } = useUserRole();
+  const { userSection } = useUserRole();
   const [units, setUnits] = useState<Unit[]>([]);
 
   // Fetch unit data from the backend endpoint
