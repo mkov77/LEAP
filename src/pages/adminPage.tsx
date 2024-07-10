@@ -152,7 +152,7 @@ function AdminPage() {
           <tr>
             <th>Section ID</th>
             <th>Status</th>
-            <th>Delete Select</th>
+            <th>Delete Selection</th>
           </tr>
         </thead>
         <Table.Tbody>
@@ -232,7 +232,7 @@ function AdminPage() {
             {renderSectionsTable()}
             <div style={{ display: "flex", justifyContent: "center", textAlign: "center" }}>
               <Button
-                style={{ height: '30px', width: '250px', textAlign: "center" }}
+                style={{ height: '40px', width: '225px', textAlign: "center" }}
                 mt="xl"
                 size="md"
                 onClick={() => selectedSection && handleLaunchSession(selectedSection)} // Update route
@@ -243,7 +243,7 @@ function AdminPage() {
             </div>
             <Group mt="md" style={{ display: "flex", justifyContent: "center", textAlign: "center" }}>
               <Button color="blue" onClick={openModal} style={{ display: "flex", justifyContent: "center", textAlign: "center" }}>
-                New Section
+                Create Section
               </Button>
               <Button color="red" onClick={handleDeleteSections} disabled={selectedSections.length === 0}>
                 Delete
