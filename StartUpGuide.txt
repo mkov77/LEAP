@@ -1,0 +1,24 @@
+Step 1. Cloning the repository.
+Open a terminal. Navigate to the root folder you want to clone the respository into. 
+Use 'cd <foldername>' to go into a folder and 'cd ..' to go back.
+Run the following line:
+git clone https://github.com/mkov77/LEAP.git
+
+Step 2. Restoring the backend.
+You are going to need to install PostgreSQL. Once it's installed, open PgAdmin4 which
+will be installed during the PostgreSQL process. Create a new database called "LEAP". 
+This can be done by right clicking a database group on the left navigation bar on PgAdmin4.
+Right click your new database and click "Restore...". Where it says "Filename", find
+the LEAP.sql file located in the ./Leap/backend folder. Click restore. The tables and 
+data should load in.
+
+Step 3. 
+Go back to your terminal. Make sure you are in the project folder that you cloned. 
+It will be called "LEAP". Run the following line to install all the required dependencies:
+npm install
+If this doesn't work, you probably dont have npm and to go install it. ChatGPT or google are 
+the best resources if this applies.
+
+Step 4. Starting the program.
+Go to your file explorer and locate the project folder. At the root of the project folder,
+double click to open STARTUP.bat. This will launch the site and the backend. 
