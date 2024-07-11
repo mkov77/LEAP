@@ -26,6 +26,7 @@ import { Section } from './landingPage';
 import logo from '../images/logo/Tr_FullColor_NoSlogan.png'
 import { IconCubeOff, IconCubePlus } from '@tabler/icons-react';
 import UnitCreationModule from '../components/UnitCreationModule';
+import UnitDeleteModule from '../components/UnitDeleteModule';
 
 
 function AdminPage() {
@@ -40,6 +41,7 @@ function AdminPage() {
   const [modalOpened, setModalOpened] = useState(false);
   const { userRole, setUserSection } = useUserRole();
   const [unitModalOpened, setUnitModalOpened] = useState(false);
+  const [deleteModalOpened, setDeleteModalOpened] = useState(false);
 
 
   useEffect(() => {
@@ -248,6 +250,14 @@ function AdminPage() {
     setUnitModalOpened(false); // Close the modal
   };
 
+  function handleDeleteUnit() {
+    setDeleteModalOpened(true); // Open the modal when the button is clicked
+  }
+
+  const closeDeleteModal = () => {
+    setDeleteModalOpened(false); // Close the modal
+  };
+
   return (
     <MantineProvider defaultColorScheme='dark'>
       <AppShell
@@ -301,7 +311,7 @@ function AdminPage() {
               <Button color="green" onClick={handleCreateUnit} style={{ width: '150px', marginTop: 20 }}>
                 <IconCubePlus /><Space w="10" />Unit Creator
               </Button>
-              <Button color="red" onClick={handleCreateUnit} style={{ width: '150px', marginTop: 20 }}>
+              <Button color="red" onClick={handleDeleteUnit} style={{ width: '150px', marginTop: 20 }}>
                 <IconCubeOff /><Space w="10" />Delete Units
               </Button>
             </Group>
@@ -309,6 +319,7 @@ function AdminPage() {
         </AppShell.Main>
 
         <UnitCreationModule isOpen={unitModalOpened} onClose={closeUnitModal} />
+        <UnitDeleteModule isOpen={deleteModalOpened} onClose={closeDeleteModal} />
 
         <Modal opened={modalOpened} onClose={closeModal} title="New Section" centered>
           <FocusTrap>

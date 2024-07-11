@@ -535,6 +535,40 @@ app.post('/api/newunit', async (req, res) => {
   }
 });
 
+app.get('/api/sectionlessunits', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, unit_id FROM units WHERE section IS NULL');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching units:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to delete a unit by its ID
+app.delete('/api/units/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log('Deleting unit with id:', id);
+  
+  try {
+    // Step 1: Delete from unit_tactics table
+    const deleteTacticsQuery = 'DELETE FROM unit_tactics WHERE "ID" = $1';
+    await pool.query(deleteTacticsQuery, [id]);
+    
+    // Step 2: Delete from units table
+    const deleteUnitsQuery = 'DELETE FROM units WHERE id = $1';
+    const deleteResult = await pool.query(deleteUnitsQuery, [id]);
+
+    if (deleteResult.rowCount > 0) {
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ error: 'Unit not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting unit:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

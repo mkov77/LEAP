@@ -59,8 +59,8 @@ export default function UnitCreationModule({ isOpen, onClose }: UnitCreationProp
         {form.errors.unitName && <Text color="red">{form.errors.unitName}</Text>}
 
         <Select
-          label="Unit Type"
-          placeholder="Select unit type"
+          label="Unit Status"
+          placeholder="Select unit status"
           error={form.errors.unitType}
           data={[
             { value: 'friendly', label: 'Friendly' },
