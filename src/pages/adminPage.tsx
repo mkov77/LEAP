@@ -24,7 +24,7 @@ import { FaArrowAltCircleLeft } from "react-icons/fa";
 import axios from 'axios';
 import { Section } from './landingPage';
 import logo from '../images/logo/Tr_FullColor_NoSlogan.png'
-import { IconCubePlus } from '@tabler/icons-react';
+import { IconCubeOff, IconCubePlus } from '@tabler/icons-react';
 import UnitCreationModule from '../components/UnitCreationModule';
 
 
@@ -122,28 +122,63 @@ function AdminPage() {
     setModalOpened(false);
   };
 
+
   const handleDeleteSections = async () => {
     try {
-      console.log("Section ID: ", selectedSections);
-      // Delete selected sections from the database
+      console.log("Selected Section IDs: ", selectedSections);
+  
+      // Function to handle section removal
+      const removeSections = async (isFriendly: boolean) => {
+        console.log(`Starting removal for isFriendly=${isFriendly}`);
+        await Promise.all(
+          selectedSections.map(async (sectionId) => {
+            try {
+              console.log(`Sending remove request for section ${sectionId} with isFriendly=${isFriendly}`);
+              const response = await axios.put(`http://10.0.1.226:5000/api/units/remove`, {
+                section: sectionId,
+                isFriendly: isFriendly
+              });
+              console.log(`Response from remove API for section ${sectionId} with isFriendly=${isFriendly}: `, response.data);
+            } catch (error) {
+              console.log(`Error clearing section ${sectionId} with isFriendly=${isFriendly}:`, error);
+            }
+          })
+        );
+        console.log(`Finished removal for isFriendly=${isFriendly}`);
+      };
+  
+      // Remove sections for friendly units
+      await removeSections(true);
+  
+      // Remove sections for non-friendly (enemy) units
+      await removeSections(false);
+  
+      // Ensure sections are deleted only after all removals
+      console.log("Removing sections from the database");
+  
       await Promise.all(
-        selectedSections.map((sectionId) =>
-          axios.delete(`http://10.0.1.226:5000/api/sections/${sectionId}`)
-        )
+        selectedSections.map(async (sectionId) => {
+          try {
+            console.log(`Deleting section ${sectionId}`);
+            const response = await axios.delete(`http://10.0.1.226:5000/api/sections/${sectionId}`);
+            console.log(`Deleted section ${sectionId}: `, response.data);
+          } catch (error) {
+            console.log(`Error deleting section ${sectionId}:`, error);
+          }
+        })
       );
-
+  
       // Update the state after successful deletion
       setSections((prevSections) =>
         prevSections.filter((section) => !selectedSections.includes(section.sectionid))
       );
       setSelectedSections([]);
+      setSelectedSection(null);
     } catch (error) {
       console.error('Error deleting sections:', error);
     }
-
-    setSelectedSection(null)
-  };
-
+  };  
+  
   const handleRowDoubleClick = (sectionid: string) => {
     setUserSection(sectionid);
     navigate(`/sectionControls/${sectionid}`);
@@ -191,11 +226,11 @@ function AdminPage() {
               </td>
               <td>
                 <Center>
-                <Checkbox
-                  checked={selectedSections.includes(section.sectionid)}
-                  onChange={() => handleCheckboxChange(section.sectionid)}
-                  color='red'
-                />
+                  <Checkbox
+                    checked={selectedSections.includes(section.sectionid)}
+                    onChange={() => handleCheckboxChange(section.sectionid)}
+                    color='red'
+                  />
                 </Center>
               </td>
             </Table.Tr>
@@ -263,11 +298,13 @@ function AdminPage() {
               </Button>
             </Group>
             <Group mt="md" style={{ display: "flex", justifyContent: "center", textAlign: "center" }}>
-
-            <Button color="green" onClick={handleCreateUnit} style={{width: '150px', marginTop: 20}}>
-                <IconCubePlus/><Space w="10" />Unit Creator
-            </Button>
-              </Group>
+              <Button color="green" onClick={handleCreateUnit} style={{ width: '150px', marginTop: 20 }}>
+                <IconCubePlus /><Space w="10" />Unit Creator
+              </Button>
+              <Button color="red" onClick={handleCreateUnit} style={{ width: '150px', marginTop: 20 }}>
+                <IconCubeOff /><Space w="10" />Delete Units
+              </Button>
+            </Group>
           </div>
         </AppShell.Main>
 

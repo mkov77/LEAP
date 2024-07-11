@@ -439,23 +439,29 @@ app.put('/api/units/update', async (req, res) => {
 
 app.put('/api/units/remove', async (req, res) => {
   const { section, isFriendly } = req.body;
+  console.log(`Received request to remove section: ${section} with isFriendly: ${isFriendly}`);
+
   try {
     // Update unit details
     const updateQuery = `
-      update units
-      set children = '{}',
-      unit_health = 100,
-      root = false,
-      section = null
+      UPDATE units
+      SET children = '{}',
+          unit_health = 100,
+          root = false,
+          section = null
       WHERE section = $1 AND "isFriendly" = $2
     `;
-    const updateValues = [
-      section,
-      isFriendly
-    ];
+    const updateValues = [section, isFriendly];
 
     const updateResult = await pool.query(updateQuery, updateValues);
 
+    if (updateResult.rowCount > 0) {
+      console.log(`Successfully updated units for section: ${section} with isFriendly: ${isFriendly}`);
+      res.status(200).json({ success: true });
+    } else {
+      console.log(`No units found for section: ${section} with isFriendly: ${isFriendly}`);
+      res.status(404).json({ success: false, message: 'No units found' });
+    }
   } catch (error) {
     console.error('Error updating unit:', error);
     res.status(500).json({ error: 'Internal Server Error' });
