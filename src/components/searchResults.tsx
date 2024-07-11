@@ -22,7 +22,7 @@ const SearchResultList: React.FC<Props> = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/units/sectionSort', {
+        const response = await axios.get<Unit[]>('http://192.168.204.1:5000/api/units/sectionSort', {
           params: {
             sectionid: userSection  // Pass userSection as a query parameter
           }

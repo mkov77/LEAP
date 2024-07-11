@@ -34,7 +34,7 @@ export default function UnitDeleteModule({ isOpen, onClose }: UnitDeleteProps) {
       const fetchUnits = async () => {
         try {
           setIsLoading(true);
-          const response = await axios.get<Unit[]>('http://10.0.1.226:5000/api/sectionlessunits');
+          const response = await axios.get<Unit[]>('http://192.168.204.1:5000/api/sectionlessunits');
           setUnits(response.data);
           setIsLoading(false);
         } catch (error) {
@@ -56,7 +56,7 @@ export default function UnitDeleteModule({ isOpen, onClose }: UnitDeleteProps) {
       setSubmitSuccess(false);
 
       // Send delete request to the server
-      await axios.delete(`http://10.0.1.226:5000/api/units/${values.id}`);
+      await axios.delete(`http://192.168.204.1:5000/api/units/${values.id}`);
 
       setSubmitSuccess(true);
       setIsLoading(false);

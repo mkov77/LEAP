@@ -223,7 +223,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyP
     try {
       console.log('Fetching data for section:', userSection);
 
-      const response = await axios.get<Unit[]>(`http://10.0.1.226:5000/api/units/sectionNullandAllianceSort`, {
+      const response = await axios.get<Unit[]>(`http://192.168.204.1:5000/api/units/sectionNullandAllianceSort`, {
         params: {
           sectionid: userSection,
           isFriendly: is_friendly
@@ -284,7 +284,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyP
     }
 
     try {
-      const response = await axios.put(`http://10.0.1.226:5000/api/units/update`, {
+      const response = await axios.put(`http://192.168.204.1:5000/api/units/update`, {
         parent_id: selectedNode,
         unit_id: Number(formValues.ID),
         unit_type: formValues.unitType,
@@ -310,7 +310,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyP
     }
 
     try {
-      const response = await axios.put(`http://10.0.1.226:5000/api/unitTactics/update`, {
+      const response = await axios.put(`http://192.168.204.1:5000/api/unitTactics/update`, {
         awareness: segmentValues.awareness,
         logistics: segmentValues.logistics,
         coverage: segmentValues.coverage,

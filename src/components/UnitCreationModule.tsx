@@ -29,7 +29,7 @@ export default function UnitCreationModule({ isOpen, onClose }: UnitCreationProp
     setSubmitError(null);
   
     try {
-      const response = await axios.post('http://10.0.1.226:5000/api/newunit', {
+      const response = await axios.post('http://192.168.204.1:5000/api/newunit', {
         unit_id: values.unitName,
         is_friendly: values.unitType === 'friendly',
       });
