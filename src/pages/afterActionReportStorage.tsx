@@ -90,7 +90,7 @@ export default function AAR() {
     const fetchEngagementData = async () => {
       try {
         console.log('Fetching data for engagement:', sectionId);
-        const response = await axios.get<Engagement[]>(`http://192.168.204.1:5000/api/engagements/${sectionId}`, {
+        const response = await axios.get<Engagement[]>(`http://localhost:5000/api/engagements/${sectionId}`, {
           params: {
             sectionid: sectionId  // Pass userSection as a query parameter
           }
@@ -101,7 +101,7 @@ export default function AAR() {
 
 
         const tacticsPromises = response.data.map(async (engagement) => {
-          const tacticsResponse = await axios.get<Tactics[]>(`http://192.168.204.1:5000/api/tactics/${engagement.engagementid}`);
+          const tacticsResponse = await axios.get<Tactics[]>(`http://localhost:5000/api/tactics/${engagement.engagementid}`);
           return { engagementId: engagement.engagementid, tactics: tacticsResponse.data };
         });
 

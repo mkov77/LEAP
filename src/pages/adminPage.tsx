@@ -63,7 +63,7 @@ function AdminPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<Section[]>('http://192.168.204.1:5000/api/sections');
+        const response = await axios.get<Section[]>('http://localhost:5000/api/sections');
         setSections(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -92,7 +92,7 @@ function AdminPage() {
     if (newSectionName.trim()) {
       try {
         // Make POST request to backend
-        const response = await axios.post('http://192.168.204.1:5000/api/sections', {
+        const response = await axios.post('http://localhost:5000/api/sections', {
           sectionid: newSectionName.trim(),
           isonline: false, // Default to offline
         });
@@ -136,7 +136,7 @@ function AdminPage() {
           selectedSections.map(async (sectionId) => {
             try {
               console.log(`Sending remove request for section ${sectionId} with isFriendly=${isFriendly}`);
-              const response = await axios.put(`http://192.168.204.1:5000/api/units/remove`, {
+              const response = await axios.put(`http://localhost:5000/api/units/remove`, {
                 section: sectionId,
                 isFriendly: isFriendly
               });
@@ -162,7 +162,7 @@ function AdminPage() {
         selectedSections.map(async (sectionId) => {
           try {
             console.log(`Deleting section ${sectionId}`);
-            const response = await axios.delete(`http://192.168.204.1:5000/api/sections/${sectionId}`);
+            const response = await axios.delete(`http://localhost:5000/api/sections/${sectionId}`);
             console.log(`Deleted section ${sectionId}: `, response.data);
           } catch (error) {
             console.log(`Error deleting section ${sectionId}:`, error);

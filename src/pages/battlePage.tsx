@@ -61,7 +61,7 @@ function BattlePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<Unit[]>('http://192.168.204.1:5000/api/units/sectionSort', {
+        const response = await axios.get<Unit[]>('http://localhost:5000/api/units/sectionSort', {
           params: {
             sectionid: userSection  // Pass userSection as a query parameter
           }
@@ -78,7 +78,7 @@ function BattlePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<Unit[]>('http://192.168.204.1:5000/api/units/enemyUnits', {
+        const response = await axios.get<Unit[]>('http://localhost:5000/api/units/enemyUnits', {
           params: {
             sectionid: userSection  // Pass userSection as a query parameter
           }
@@ -96,7 +96,7 @@ function BattlePage() {
   useEffect(() => {
     const fetchUnitTactics = async () => {
       try {
-        const response = await axios.get<UnitTactics>(`http://192.168.204.1:5000/api/unitTactics/${enemyUnit?.id}`);
+        const response = await axios.get<UnitTactics>(`http://localhost:5000/api/unitTactics/${enemyUnit?.id}`);
         setUnitTactics(response.data);
       } catch (error) {
         console.error('Error fetching unit tactics:', error);
@@ -146,7 +146,7 @@ function BattlePage() {
 
   // function to update unit health after each round of an engagement
   const updateUnitHealth = async (id: number, newHealth: number) => {
-    const url = `http://192.168.204.1:5000/api/units/health`; // Corrected URL to point to the server running on port 5000
+    const url = `http://localhost:5000/api/units/health`; // Corrected URL to point to the server running on port 5000
     const options = {
       method: 'PUT',
       headers: {
@@ -455,7 +455,7 @@ function BattlePage() {
     // Submit answers to backend
     try {
       // Submit engagement data
-      const engagementResponse = await fetch('http://192.168.204.1:5000/api/engagements', {
+      const engagementResponse = await fetch('http://localhost:5000/api/engagements', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -471,7 +471,7 @@ function BattlePage() {
       console.log('Engagement created:', engagementResult);
 
       // Submit tactics data
-      const tacticsResponse = await fetch('http://192.168.204.1:5000/api/tactics', {
+      const tacticsResponse = await fetch('http://localhost:5000/api/tactics', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

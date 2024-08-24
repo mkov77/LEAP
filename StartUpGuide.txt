@@ -40,7 +40,7 @@ ChatGPT or google are the best resources if this applies.
 
 Step 5. Adjust the endpoints.
 You will a need an IDE (a code editor) for this. I suggest Visual Studio Code.
-Search-replace every instance of "192.168.204.1" with your computer's IP address.
+Search-replace every instance of "localhost" with your computer's IP address.
 
 Step 6. Starting the program.
 Go to your file explorer and locate the project folder. At the root of the project folder,

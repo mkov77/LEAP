@@ -43,7 +43,7 @@ function SectionControls() {
   useEffect(() => {
     const fetchSectionData = async () => {
       try {
-        const response = await fetch(`http://192.168.204.1:5000/api/sections/${sectionId}`);
+        const response = await fetch(`http://localhost:5000/api/sections/${sectionId}`);
         if (response.ok) {
           const sectionData = await response.json();
           setSectionOnline(sectionData.isonline);
@@ -70,7 +70,7 @@ function SectionControls() {
     setRefreshHierarchy(prev => prev + 1);
 
     try {
-      const response = await axios.put(`http://192.168.204.1:5000/api/units/remove`, {
+      const response = await axios.put(`http://localhost:5000/api/units/remove`, {
         section: sectionId,
         isFriendly: (isFriendlyHierarchy === 'Friendly')
       });
@@ -85,7 +85,7 @@ function SectionControls() {
 
   const toggleSectionOnline = async () => {
     try {
-      const response = await fetch(`http://192.168.204.1:5000/api/sections/${sectionId}`, {
+      const response = await fetch(`http://localhost:5000/api/sections/${sectionId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

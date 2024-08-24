@@ -10,7 +10,7 @@ app.use(express.json());
 
 const pool = new Pool({
   user: 'postgres',
-  host: 'localhost',
+  host: 'postgres',
   database: 'LEAP',
   password: 'admin',
   port: 5432,
