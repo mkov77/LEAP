@@ -1,4 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+release-build/MyReactApp-win32-x64/MyReactApp.exe
+release-build/MyReactApp-win32-x64/resources/app/LEAP_images.tar
 
 # dependencies
 /node_modules
