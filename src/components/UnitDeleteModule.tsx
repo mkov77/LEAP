@@ -34,7 +34,7 @@ export default function UnitDeleteModule({ isOpen, onClose }: UnitDeleteProps) {
       const fetchUnits = async () => {
         try {
           setIsLoading(true);
-          const response = await axios.get<Unit[]>('http://localhost:5000/api/sectionlessunits');
+          const response = await axios.get<Unit[]>('http://localhost:5000/api/presetunits');
           setUnits(response.data);
           setIsLoading(false);
         } catch (error) {
@@ -78,7 +78,7 @@ export default function UnitDeleteModule({ isOpen, onClose }: UnitDeleteProps) {
           placeholder="Select unit to delete"
           error={form.errors.id}
           searchable
-          data={units.map(unit => ({ value: unit.id.toString(), label: unit.unit_id }))}
+          data={units.map(unit => ({ value: unit.unit_id.toString(), label: unit.unit_id }))}
           {...form.getInputProps('id')}
         />
         {form.errors.id && <Text color="red">{form.errors.id}</Text>}

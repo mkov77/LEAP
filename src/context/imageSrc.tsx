@@ -162,17 +162,20 @@ interface Props {
     isFriendly: boolean;
 }
 
-export const getImageSRC = (unitType: string, isFriendly: boolean): string | undefined => {
-    const unitKey = unitTypeToKey(unitType.toString());
+export const getImageSRC = (unitType: string, isFriendly: boolean): string => {
+    const unitKey = unitTypeToKey(unitType);
 
+    // Check if the unitKey is valid
     if (!unitKey) {
         console.warn(`No matching unit key found for unit type: ${unitType}`);
-        return ''; // or handle this case accordingly
+        return ''; // Handle the case where the unit type does not match
     }
 
+    // Determine the image source based on the isFriendly flag
     const imageSrc = isFriendly ? unitImages[unitKey].blue : unitImages[unitKey].red;
 
-    return imageSrc || '';
+    return imageSrc; // Return the image source (blue or red)
 };
+
 
 export default getImageSRC;

@@ -12,15 +12,17 @@ interface NodeEditProps {
     nodeID: number;
     is_friendly: boolean;
     userSection: string;
+    is_root: boolean
 }
 
 
 
-export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, userSection }: NodeEditProps) {
+export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, userSection, is_root }: NodeEditProps) {
     console.log("WE ARE SO OUT HERE. HERE BEING NODE EDIT MODAL.")
 
     const [formValues, setFormValues] = useState({
         unit_name: '',
+        updated_unit_name: '',
         unit_type: '',
         unit_health: 100,
         unit_role: '',
@@ -42,76 +44,144 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
         fire: 1,
         pattern: 1
     });
-    const [addNodeOpened, { open, close }] = useDisclosure(false);
+    const [unitTactics, setUnitTactics] = useState({
+        awareness: 1,
+        logistics: 1,
+        coverage: 1,
+        gps: 1,
+        comms: 1,
+        fire: 1,
+        pattern: 1
+    });
+    const [addNodeOpened, { open: openAddNode, close: closeAddNode }] = useDisclosure(false);
     const [unit, setUnit] = useState<Unit>();
-    const [isRoot, setIsRoot] = useState(false);
     const [deleteConfirmOpened, { open: openDeleteConfirm, close: closeDeleteConfirm }] = useDisclosure(false);
     const [editNodeOpened, { open: openEditNode, close: closeEditNode }] = useDisclosure(false);
+
+    const [nodeValues, setNodeValues] = useState({
+        unit_name: '',
+        unit_type: '',
+        unit_health: 100,
+        unit_role: '',
+        unit_size: '',
+        unit_posture: '',
+        unit_readiness: '',
+        unit_skill: '',
+        unit_mobility: '',
+        is_friendly,
+        root: false,
+    });
 
 
 
 
     useEffect(() => {
         const fetchUnitData = async () => {
+            // Check if we are a root first
+            if (is_root) {
+                console.log("!!WE A ROOT. WE A ROOT.");
+                onClose();        // Close the main modal
+                openAddNode();    // Open the Add Node modal
+                return;           // Skip fetching the unit data if is_root is true
+            }
+
             try {
+                // Fetch unit data
                 const response = await axios.get(`http://localhost:5000/api/unit/${nodeID}`);
                 console.log("Retrieving unit: ", nodeID);
                 const data = response.data[0]; // Accessing data directly from response
                 setUnit(data); // Set the fetched data to the unit state
-                console.log("Unit updated: ", unit); // Log the new unit data
-                console.log("UNIT IS: ", unit?.unit_name)
+                console.log("Unit updated: ", data); // Log the new unit data
+
+                // Fetch unit tactics based on unit_id from unit data
+                if (data?.unit_id) {
+                    const tacticsResponse = await axios.get(`http://localhost:5000/api/unitTactics/${data.unit_id}`);
+                    console.log("Fetching unit tactics for unit ID:", data.unit_id);
+                    const tacticsData = tacticsResponse.data;
+                    setUnitTactics(tacticsData); // Update the unitTactics state
+                    console.log("Unit tactics updated:", tacticsData);
+                }
             } catch (error) {
-                console.error('Error fetching unit data:', error);
+                console.error('Error fetching unit data or unit tactics:', error);
             }
         };
 
-        // Fetch data when the page is rendered
+        // Fetch data when the page is rendered or nodeID changes
         fetchUnitData();
-    }, [nodeID]); // Optionally include nodeID as a dependency to refetch when it changes  
+        fetchPresetUnits();
+    }, [nodeID, is_root]); // Add is_root as a dependency so it triggers when this value changes
+
+
+    // Update nodeValues when the unit data changes
+    useEffect(() => {
+        if (unit) {
+            setNodeValues({
+                unit_name: unit?.unit_name || '',
+                unit_type: unit?.unit_type || '',
+                unit_health: Number(unit?.unit_health) || 0,
+                unit_role: unit?.unit_role || '',
+                unit_size: unit?.unit_size || '',
+                unit_posture: unit?.unit_posture || '',
+                unit_readiness: unit?.unit_readiness || '',
+                unit_skill: unit?.unit_skill || '',
+                unit_mobility: unit?.unit_mobility || '',
+                is_friendly,
+                root: unit?.is_root,
+            });
+        }
+    }, [unit]); // Update nodeValues when unit data is fetched and set
 
     // FUNCTION: FETCH PRESET UNITS
     const fetchPresetUnits = async () => {
         try {
-          const response = await axios.get('http://localhost:5000/api/preset_units');
-    
-          const normalizedData = response.data.map((unit: any) => ({
-            unit_name: unit.unit_name,
-            unit_type: unit.unit_type,
-            is_friendly: unit.is_friendly,
-            unit_health: 100, // Default health
-            unit_role: unit.unit_role,
-            unit_size: unit.unit_size,
-            unit_posture: unit.unit_posture,
-            unit_mobility: unit.unit_mobility || 'Unknown',
-            unit_readiness: unit.unit_readiness,
-            unit_skill: unit.unit_skill
-          }));
-    
-          // Filter preset units based on the is_friendly prop
-          const filteredPresetUnits = normalizedData.filter((unit: { is_friendly: boolean; }) => unit.is_friendly === is_friendly);
-    
-          console.log("Fetching and filtering preset units");
-          console.log(filteredPresetUnits);
-    
-          setPresetUnits(filteredPresetUnits); // Set filtered preset units
+            const response = await axios.get('http://localhost:5000/api/preset_units');
+
+            const normalizedData = response.data.map((unit: any) => ({
+                unit_name: unit.unit_name,
+                unit_type: unit.unit_type,
+                is_friendly: unit.is_friendly,
+                unit_health: 100, // Default health
+                unit_role: unit.unit_role,
+                unit_size: unit.unit_size,
+                unit_posture: unit.unit_posture,
+                unit_mobility: unit.unit_mobility || 'Unknown',
+                unit_readiness: unit.unit_readiness,
+                unit_skill: unit.unit_skill
+            }));
+
+            // Filter preset units based on the is_friendly prop
+            const filteredPresetUnits = normalizedData.filter((unit: { is_friendly: boolean; }) => unit.is_friendly === is_friendly);
+
+            console.log("Fetching and filtering preset units");
+            console.log(filteredPresetUnits);
+
+            setPresetUnits(filteredPresetUnits); // Set filtered preset units
         } catch (error) {
-          console.error('Error fetching preset units:', error);
+            console.error('Error fetching preset units:', error);
         }
-      };
+    };
 
 
     // FUNCTION: HANDLE DELETE NODE
     const handleDeleteNode = async () => {
-        // try {
-        //   const response = await axios.delete(`http://localhost:5000/api/unit/${nodeID}`);
-        //   if (response.status === 200) {
-        //     console.log('Node deleted successfully');
-        //     closeDeleteConfirm(); // Close the confirmation modal
-        //     onClose(); // Close the main modal
-        //   }
-        // } catch (error) {
-        //   console.error('Error deleting node:', error);
-        // }
+        if (!nodeID) {
+            console.log('Node ID cannot be empty');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/deleteNode/${nodeID}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                console.log(`Node ${nodeID} and its children have been deleted successfully.`);
+            } else {
+                console.log(`Error: Unable to delete node ${nodeID}.`);
+            }
+        } catch (error) {
+            console.log(`Error: ${error}`);
+        }
 
         console.log("hmmm yeah this will delete one of these days")
         closeDeleteConfirm();
@@ -130,6 +200,7 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                 // Auto-populate form fields with the selected unit's data
                 setFormValues({
                     unit_name: selectedUnit.unit_name,
+                    updated_unit_name: selectedUnit.unit_name,
                     unit_type: selectedUnit.unit_type,
                     unit_health: 100, // Default value, or use `selectedUnit.unit_health` if available
                     unit_role: selectedUnit.unit_role,
@@ -181,11 +252,20 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
         }
     };
 
+
+    // FUNCTION HANDLE NODE CHANGE
+    const handleNodeChange = (value: string | null, fieldName: string) => {
+        setNodeValues((prevValues) => ({
+            ...prevValues,
+            [fieldName]: value,
+        }));
+    };
+
     //   FUNCTION: HANDLE SUBMIT
-    const handleSubmit = async (event: React.FormEvent) => {
+    const handleAddSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        const requiredFields = ['unit_name', 'unit_type', 'unit_health', 'unit_role', 'unit_size', 'unit_posture', 'unit_readiness', 'unit_skill'];
+        const requiredFields = ['updated_unit_name', 'unit_type', 'unit_health', 'unit_role', 'unit_size', 'unit_posture', 'unit_readiness', 'unit_skill'];
 
         // Check required fields
         for (const field of requiredFields) {
@@ -198,7 +278,7 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
         try {
             // Step 1: Submit the unit data to the section_units table
             const unitResponse = await axios.post(`http://localhost:5000/api/section_units`, {
-                unit_name: formValues.unit_name,
+                unit_name: formValues.updated_unit_name,
                 unit_health: formValues.unit_health,
                 unit_type: formValues.unit_type,
                 unit_role: formValues.unit_role,
@@ -208,7 +288,7 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                 unit_readiness: formValues.unit_readiness,
                 unit_skill: formValues.unit_skill,
                 is_friendly: formValues.is_friendly,
-                is_root: isRoot,
+                is_root: is_root,
                 section_id: userSection
             });
 
@@ -233,10 +313,13 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                     console.error('Failed to add tactics:', tacticsResponse);
                 }
 
-                // Step 3: Update parent node's children if necessary
-                if (nodeID) {
-                    await updateParentNodeChildren(nodeID, newNodeID);
+                if (!is_root) {
+                    await axios.post('http://localhost:5000/api/newchildnode', {
+                        child_id: newNodeID,  // The new child node's ID
+                        parent_id: unit?.unit_id  // The parent node's ID
+                    });
                 }
+
             } else {
                 console.error('Failed to add unit:', unitResponse);
             }
@@ -245,32 +328,82 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
         }
 
         // Close the modal and reset the form
-        close();
+        closeAddNode();
         resetForm();
+        onClose();
     };
 
-    // FUNCTION: UPDATE PARENT NODE CHILDREN
-    const updateParentNodeChildren = async (parentNodeId: number, newChildId: number) => {
-        try {
-            const response = await axios.put(`http://localhost:5000/api/section_units/${parentNodeId}/addChild`, {
-                childId: newChildId
-            });
 
-            if (response.status === 200) {
-                console.log(`Child node with ID ${newChildId} added to parent node with ID ${parentNodeId}`);
+    const handleEditSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+    
+        const requiredFields = ['unit_name', 'unit_type', 'unit_health', 'unit_role', 'unit_size', 'unit_posture', 'unit_readiness', 'unit_skill'];
+    
+        // Check required fields
+        for (const field of requiredFields) {
+            if (!nodeValues[field as keyof typeof nodeValues]) {
+                alert(`The field "${field}" is required.`);
+                return; // Stop submission if any required field is missing
+            }
+        }
+    
+        try {
+            // Step 1: Submit the unit data to the section_units table
+            const unitResponse = await axios.post(`http://localhost:5000/api/update_unit`, {
+                unit_id: unit?.unit_id,
+                unit_name: nodeValues.unit_name,
+                unit_health: nodeValues.unit_health,
+                unit_type: nodeValues.unit_type,
+                unit_role: nodeValues.unit_role,
+                unit_size: nodeValues.unit_size,
+                unit_posture: nodeValues.unit_posture,
+                unit_mobility: nodeValues.unit_mobility,
+                unit_readiness: nodeValues.unit_readiness,
+                unit_skill: nodeValues.unit_skill,
+                is_friendly: nodeValues.is_friendly,
+                is_root: is_root,
+                section_id: userSection
+            });
+    
+            if (unitResponse.status === 200 || unitResponse.status === 201) {
+                console.log('Updated unit:', unit?.unit_id);
+    
+                // Step 2: Submit the tactics data to the section_tactics table
+                const tacticsResponse = await axios.post('http://localhost:5000/api/update/tactics', {
+                    unit_id: unit?.unit_id, // Include unit_id to associate tactics with the correct unit
+                    awareness: unitTactics.awareness,
+                    logistics: unitTactics.logistics,
+                    coverage: unitTactics.coverage,
+                    gps: unitTactics.gps,
+                    comms: unitTactics.comms,
+                    fire: unitTactics.fire,
+                    pattern: unitTactics.pattern,
+                });
+    
+                if (tacticsResponse.status === 200 || tacticsResponse.status === 201) {
+                    console.log('Tactics successfully updated for unit ID:', unit?.unit_id);
+                } else {
+                    console.error('Failed to update tactics:', tacticsResponse);
+                }
+    
             } else {
-                console.error('Failed to update parent node:', response);
+                console.error('Failed to update unit:', unitResponse);
             }
         } catch (error) {
-            console.error('Error updating parent node:', error);
+            console.error('Error updating unit and tactics:', error);
         }
-    };
+    
+        // Close the modal and reset the form
+        closeAddNode();
+        resetForm();
+        onClose();
+    };    
 
     // FUNCTION: RESET FORM
     const resetForm = () => {
-        setIsRoot(false);
         setFormValues({
             unit_name: '',
+            updated_unit_name: '',
             unit_type: '',
             unit_health: 100,
             unit_role: '',
@@ -315,6 +448,30 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
     };
 
 
+    // FUNCTION: HANDLE SEGMENT CHANGE
+    const handleTacticsChange = (value: string, segmentName: keyof typeof unitTactics) => {
+        console.log("handling segment change...?");
+        const updatedSegments = { ...unitTactics };
+
+        // Map 'Yes' to 1 and 'No' to 0
+        updatedSegments[segmentName] = value === 'Yes' ? 1 : 0;
+
+        setUnitTactics(updatedSegments);
+    };
+
+
+    const isCompleteNodeEdit = () => {
+        const requiredFields = ['unit_name', 'unit_type', 'unit_health', 'unit_role', 'unit_size', 'unit_posture', 'unit_readiness', 'unit_skill'];
+        return requiredFields.every(field => !!nodeValues[field as keyof typeof nodeValues]);
+    };
+
+
+    const isCompleteAddNode = () => {
+        const requiredFields = ['unit_name', 'unit_type', 'unit_health', 'unit_role', 'unit_size', 'unit_posture', 'unit_readiness', 'unit_skill'];
+        return requiredFields.every(field => !!formValues[field as keyof typeof formValues]);
+    };
+
+
     return (
         <>
             <Modal opened={isOpen} onClose={onClose} title={unit?.unit_name + " Options"} centered>
@@ -326,7 +483,7 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                 <Card><IconSquareX /><Text>Delete Node</Text></Card> */}
 
                         {/* Add Node */}
-                        <UnstyledButton onClick={open} p={10} style={{ borderRadius: 5, backgroundColor: '#3b3b3b' }}>
+                        <UnstyledButton onClick={openAddNode} p={10} style={{ borderRadius: 5, backgroundColor: '#3b3b3b' }}>
                             <Center>
                                 <IconSquarePlus size="50" strokeWidth="1.5" />
                             </Center>
@@ -335,7 +492,7 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                                 Add Child
                             </Text>
                         </UnstyledButton>
-                        
+
                         {/* Edit Node */}
                         <UnstyledButton onClick={openEditNode} p={10} style={{ borderRadius: 5, backgroundColor: '#3b3b3b' }} >
                             <Center>
@@ -368,8 +525,8 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
 
             </Modal>
 
-            <Modal opened={addNodeOpened} onClose={close} title={"Add child to " + unit?.unit_name}>
-                <form onSubmit={handleSubmit}>
+            <Modal opened={addNodeOpened} onClose={closeAddNode} title={is_root ? "Add Parent" : "Add Child to " + unit?.unit_name}>
+                <form onSubmit={handleAddSubmit}>
                     <Tabs defaultValue="unit">
                         <Tabs.List>
                             <Tabs.Tab value="unit" >
@@ -384,19 +541,34 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                         <Tabs.Panel value="unit">
 
                             <Select
-                                label="Unit ID"
+                                label="Preset Unit"
                                 placeholder="Pick one"
                                 name="unit"
+                                mt="md"
                                 required
                                 searchable
-                                value={formValues.unit_name.toString()}
+                                value={formValues.unit_name}
                                 onChange={(value) => handleSelectChange(value, 'ID')}
                                 data={presetUnits
-                                    .filter(unit => unit && unit.unit_name) // Filter out invalid units
+                                    .filter(unit => unit && unit.unit_name)  // Filter out invalid units
                                     .map(unit => ({
-                                        value: unit.unit_name, // Set unit name as `value`
-                                        label: unit.unit_name, // Set unit name as `label`
+                                        value: unit.unit_name,  // Set unit name as `value`
+                                        label: unit.unit_name,  // Set unit name as `label`
                                     }))}
+                            />
+
+                            {/* Text input that auto-populates from the dropdown */}
+                            <TextInput
+                                label="Unit Name"
+                                mt="md"
+                                value={formValues.updated_unit_name}  // Controlled input tied to updated_unit_name
+                                onChange={(e) =>
+                                    setFormValues({
+                                        ...formValues,
+                                        updated_unit_name: e.target.value  // Allow user to modify the name
+                                    })
+                                }
+                                placeholder="Update unit name"
                             />
 
                             <Select
@@ -622,8 +794,7 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                         </Tabs.Panel>
                     </Tabs>
                     <Group grow>
-                        {/* <Button type="submit" mt="md" disabled={!areRequiredFieldsFilled()}>Submit</Button> */}
-
+                        <Button type="submit" mt="md" disabled={!isCompleteAddNode()}>Submit</Button>
                     </Group>
                 </form>
 
@@ -645,7 +816,7 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
             </Modal>
 
             <Modal opened={editNodeOpened} onClose={closeEditNode} title={"Edit " + unit?.unit_name}>
-            <form onSubmit={handleSubmit}>
+                <form onSubmit={handleEditSubmit}>
                     <Tabs defaultValue="unit">
                         <Tabs.List>
                             <Tabs.Tab value="unit" >
@@ -659,30 +830,24 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
 
                         <Tabs.Panel value="unit">
 
-                            <Select
+                            <TextInput
                                 label="Unit ID"
-                                placeholder="Pick one"
+                                placeholder="Enter unit name"
                                 name="unit"
                                 required
-                                searchable
-                                value={formValues.unit_name.toString()}
-                                onChange={(value) => handleSelectChange(value, 'ID')}
-                                data={presetUnits
-                                    .filter(unit => unit && unit.unit_name) // Filter out invalid units
-                                    .map(unit => ({
-                                        value: unit.unit_name, // Set unit name as `value`
-                                        label: unit.unit_name, // Set unit name as `label`
-                                    }))}
+                                value={nodeValues.unit_name}
+                            // onChange={(value) => handleNodeChange(value, 'ID')}
+                            // data={unit?.unit_name}
                             />
 
                             <Select
                                 label="Unit Type"
-                                placeholder="Enter unit type"
+                                placeholder="Select unit type"
                                 required
                                 name='unit_type'
                                 mt="md"
-                                value={formValues.unit_type}
-                                onChange={(value) => handleSelectChange(value, 'unit_type')}
+                                value={nodeValues.unit_type}
+                                onChange={(value) => handleNodeChange(value, 'unit_type')}
                                 searchable
                                 data={[
                                     { value: 'Command and Control', label: 'Command and Control' },
@@ -719,18 +884,23 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                                 name='unit_health'
                                 mt="md"
                                 type='number'
-                                value={formValues.unit_health}
-                                onChange={handleChange}
+                                value={nodeValues.unit_health}
+                                onChange={(event) =>
+                                    setNodeValues((prevValues) => ({
+                                        ...prevValues,
+                                        unit_health: Number(event.target.value), // Ensure the value is updated as a number
+                                    }))
+                                }
                             />
 
                             <Select
                                 label="Unit Role"
-                                placeholder="Enter unit role"
+                                placeholder="Select unit role"
                                 required
                                 name='unit_role'
                                 mt="md"
-                                value={formValues.unit_role}
-                                onChange={(value) => handleSelectChange(value, 'unit_role')}
+                                value={nodeValues.unit_role}
+                                onChange={(value) => handleNodeChange(value, 'unit_role')}
                                 searchable
                                 data={[
                                     { value: 'Combat', label: 'Combat' },
@@ -743,12 +913,12 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
 
                             <Select
                                 label="Unit Size"
-                                placeholder="Enter unit size"
+                                placeholder="Select unit size"
                                 required
                                 name='unit_size'
                                 mt="md"
-                                value={formValues.unit_size}
-                                onChange={(value) => handleSelectChange(value, 'unit_size')}
+                                value={nodeValues.unit_size}
+                                onChange={(value) => handleNodeChange(value, 'unit_size')}
                                 searchable
                                 data={[
                                     { value: 'Squad/Team', label: 'Squad/Team' },
@@ -766,12 +936,12 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
 
                             <Select
                                 label="Force Posture"
-                                placeholder="Enter force posture"
+                                placeholder="Select force posture"
                                 required
                                 name='unit_posture'
                                 mt="md"
-                                value={formValues.unit_posture}
-                                onChange={(value) => handleSelectChange(value, 'unit_posture')}
+                                value={nodeValues.unit_posture}
+                                onChange={(value) => handleNodeChange(value, 'unit_posture')}
                                 data={[
                                     { value: 'Offensive Only', label: 'Offensive Only' },
                                     { value: 'Defensive Only', label: 'Defensive Only' },
@@ -781,12 +951,12 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
 
                             <Select
                                 label="Force Mobility"
-                                placeholder="Enter force mobility"
+                                placeholder="Select force mobility"
                                 required
                                 name='unit_mobility'
                                 mt="md"
-                                value={formValues.unit_mobility}
-                                onChange={(value) => handleSelectChange(value, 'unit_mobility')}
+                                value={nodeValues.unit_mobility}
+                                onChange={(value) => handleNodeChange(value, 'unit_mobility')}
                                 data={[
                                     { value: 'Fixed', label: 'Fixed' },
                                     { value: 'Mobile (foot)', label: 'Mobile (foot)' },
@@ -800,12 +970,12 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
 
                             <Select
                                 label="Force Readiness"
-                                placeholder="Enter force readiness"
+                                placeholder="Select force readiness"
                                 required
                                 name='unit_readiness'
                                 mt="md"
-                                value={formValues.unit_readiness}
-                                onChange={(value) => handleSelectChange(value, 'unit_readiness')}
+                                value={nodeValues.unit_readiness}
+                                onChange={(value) => handleNodeChange(value, 'unit_readiness')}
                                 data={[
                                     { value: 'Low', label: 'Low' },
                                     { value: 'Medium', label: 'Medium' },
@@ -815,12 +985,12 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
 
                             <Select
                                 label="Force Skill"
-                                placeholder="Enter force skill"
+                                placeholder="Select force skill"
                                 required
                                 name='unit_skill'
                                 mt="md"
-                                value={formValues.unit_skill}
-                                onChange={(value) => handleSelectChange(value, 'unit_skill')}
+                                value={nodeValues.unit_skill}
+                                onChange={(value) => handleNodeChange(value, 'unit_skill')}
                                 data={[
                                     { value: 'Untrained', label: 'Untrained' },
                                     { value: 'Basic', label: 'Basic' },
@@ -838,8 +1008,8 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                                 radius='xs'
                                 color="gray"
                                 data={['Yes', 'No']}
-                                value={segmentValues.awareness === 1 ? 'Yes' : 'No'} // Bind value
-                                onChange={(value) => handleSegmentChange(value, 'awareness')}
+                                value={unitTactics.awareness === 1 ? 'Yes' : 'No'} // Bind value
+                                onChange={(value) => handleTacticsChange(value, 'awareness')}
                             />
                             <p>Within logistics support range?</p>
                             <SegmentedControl
@@ -847,8 +1017,8 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                                 radius='xs'
                                 color="gray"
                                 data={['Yes', 'No']}
-                                value={segmentValues.logistics === 1 ? 'Yes' : 'No'} // Bind value
-                                onChange={(value) => handleSegmentChange(value, 'logistics')}
+                                value={unitTactics.logistics === 1 ? 'Yes' : 'No'} // Bind value
+                                onChange={(value) => handleTacticsChange(value, 'logistics')}
                             />
                             <p>Under ISR coverage?</p>
                             <SegmentedControl
@@ -856,8 +1026,8 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                                 radius='xs'
                                 color="gray"
                                 data={['Yes', 'No']}
-                                value={segmentValues.coverage === 1 ? 'Yes' : 'No'} // Bind value
-                                onChange={(value) => handleSegmentChange(value, 'coverage')}
+                                value={unitTactics.coverage === 1 ? 'Yes' : 'No'} // Bind value
+                                onChange={(value) => handleTacticsChange(value, 'coverage')}
                             />
                             <p>Working GPS?</p>
                             <SegmentedControl
@@ -865,8 +1035,8 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                                 radius='xs'
                                 color="gray"
                                 data={['Yes', 'No']}
-                                value={segmentValues.gps === 1 ? 'Yes' : 'No'} // Bind value
-                                onChange={(value) => handleSegmentChange(value, 'gps')}
+                                value={unitTactics.gps === 1 ? 'Yes' : 'No'} // Bind value
+                                onChange={(value) => handleTacticsChange(value, 'gps')}
                             />
                             <p>Working communications?</p>
                             <SegmentedControl
@@ -874,8 +1044,8 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                                 radius='xs'
                                 color="gray"
                                 data={['Yes', 'No']}
-                                value={segmentValues.comms === 1 ? 'Yes' : 'No'} // Bind value
-                                onChange={(value) => handleSegmentChange(value, 'comms')}
+                                value={unitTactics.comms === 1 ? 'Yes' : 'No'} // Bind value
+                                onChange={(value) => handleTacticsChange(value, 'comms')}
                             />
                             <p>Within fire support range?</p>
                             <SegmentedControl
@@ -883,8 +1053,8 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                                 radius='xs'
                                 color="gray"
                                 data={['Yes', 'No']}
-                                value={segmentValues.fire === 1 ? 'Yes' : 'No'} // Bind value
-                                onChange={(value) => handleSegmentChange(value, 'fire')}
+                                value={unitTactics.fire === 1 ? 'Yes' : 'No'} // Bind value
+                                onChange={(value) => handleTacticsChange(value, 'fire')}
                             />
                             <p>Accessible by pattern force?</p>
                             <SegmentedControl
@@ -892,14 +1062,13 @@ export default function NodeEditModal({ isOpen, onClose, nodeID, is_friendly, us
                                 radius='xs'
                                 color="gray"
                                 data={['Yes', 'No']}
-                                value={segmentValues.pattern === 1 ? 'Yes' : 'No'} // Bind value
-                                onChange={(value) => handleSegmentChange(value, 'pattern')}
+                                value={unitTactics.pattern === 1 ? 'Yes' : 'No'} // Bind value
+                                onChange={(value) => handleTacticsChange(value, 'pattern')}
                             />
                         </Tabs.Panel>
                     </Tabs>
                     <Group grow>
-                        {/* <Button type="submit" mt="md" disabled={!areRequiredFieldsFilled()}>Submit</Button> */}
-
+                        <Button type="submit" mt="md" disabled={!isCompleteNodeEdit()}>Submit</Button>
                     </Group>
                 </form>
             </Modal>

@@ -66,23 +66,6 @@ function SectionControls() {
     navigate('/admin');
   };
 
-  const handleClear = async () => {
-    setRefreshHierarchy(prev => prev + 1);
-
-    try {
-      const response = await axios.put(`http://localhost:5000/api/units/remove`, {
-        section: sectionId,
-        isFriendly: (isFriendlyHierarchy === 'Friendly')
-      });
-
-
-    }
-    catch (error){
-      console.log("error clearing: ", error);
-    }
-    
-  }
-
   const toggleSectionOnline = async () => {
     try {
       const response = await fetch(`http://localhost:5000/api/sections/${sectionId}`, {
@@ -240,7 +223,7 @@ function SectionControls() {
                     { label: 'Enemy Hierarchy', value: 'Enemy' }
                   ]}
                 />
-                <Button color='red' size="xl" justify='right' onClick={handleClear} >Clear</Button>
+                
                 
               </Group>
               <Hierarchy is_friendly={isFriendlyHierarchy === 'Friendly'} hierarchyRefresh={refreshHierarchy} xCoord={1250} yCoord={70}/>

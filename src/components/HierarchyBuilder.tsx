@@ -54,17 +54,6 @@ const buildHierarchy = (units: Unit[], childrenData: { parent_id: number; child_
   });
 
   console.log("SECOND PASS");
-  // Second pass: Link children to their parents based on the children table data
-  // console.log("CHILDREN DATA: ", childrenData);
-  // childrenData.forEach(relation => {
-  //   const parent = unitMap.get(relation.parent_id);
-  //   const child = unitMap.get(relation.child_id);
-  //   if (parent && child) {
-  //     parent.children!.push(child);
-  //   } else {
-  //     console.error(`Parent or child not found: ParentID = ${relation.parent_id}, ChildID = ${relation.child_id}`);
-  //   }
-  // });
   units.forEach(unit => {
     const parent = unitMap.get(unit.unit_id); // Get parent unit from map
     if (unit.children && unit.children.length > 0) {
@@ -98,7 +87,7 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
 
   const {
     unit_type,
-    is_friendly,
+    is_friendly,  // This now comes from nodeDatum.attributes, which represents the specific unit's data
     unit_health,
     unit_role,
     unit_size,
@@ -109,11 +98,14 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
   } = nodeDatum.attributes as UnitAttributes;
 
 
+  console.log("aRe wE FeeLing FriEndLy? ", is_friendly)
+
+  const isFriendlyBoolean = typeof is_friendly === 'boolean' ? is_friendly : is_friendly === 'true';
+
   return (
     <HoverCard width={280} shadow="md" openDelay={750}>
       <HoverCard.Target>
         <g onClick={toggleModal}>
-
 
           <rect
             width={cardWidth}
@@ -130,10 +122,10 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
             stroke="none"
           />
           <image
-            href={getImageSRC(unit_type, is_friendly)}
-            x={is_friendly ? -imageSize / 2 + 7.5 : -imageSize / 2.75 + 7.5}
-            y={is_friendly ? -cardHeight / 2 + 10 : -cardHeight / 2 + 5}
-            width={is_friendly ? 100 : 75}
+            href={getImageSRC(unit_type, isFriendlyBoolean)}
+            x={isFriendlyBoolean ? -imageSize / 2 + 7.5 : -imageSize / 2.75 + 7.5}
+            y={isFriendlyBoolean ? -cardHeight / 2 + 10 : -cardHeight / 2 + 5}
+            width={isFriendlyBoolean ? 100 : 75}
           />
           <text fill="white" x={((Number(nodeDatum.name.length) / 2) * -9.5) + 7.5} y={cardHeight / 2 - 10} width={40} textAnchor="start" stroke="none">
             {nodeDatum.name}
@@ -153,15 +145,6 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
             }}
             stroke="none"  // No stroke
           />
-          {/* if (unit_health >= 75) {
-    healthColor = '#6aa84f';
-  } else if (unit_health < 75 && unit_health >= 50) {
-    healthColor = '#f1c232';
-  } else if (unit_health < 50 && unit_health >= 25) {
-    healthColor = '#e69138';
-  } else {
-    healthColor = '#cc0000';
-  } */}
 
           <rect
             width={15}  // Width of the red rectangle
@@ -185,7 +168,7 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
           <strong>Type:</strong> {unit_type}<br />
           <strong>Friendly:</strong> {is_friendly ? 'Yes' : 'No'}<br />
           <strong>Health:</strong> {unit_health}<br />
-          <strong>Role Type:</strong> {unit_type}<br />
+          <strong>Role Type:</strong> {unit_role}<br />
           <strong>Unit Size:</strong> {unit_size}<br />
           <strong>Force Posture:</strong> {unit_posture}<br />
           <strong>Force Mobility:</strong> {unit_mobility}<br />
@@ -197,8 +180,6 @@ const CustomNode = ({ nodeDatum, toggleModal }: CustomNodeElementProps & { toggl
   );
 };
 
-
-
 function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyProps) {
   const [units, setUnits] = useState<Unit[]>([]);
   console.log("CHECKING UNITS ", units)
@@ -206,30 +187,8 @@ function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyP
   const [opened, { open, close }] = useDisclosure(false);
   const [tree, setTree] = useState<RawNodeDatum[] | null>();
   const { userRole, userSection } = useUserRole()
-  const [formValues, setFormValues] = useState({
-    unit_name: '',
-    unit_type: '',
-    unit_health: 100,
-    unit_role: '',
-    unit_size: '',
-    unit_posture: '',
-    unit_readiness: '',
-    unit_skill: '',
-    unit_mobility: '',
-    is_friendly,
-    root: false
-  });
   const [selectedNode, setSelectedNode] = useState<number>();
   const [isRoot, setIsRoot] = useState(false);
-  const [segmentValues, setSegmentValues] = useState({
-    awareness: 1,
-    logistics: 1,
-    coverage: 1,
-    gps: 1,
-    comms: 1,
-    fire: 1,
-    pattern: 1
-  });
   const [childrenData, setChildrenData] = useState<Array<{ parent_id: number; child_id: number }>>([]);
 
   useEffect(() => {
@@ -349,203 +308,6 @@ function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyP
     open();
   }
 
-  const updateParentNodeChildren = async (parentNodeId: number, newChildId: number) => {
-    try {
-      const response = await axios.put(`http://localhost:5000/api/section_units/${parentNodeId}/addChild`, {
-        childId: newChildId
-      });
-
-      if (response.status === 200) {
-        console.log(`Child node with ID ${newChildId} added to parent node with ID ${parentNodeId}`);
-      } else {
-        console.error('Failed to update parent node:', response);
-      }
-    } catch (error) {
-      console.error('Error updating parent node:', error);
-    }
-  };
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    const requiredFields = ['unit_name', 'unit_type', 'unit_health', 'unit_role', 'unit_size', 'unit_posture', 'unit_readiness', 'unit_skill'];
-
-    // Check required fields
-    for (const field of requiredFields) {
-      if (!formValues[field as keyof typeof formValues]) {
-        alert(`The field "${field}" is required.`);
-        return; // Stop submission if any required field is missing
-      }
-    }
-
-    try {
-      // Step 1: Submit the unit data to the section_units table
-      const unitResponse = await axios.post(`http://localhost:5000/api/section_units`, {
-        unit_name: formValues.unit_name,
-        unit_health: formValues.unit_health,
-        unit_type: formValues.unit_type,
-        unit_role: formValues.unit_role,
-        unit_size: formValues.unit_size,
-        unit_posture: formValues.unit_posture,
-        unit_mobility: formValues.unit_mobility,
-        unit_readiness: formValues.unit_readiness,
-        unit_skill: formValues.unit_skill,
-        is_friendly: formValues.is_friendly,
-        is_root: isRoot,
-        section_id: userSection
-      });
-
-      if (unitResponse.status === 200 || unitResponse.status === 201) {
-        const newNodeID = unitResponse.data.node.unit_id; // Assuming response contains the new node's ID
-        console.log('New node added with ID:', newNodeID);
-
-        // Step 2: Submit the tactics data to the section_tactics table
-        const tacticsResponse = await axios.post('http://localhost:5000/api/newsectionunit/tactics', {
-          awareness: segmentValues.awareness,
-          logistics: segmentValues.logistics,
-          coverage: segmentValues.coverage,
-          gps: segmentValues.gps,
-          comms: segmentValues.comms,
-          fire: segmentValues.fire,
-          pattern: segmentValues.pattern,
-        });
-
-        if (tacticsResponse.status === 200 || tacticsResponse.status === 201) {
-          console.log('Tactics successfully added for unit ID:', newNodeID);
-        } else {
-          console.error('Failed to add tactics:', tacticsResponse);
-        }
-
-        // Step 3: Update parent node's children if necessary
-        if (selectedNode) {
-          await updateParentNodeChildren(selectedNode, newNodeID);
-        }
-
-        // Step 4: Refresh data after successful submission
-        fetchData(); // Refresh the data
-      } else {
-        console.error('Failed to add unit:', unitResponse);
-      }
-    } catch (error) {
-      console.error('Error adding unit and tactics:', error);
-    }
-
-    // Close the modal and reset the form
-    close();
-    resetForm();
-  };
-
-  const resetForm = () => {
-    setIsRoot(false);
-    setFormValues({
-      unit_name: '',
-      unit_type: '',
-      unit_health: 100,
-      unit_role: '',
-      unit_size: '',
-      unit_posture: '',
-      unit_readiness: '',
-      unit_skill: '',
-      unit_mobility: '',
-      is_friendly: is_friendly, // Reset friendly status if it's part of your form
-      root: false
-    });
-    setSegmentValues({
-      awareness: 1,
-      logistics: 1,
-      coverage: 1,
-      gps: 1,
-      comms: 1,
-      fire: 1,
-      pattern: 1
-    });
-  };
-
-  const areRequiredFieldsFilled = () => {
-    const requiredFields = ['unit_name', 'unit_type', 'unit_health', 'unit_role', 'unit_size', 'unit_posture', 'unit_readiness', 'unit_skill'];
-    return requiredFields.every(field => !!formValues[field as keyof typeof formValues]);
-  };
-
-  const handleSegmentChange = (value: string, segmentName: keyof typeof segmentValues) => {
-    console.log("handling segment change...?");
-    const updatedSegments = { ...segmentValues };
-
-    // Map 'Yes' to 1 and 'No' to 0
-    updatedSegments[segmentName] = value === 'Yes' ? 1 : 0;
-
-    setSegmentValues(updatedSegments);
-  };
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
-    console.log('handling change..?');
-    const { name, value } = event.currentTarget;
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      [name]: value
-    }));
-  };
-
-  const handleSelectChange = async (value: string | null, name: string) => {
-    if (name === 'ID') {
-      console.log("handling select change...?");
-
-      const selectedUnit = presetUnits.find(unit => unit.unit_name === value);
-
-      if (selectedUnit) {
-        // Auto-populate form fields with the selected unit's data
-        setFormValues({
-          unit_name: selectedUnit.unit_name,
-          unit_type: selectedUnit.unit_type,
-          unit_health: 100, // Default value, or use `selectedUnit.unit_health` if available
-          unit_role: selectedUnit.unit_role,
-          unit_size: selectedUnit.unit_size,
-          unit_posture: selectedUnit.unit_posture,
-          unit_readiness: selectedUnit.unit_readiness,
-          unit_skill: selectedUnit.unit_skill,
-          unit_mobility: selectedUnit.unit_mobility,
-          is_friendly: is_friendly,
-          root: true, // Adjust if needed based on the selected unit
-        });
-
-        try {
-          // Step 1: Fetch tactics from `preset_tactics` where unit_name matches
-          const tacticsResponse = await axios.get(`http://localhost:5000/api/preset_tactics`, {
-            params: {
-              unit_name: selectedUnit.unit_name,
-            }
-          });
-
-          if (tacticsResponse.status === 200 && tacticsResponse.data) {
-            const presetTactics = tacticsResponse.data.tactics; // Assuming the API response contains tactics data
-
-            console.log("But do we get the tactics? ", tacticsResponse.data.tactics)
-
-            // Step 2: Auto-populate segmentValues (for tactics)
-            setSegmentValues({
-              awareness: presetTactics.awareness,
-              logistics: presetTactics.logistics,
-              coverage: presetTactics.coverage,
-              gps: presetTactics.gps,
-              comms: presetTactics.comms,
-              fire: presetTactics.fire,
-              pattern: presetTactics.pattern
-            });
-          } else {
-            console.warn("No tactics found for the selected unit.");
-          }
-        } catch (error) {
-          console.error("Error fetching preset tactics:", error);
-        }
-      }
-    } else {
-      // Update form values for other fields
-      setFormValues(prevValues => ({
-        ...prevValues,
-        [name]: value ?? '',
-      }));
-    }
-  };
-
   return (
     <div style={{ width: '100%', height: '100vh' }}>
 
@@ -571,268 +333,7 @@ function Hierarchy({ is_friendly, hierarchyRefresh, xCoord, yCoord }: HierarchyP
 
       }
       
-      <NodeEditModal isOpen={opened} onClose={close} nodeID={Number(selectedNode)} is_friendly={is_friendly} userSection={userSection}/>
-
-      {/* <Modal opened={opened} onClose={close} title="Add Unit">
-        <form onSubmit={handleSubmit}>
-          <Tabs defaultValue="unit">
-            <Tabs.List>
-              <Tabs.Tab value="unit" >
-                Unit selection
-              </Tabs.Tab>
-              <Tabs.Tab value="tactics" >
-                Unit Tactics
-              </Tabs.Tab>
-
-            </Tabs.List>
-
-            <Tabs.Panel value="unit">
-
-              <Select
-                label="Unit ID"
-                placeholder="Pick one"
-                name="unit"
-                required
-                searchable
-                value={formValues.unit_name.toString()}
-                onChange={(value) => handleSelectChange(value, 'ID')}
-                data={presetUnits
-                  .filter(unit => unit && unit.unit_name) // Filter out invalid units
-                  .map(unit => ({
-                    value: unit.unit_name, // Set unit name as `value`
-                    label: unit.unit_name, // Set unit name as `label`
-                  }))}
-              />
-
-              <Select
-                label="Unit Type"
-                placeholder="Enter unit type"
-                required
-                name='unit_type'
-                mt="md"
-                value={formValues.unit_type}
-                onChange={(value) => handleSelectChange(value, 'unit_type')}
-                searchable
-                data={[
-                  { value: 'Command and Control', label: 'Command and Control' },
-                  { value: 'Infantry', label: 'Infantry' },
-                  { value: 'Reconnaissance', label: 'Reconnaissance' },
-                  { value: 'Armored Mechanized', label: 'Armored Mechanized' },
-                  { value: 'Combined Arms', label: 'Combined Arms' },
-                  { value: 'Armored Mechanized Tracked', label: 'Armored Mechanized Tracked' },
-                  { value: 'Field Artillery', label: 'Field Artillery' },
-                  { value: 'Self-propelled', label: 'Self-propelled' },
-                  { value: 'Electronic Warfare', label: 'Electronic Warfare' },
-                  { value: 'Signal', label: 'Signal' },
-                  { value: 'Special Operations Forces', label: 'Special Operations Forces' },
-                  { value: 'Ammunition', label: 'Ammunition' },
-                  { value: 'Air Defense', label: 'Air Defense' },
-                  { value: 'Engineer', label: 'Engineer' },
-                  { value: 'Air Assault', label: 'Air Assault' },
-                  { value: 'Medical Treatment Facility', label: 'Medical Treatment Facility' },
-                  { value: 'Aviation Rotary Wing', label: 'Aviation Rotary Wing' },
-                  { value: 'Combat Support', label: 'Combat Support' },
-                  { value: 'Sustainment', label: 'Sustainment' },
-                  { value: 'Unmanned Aerial Systems', label: 'Unmanned Aerial Systems' },
-                  { value: 'Combat Service Support', label: 'Combat Service Support' },
-                  { value: 'Petroleum, Oil and Lubricants', label: 'Petroleum, Oil and Lubricants' },
-                  { value: 'Sea Port', label: 'Sea Port' },
-                  { value: 'Railhead', label: 'Railhead' }
-                ]}
-              />
-
-              <TextInput
-                label="Unit Health"
-                placeholder="Enter unit health"
-                required
-                name='unit_health'
-                mt="md"
-                type='number'
-                value={formValues.unit_health}
-                onChange={handleChange}
-              />
-
-              <Select
-                label="Unit Role"
-                placeholder="Enter unit role"
-                required
-                name='unit_role'
-                mt="md"
-                value={formValues.unit_role}
-                onChange={(value) => handleSelectChange(value, 'unit_role')}
-                searchable
-                data={[
-                  { value: 'Combat', label: 'Combat' },
-                  { value: 'Headquarters', label: 'Headquarters' },
-                  { value: 'Support', label: 'Support' },
-                  { value: 'Supply Materials', label: 'Supply Materials' },
-                  { value: 'Facility', label: 'Facility' }
-                ]}
-              />
-
-              <Select
-                label="Unit Size"
-                placeholder="Enter unit size"
-                required
-                name='unit_size'
-                mt="md"
-                value={formValues.unit_size}
-                onChange={(value) => handleSelectChange(value, 'unit_size')}
-                searchable
-                data={[
-                  { value: 'Squad/Team', label: 'Squad/Team' },
-                  { value: 'Platoon', label: 'Platoon' },
-                  { value: 'Company/Battery', label: 'Company/Battery' },
-                  { value: 'Battalion', label: 'Battalion' },
-                  { value: 'Brigade/Regiment', label: 'Brigade/Regiment' },
-                  { value: 'Division', label: 'Division' },
-                  { value: 'Corps', label: 'Corps' },
-                  { value: 'UAS (1)', label: 'UAS (1)' },
-                  { value: 'Aviation Section (2)', label: 'Aviation Section (2)' },
-                  { value: 'Aviation Flight (4)', label: 'Aviation Flight (4)' }
-                ]}
-              />
-
-              <Select
-                label="Force Posture"
-                placeholder="Enter force posture"
-                required
-                name='unit_posture'
-                mt="md"
-                value={formValues.unit_posture}
-                onChange={(value) => handleSelectChange(value, 'unit_posture')}
-                data={[
-                  { value: 'Offensive Only', label: 'Offensive Only' },
-                  { value: 'Defensive Only', label: 'Defensive Only' },
-                  { value: 'Offense and Defense', label: 'Offense and Defense' }
-                ]}
-              />
-
-              <Select
-                label="Force Mobility"
-                placeholder="Enter force mobility"
-                required
-                name='unit_mobility'
-                mt="md"
-                value={formValues.unit_mobility}
-                onChange={(value) => handleSelectChange(value, 'unit_mobility')}
-                data={[
-                  { value: 'Fixed', label: 'Fixed' },
-                  { value: 'Mobile (foot)', label: 'Mobile (foot)' },
-                  { value: 'Mobile (wheeled)', label: 'Mobile (wheeled)' },
-                  { value: 'Mobile (track)', label: 'Mobile (track)' },
-                  { value: 'Stationary', label: 'Stationary' },
-                  { value: 'Flight (fixed wing)', label: 'Flight (fixed wing)' },
-                  { value: 'Flight (rotary wing)', label: 'Flight (rotary wing)' }
-                ]}
-              />
-
-              <Select
-                label="Force Readiness"
-                placeholder="Enter force readiness"
-                required
-                name='unit_readiness'
-                mt="md"
-                value={formValues.unit_readiness}
-                onChange={(value) => handleSelectChange(value, 'unit_readiness')}
-                data={[
-                  { value: 'Low', label: 'Low' },
-                  { value: 'Medium', label: 'Medium' },
-                  { value: 'High', label: 'High' },
-                ]}
-              />
-
-              <Select
-                label="Force Skill"
-                placeholder="Enter force skill"
-                required
-                name='unit_skill'
-                mt="md"
-                value={formValues.unit_skill}
-                onChange={(value) => handleSelectChange(value, 'unit_skill')}
-                data={[
-                  { value: 'Untrained', label: 'Untrained' },
-                  { value: 'Basic', label: 'Basic' },
-                  { value: 'Advanced', label: 'Advanced' },
-                  { value: 'Elite', label: 'Elite' }
-                ]}
-              />
-
-            </Tabs.Panel>
-
-            <Tabs.Panel value="tactics">
-              <p>Aware of OPFOR presence?</p>
-              <SegmentedControl
-                size='md'
-                radius='xs'
-                color="gray"
-                data={['Yes', 'No']}
-                value={segmentValues.awareness === 1 ? 'Yes' : 'No'} // Bind value
-                onChange={(value) => handleSegmentChange(value, 'awareness')}
-              />
-              <p>Within logistics support range?</p>
-              <SegmentedControl
-                size='md'
-                radius='xs'
-                color="gray"
-                data={['Yes', 'No']}
-                value={segmentValues.logistics === 1 ? 'Yes' : 'No'} // Bind value
-                onChange={(value) => handleSegmentChange(value, 'logistics')}
-              />
-              <p>Under ISR coverage?</p>
-              <SegmentedControl
-                size='md'
-                radius='xs'
-                color="gray"
-                data={['Yes', 'No']}
-                value={segmentValues.coverage === 1 ? 'Yes' : 'No'} // Bind value
-                onChange={(value) => handleSegmentChange(value, 'coverage')}
-              />
-              <p>Working GPS?</p>
-              <SegmentedControl
-                size='md'
-                radius='xs'
-                color="gray"
-                data={['Yes', 'No']}
-                value={segmentValues.gps === 1 ? 'Yes' : 'No'} // Bind value
-                onChange={(value) => handleSegmentChange(value, 'gps')}
-              />
-              <p>Working communications?</p>
-              <SegmentedControl
-                size='md'
-                radius='xs'
-                color="gray"
-                data={['Yes', 'No']}
-                value={segmentValues.comms === 1 ? 'Yes' : 'No'} // Bind value
-                onChange={(value) => handleSegmentChange(value, 'comms')}
-              />
-              <p>Within fire support range?</p>
-              <SegmentedControl
-                size='md'
-                radius='xs'
-                color="gray"
-                data={['Yes', 'No']}
-                value={segmentValues.fire === 1 ? 'Yes' : 'No'} // Bind value
-                onChange={(value) => handleSegmentChange(value, 'fire')}
-              />
-              <p>Accessible by pattern force?</p>
-              <SegmentedControl
-                size='md'
-                radius='xs'
-                color="gray"
-                data={['Yes', 'No']}
-                value={segmentValues.pattern === 1 ? 'Yes' : 'No'} // Bind value
-                onChange={(value) => handleSegmentChange(value, 'pattern')}
-              />
-            </Tabs.Panel>
-          </Tabs>
-          <Group grow>
-            <Button type="submit" mt="md" disabled={!areRequiredFieldsFilled()}>Submit</Button>
-
-          </Group>
-        </form>
-
-      </Modal> */}
+      <NodeEditModal isOpen={opened} onClose={close} nodeID={Number(selectedNode)} is_friendly={is_friendly} userSection={userSection} is_root={isRoot}/>
     </div>
   );
 }

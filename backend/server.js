@@ -345,7 +345,7 @@ app.get('/api/unitTactics/:id', async (req, res) => {
   try {
     // Query to fetch unit tactic by ID
     const query = `
-      SELECT * FROM unit_tactics WHERE "ID" = $1;
+      SELECT * FROM section_tactics WHERE "unit_id" = $1;
     `;
     const values = [id];
 
@@ -472,29 +472,6 @@ app.put('/api/units/remove', async (req, res) => {
 });
 
 
-
-// Endpoint to update the health of a unit
-// app.put('/api/units', async (req, res) => {
-//   const { id, health } = req.body; // Get id from request body
-
-//   try {
-//     const result = await pool.query('UPDATE units SET unit_health = $1 WHERE id = $2 RETURNING *', [
-//       health,
-//       id,
-//     ]);
-
-//     if (result.rows.length > 0) {
-//       res.json(result.rows[0]); // Respond with updated unit data
-//     } else {
-//       res.status(404).json({ message: 'Unit not found' });
-//     }
-//   } catch (error) {
-//     console.error('Error updating unit health:', error);
-//     res.status(500).json({ message: 'Internal server error' });
-//   }
-// });
-
-
 app.put('/api/units/health', async (req, res) => {
   const { id, newHealth } = req.body; // Ensure request body contains id and newHealth
 
@@ -538,12 +515,13 @@ app.post('/api/newunit', async (req, res) => {
   }
 });
 
-app.get('/api/sectionlessunits', async (req, res) => {
+app.get('/api/presetunits', async (req, res) => {
   try {
-    const result = await pool.query('SELECT id, unit_id FROM units WHERE section IS NULL');
+    const result = await pool.query('SELECT unit_name FROM preset_units');
     res.json(result.rows);
+    console.log(result.rows)
   } catch (error) {
-    console.error('Error fetching units:', error);
+    console.error('Error fetching preset units:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -819,7 +797,6 @@ app.post('/api/newsectionunit/tactics', async (req, res) => {
   console.log("Attempting to store tactics record");
 
   const {
-    unit_name, // Added unit_name for referencing the unit
     awareness,
     logistics,
     coverage,
@@ -991,6 +968,359 @@ app.get('/api/unit/:unitId', async (req, res) => {
     console.error('unitId: ', [unitId]);
     console.error(err.message);
     res.status(500).send('Server Error');
+  }
+});
+
+// Endpoint to store child node relationship in section_tree
+app.post('/api/newchildnode', async (req, res) => {
+  console.log("Attempting to store child node");
+
+  const { child_id, parent_id } = req.body;
+
+  try {
+    // Insert into the `section_tree` table
+    const result = await pool.query(
+      `INSERT INTO section_tree (child_id, parent_id)
+       VALUES ($1, $2) RETURNING *`,
+      [
+        child_id, 
+        parent_id
+      ]
+    );
+
+    // Respond with the inserted row
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error storing child node:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+// POST endpoint to update a unit
+app.post('/api/update_unit', async (req, res) => {
+  const {
+      unit_id,
+      unit_name,
+      unit_health,
+      unit_type,
+      unit_role,
+      unit_size,
+      unit_posture,
+      unit_mobility,
+      unit_readiness,
+      unit_skill,
+      is_friendly,
+      is_root,
+      section_id
+  } = req.body;
+
+  try {
+      // Validate that unit_id is provided
+      if (!unit_id) {
+          return res.status(400).json({ error: 'Unit ID is required.' });
+      }
+
+      // Query to update the unit
+      const query = `
+          UPDATE section_units
+          SET
+              unit_name = $1,
+              unit_health = $2,
+              unit_type = $3,
+              unit_role = $4,
+              unit_size = $5,
+              unit_posture = $6,
+              unit_mobility = $7,
+              unit_readiness = $8,
+              unit_skill = $9,
+              is_friendly = $10,
+              is_root = $11,
+              section_id = $12
+          WHERE unit_id = $13;
+      `;
+      
+      const values = [
+          unit_name,
+          unit_health,
+          unit_type,
+          unit_role,
+          unit_size,
+          unit_posture,
+          unit_mobility,
+          unit_readiness,
+          unit_skill,
+          is_friendly,
+          is_root,
+          section_id,
+          unit_id
+      ];
+
+      const result = await pool.query(query, values);
+
+      // Check if any row was updated
+      if (result.rowCount === 0) {
+          return res.status(404).json({ error: 'Unit not found or no changes made.' });
+      }
+
+      res.status(200).json({ message: 'Unit updated successfully.' });
+  } catch (error) {
+      console.error('Error updating unit:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// POST endpoint to update unit tactics
+app.post('/api/update/tactics', async (req, res) => {
+  const {
+      unit_id,
+      awareness,
+      logistics,
+      coverage,
+      gps,
+      comms,
+      fire,
+      pattern
+  } = req.body;
+
+  try {
+      // Validate that unit_id is provided
+      if (!unit_id) {
+          return res.status(400).json({ error: 'Unit ID is required.' });
+      }
+
+      // Query to update the unit tactics
+      const query = `
+          UPDATE section_tactics
+          SET
+              awareness = $1,
+              logistics = $2,
+              coverage = $3,
+              gps = $4,
+              comms = $5,
+              fire = $6,
+              pattern = $7
+          WHERE unit_id = $8;
+      `;
+
+      const values = [
+          awareness,
+          logistics,
+          coverage,
+          gps,
+          comms,
+          fire,
+          pattern,
+          unit_id
+      ];
+
+      const result = await pool.query(query, values);
+
+      // Check if any row was updated
+      if (result.rowCount === 0) {
+          return res.status(404).json({ error: 'Unit tactics not found or no changes made.' });
+      }
+
+      res.status(200).json({ message: 'Unit tactics updated successfully.' });
+  } catch (error) {
+      console.error('Error updating unit tactics:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+/**
+ * Helper function to find all descendants of a node recursively
+ */
+const findAllDescendants = async (parentId) => {
+  try {
+      const res = await pool.query('SELECT child_id FROM section_tree WHERE parent_id = $1', [parentId]);
+      const children = res.rows.map(row => row.child_id);
+
+      let allDescendants = [];
+      for (let child of children) {
+          allDescendants.push(child);
+          const childDescendants = await findAllDescendants(child); // Recursively find all descendants
+          allDescendants = [...allDescendants, ...childDescendants];
+      }
+
+      return allDescendants;
+  } catch (error) {
+      console.error(`Error finding descendants for node ${parentId}: `, error);
+      throw error;
+  }
+};
+
+/**
+* Endpoint to delete a node and its children
+*/
+app.delete('/api/deleteNode/:nodeId', async (req, res) => {
+  const nodeId = parseInt(req.params.nodeId);
+
+  try {
+      // Step 1: Find all descendants of the node
+      const descendantIds = await findAllDescendants(nodeId);
+
+      // Step 2: Gather all node IDs to delete (including the original node)
+      const nodesToDelete = [nodeId, ...descendantIds];
+
+      // Step 3: Delete from section_units
+      await pool.query('DELETE FROM section_units WHERE unit_id = ANY($1)', [nodesToDelete]);
+
+      // Step 4: Delete from section_tactics
+      await pool.query('DELETE FROM section_tactics WHERE unit_id = ANY($1)', [nodesToDelete]);
+
+      // Step 5: Delete from section_tree (child-parent relationships)
+      await pool.query('DELETE FROM section_tree WHERE child_id = ANY($1) OR parent_id = ANY($1)', [nodesToDelete]);
+
+      res.status(200).json({ message: `Node ${nodeId} and its descendants were deleted successfully.` });
+  } catch (error) {
+      console.error('Error deleting node and its children:', error);
+      res.status(500).json({ error: 'Failed to delete node and its descendants.' });
+  }
+});
+
+
+// Endpoint to delete a unit by its name
+app.delete('/api/units/:id', async (req, res) => {
+  const { unit_name } = req.params;
+  console.log('Deleting unit with name:', unit_name);
+  
+  try {
+    // Step 1: Delete from unit_tactics table
+    const deleteTacticsQuery = 'DELETE FROM preset_tactics WHERE "unit_name" = $1';
+    await pool.query(deleteTacticsQuery, [unit_name]);
+    
+    // Step 2: Delete from units table
+    const deleteUnitsQuery = 'DELETE FROM preset_units WHERE "unit_name" = $1';
+    const deleteResult = await pool.query(deleteUnitsQuery, [unit_name]);
+
+    if (deleteResult.rowCount > 0) {
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ error: 'Unit not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting unit:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+/**
+ * Endpoint to copy a section and its associated data (units, tactics, tree)
+ */
+app.post('/api/copySection', async (req, res) => {
+  const { oldSectionId, newSectionId } = req.body;
+
+  if (!oldSectionId || !newSectionId) {
+      return res.status(400).json({ message: 'Both oldSectionId and newSectionId are required.' });
+  }
+
+  const client = await pool.connect(); // Connect to the database
+  try {
+      // Begin transaction
+      await client.query('BEGIN');
+
+      // Step 1: Copy the section itself
+      const sectionResult = await client.query(
+          'SELECT * FROM sections WHERE sectionid = $1',
+          [oldSectionId]
+      );
+      if (sectionResult.rows.length === 0) {
+          throw new Error(`Section with id ${oldSectionId} does not exist.`);
+      }
+
+      const oldSection = sectionResult.rows[0];
+      await client.query(
+          'INSERT INTO sections (sectionid, isonline) VALUES ($1, $2)',
+          [newSectionId, oldSection.isonline]
+      );
+
+      // Step 2: Copy section_units (nodes) for the old section
+      const unitsResult = await client.query(
+          'SELECT * FROM section_units WHERE section_id = $1',
+          [oldSectionId]
+      );
+
+      const unitIdMap = {}; // Map old unit_id to new unit_id
+
+      for (let unit of unitsResult.rows) {
+          const newUnitResult = await client.query(
+              `INSERT INTO section_units 
+              (unit_name, unit_health, unit_type, unit_role, unit_size, unit_posture, unit_mobility, unit_readiness, unit_skill, is_friendly, is_root, section_id)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+              RETURNING unit_id`,
+              [
+                  unit.unit_name,
+                  unit.unit_health,
+                  unit.unit_type,
+                  unit.unit_role,
+                  unit.unit_size,
+                  unit.unit_posture,
+                  unit.unit_mobility,
+                  unit.unit_readiness,
+                  unit.unit_skill,
+                  unit.is_friendly,
+                  unit.is_root,
+                  newSectionId
+              ]
+          );
+
+          const newUnitId = newUnitResult.rows[0].unit_id;
+          unitIdMap[unit.unit_id] = newUnitId; // Map old unit_id to new unit_id
+
+          // Step 3: Copy section_tactics for each unit
+          const tacticsResult = await client.query(
+              'SELECT * FROM section_tactics WHERE unit_id = $1',
+              [unit.unit_id]
+          );
+
+          if (tacticsResult.rows.length > 0) {
+              const oldTactics = tacticsResult.rows[0];
+              await client.query(
+                  `INSERT INTO section_tactics 
+                  (unit_id, awareness, logistics, coverage, gps, comms, fire, pattern)
+                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+                  [
+                      newUnitId,
+                      oldTactics.awareness,
+                      oldTactics.logistics,
+                      oldTactics.coverage,
+                      oldTactics.gps,
+                      oldTactics.comms,
+                      oldTactics.fire,
+                      oldTactics.pattern
+                  ]
+              );
+          }
+      }
+
+      // Step 4: Copy section_tree relationships
+      const treeResult = await client.query(
+          'SELECT * FROM section_tree WHERE child_id = ANY(SELECT unit_id FROM section_units WHERE section_id = $1)',
+          [oldSectionId]
+      );
+
+      for (let relationship of treeResult.rows) {
+          const newChildId = unitIdMap[relationship.child_id];
+          const newParentId = unitIdMap[relationship.parent_id];
+
+          await client.query(
+              `INSERT INTO section_tree (parent_id, child_id) VALUES ($1, $2)`,
+              [newParentId, newChildId]
+          );
+      }
+
+      // Commit the transaction
+      await client.query('COMMIT');
+      res.status(200).json({ message: `Section ${oldSectionId} copied to ${newSectionId} successfully.` });
+  } catch (error) {
+      // Rollback the transaction in case of error
+      await client.query('ROLLBACK');
+      console.error('Error copying section:', error);
+      res.status(500).json({ message: 'Failed to copy section.', error: error.message });
+  } finally {
+      client.release();
   }
 });
 

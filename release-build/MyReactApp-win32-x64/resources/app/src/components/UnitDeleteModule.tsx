@@ -9,7 +9,7 @@ interface UnitDeleteProps {
 }
 
 interface Unit {
-  id: number;
+  //id: number;
   unit_id: string;
 }
 
@@ -21,10 +21,10 @@ export default function UnitDeleteModule({ isOpen, onClose }: UnitDeleteProps) {
 
   const form = useForm({
     initialValues: {
-      id: '',
+      unit_name: '',
     },
     validate: {
-      id: (value) => (value ? null : 'Unit selection is required'),
+      unit_name: (value) => (value ? null : 'Unit selection is required'),
     },
   });
 
@@ -34,7 +34,9 @@ export default function UnitDeleteModule({ isOpen, onClose }: UnitDeleteProps) {
       const fetchUnits = async () => {
         try {
           setIsLoading(true);
-          const response = await axios.get<Unit[]>('http://localhost:5000/api/sectionlessunits');
+          console.log("GYLGUILGUILGUIGUI:")
+          const response = await axios.get<Unit[]>('http://localhost:5000/api/presetunits');
+          console.log("sdvjk;: ", response)
           setUnits(response.data);
           setIsLoading(false);
         } catch (error) {
@@ -46,9 +48,9 @@ export default function UnitDeleteModule({ isOpen, onClose }: UnitDeleteProps) {
     }
   }, [isOpen]);
 
-  const handleSubmit = async (values: { id: string })=> {
+  const handleSubmit = async (values: { unit_name: string })=> {
 
-    console.log('Trying to delete ' + values.id)
+    console.log('Trying to delete ' + values.unit_name)
 
     try {
       setIsLoading(true);
@@ -56,7 +58,7 @@ export default function UnitDeleteModule({ isOpen, onClose }: UnitDeleteProps) {
       setSubmitSuccess(false);
 
       // Send delete request to the server
-      await axios.delete(`http://localhost:5000/api/units/${values.id}`);
+      await axios.delete(`http://localhost:5000/api/units/${values.unit_name}`);
 
       setSubmitSuccess(true);
       setIsLoading(false);
@@ -78,10 +80,16 @@ export default function UnitDeleteModule({ isOpen, onClose }: UnitDeleteProps) {
           placeholder="Select unit to delete"
           error={form.errors.id}
           searchable
-          data={units.map(unit => ({ value: unit.id.toString(), label: unit.unit_id }))}
+          data={units.map(unit => ({ value: unit.unit_id, label: unit.unit_id }))}
           {...form.getInputProps('id')}
         />
         {form.errors.id && <Text color="red">{form.errors.id}</Text>}
+
+        {/* data={units.map(unit => ({
+  value: unit.unit_id || '', // Use a fallback if unit_id is undefined
+  label: unit.unit_id || 'Unknown', // Use a fallback for the label as well
+}))}
+ */}
 
         {isLoading ? (
           <Loader size={24} />
